@@ -29,7 +29,7 @@ class SpaceRepetitionBasePlotClass:
     self.figure         = None
     self.data_args      = 0
 
-    if "epoch" in kwargs):
+    if("epoch" in kwargs):
       epoch = kwargs["epoch"]
     else:
       epoch = None
@@ -89,13 +89,13 @@ class SpaceRepetitionBasePlotClass:
       self.forth_graph_color = None
 
   def get_time_series_function(self):
-    def ftime_series(x,y):
-      new_data    = [[],[]]
+    def ftime_series(x, y):
+      new_data    = [[], []]
       time_series = []
-      time_series = np.asarray([ self.days_to_time(self.ppd.epoch, days) for days in x ])
+      time_series = np.asarray([self.days_to_time(self.ppd.epoch,  days) for days in x])
       new_data[0] = time_series[:]
       new_data[1] = y[:]
-      return [ new_data[0][:], new_data[1][:] ]
+      return [new_data[0][:], new_data[1][:]]
     return ftime_series
 
   def days_from_epoch(self, time):
@@ -104,7 +104,7 @@ class SpaceRepetitionBasePlotClass:
       time_since_start  = time
       time_since_start -= self.epoch
       time_in_seconds   = time_since_start.total_seconds()
-      c_time            = float(time_in_seconds/86400.0)
+      c_time            = float(time_in_seconds / 86400.0)
     else:
       raise TypeError("only datetime objects supported")
 
@@ -116,31 +116,30 @@ class SpaceRepetitionBasePlotClass:
       raise TypeError("datetime objects not supported")
     else:
       time              = epoch
-      time             += timedelta(seconds=(days*86400))
+      time             += timedelta(seconds=(days * 86400))
     return time
 
   def show(self):
     plt.show(block=True)
 
 class SpaceRepetitionPlot(SpaceRepetitionBasePlotClass):
-  def __init__(self,*data,**kwargs):
+  def __init__(self, *data, **kwargs):
     if 'epoch' in kwargs:
-      from_epoch      = SpaceRepetitionPlotDaysFromEpoch(*data,**kwargs)
+      from_epoch      = SpaceRepetitionPlotDaysFromEpoch(*data, **kwargs)
       self.ppd       = from_epoch.ppd
       self.ppd.epoch = kwargs['epoch']
     else:
-      from_zero      = SpaceRepetitionPlotDaysFromZero(*data,**kwargs)
+      from_zero      = SpaceRepetitionPlotDaysFromZero(*data, **kwargs)
       self.ppd       = from_zero.ppd
       self.ppd.epoch = None
 
 class SpaceRepetitionPlotDaysFromEpoch(SpaceRepetitionBasePlotClass):
-  def __init__(self,*data,**kwargs):
-    SpaceRepetitionBasePlotClass.__init__(self,*data,**kwargs)
+  def __init__(self, *data, **kwargs):
+    SpaceRepetitionBasePlotClass.__init__(self, *data, **kwargs)
 
     i              = self.ppd.graph_location
     f              = self.ppd.figure
     axarr          = self.ppd.axarr
-    graph_location = self.ppd.graph_location
     x_range        = kwargs['x_range']
     y_domain       = kwargs['y_domain']
 
@@ -156,51 +155,55 @@ class SpaceRepetitionPlotDaysFromEpoch(SpaceRepetitionBasePlotClass):
     ftime_series = self.get_time_series_function()
 
     if len(data) > self.data_args:
-      new_data = ftime_series(data[0],data[1])
-      if self.first_graph_color == None:
+      new_data = ftime_series(data[0], data[1])
+      if self.first_graph_color is None:
         plot.plot(*new_data[0:2])
       else:
         plot.plot(*new_data[0:2], color=self.first_graph_color)
 
-      new_data = ftime_series(data[2],data[3])
-      if self.second_graph_color == None:
+      new_data = ftime_series(data[2], data[3])
+      if self.second_graph_color is None:
         if len(data) > 2:
           plot.plot(*new_data[0:2])
       else:
-        plot.plot(*new_data[0:2], color=self.second_graph_color )
+        plot.plot(*new_data[0:2], color=self.second_graph_color)
 
-      new_data = ftime_series(data[4],data[5])
-      if self.third_graph_color == None:
+      new_data = ftime_series(data[4], data[5])
+      if self.third_graph_color is None:
         if len(data) > 4:
           plot.plot(*new_data[0:2])
       else:
-        plot.plot(*new_data[0:2], color=self.third_graph_color )
+        plot.plot(*new_data[0:2], color=self.third_graph_color)
 
-      for x in range(self.data_args,len(data)):
+      for x in range(self.data_args, len(data)):
         if x % 2 == 0:
-          new_data = ftime_series(data[x],data[x+1])
+          new_data = ftime_series(data[x], data[x + 1])
           plot.plot(*new_data, color='xkcd:cement', linestyle="-.")
-      if self.scheduled != None:
+      if self.scheduled is not None:
         vb = self.scheduled['vertical_bars']
         colour = self.scheduled['colour']
-        for x in range(0,len(vb)):
+        for x in range(0, len(vb)):
           if x % 2 == 0:
-            new_data = ftime_series(vb[x],vb[x+1])
+            new_data = ftime_series(vb[x], vb[x + 1])
             plot.plot(*new_data, color=colour, linestyle="-.")
             #bars = vb[x:x+2]
             #plot.plot(*bars, color=colour, linestyle="-.")
 
       plot.axes.set_ylabel(self.y_label)
       plot.axes.set_xlabel(self.x_label)
+      for tick in plot.xaxis.get_ticklabels():
+        tick.set_rotation(25)
+        tick.set_rotation_mode('anchor')
+        tick.set_va('top')
+        tick.set_ha('right')
 
 class SpaceRepetitionPlotDaysFromZero(SpaceRepetitionBasePlotClass):
-  def __init__(self,*data,**kwargs):
-    SpaceRepetitionBasePlotClass.__init__(self,*data,**kwargs)
+  def __init__(self, *data, **kwargs):
+    SpaceRepetitionBasePlotClass.__init__(self, *data, **kwargs)
 
     i              = self.ppd.graph_location
     f              = self.ppd.figure
     axarr          = self.ppd.axarr
-    graph_location = self.ppd.graph_location
     x_range        = kwargs['x_range']
     y_domain       = kwargs['y_domain']
 
@@ -208,38 +211,38 @@ class SpaceRepetitionPlotDaysFromZero(SpaceRepetitionBasePlotClass):
     plot        = axarr[i]
 
     if len(data) > self.data_args:
-      if self.first_graph_color == None:
+      if self.first_graph_color is None:
         plot.plot(*data[0:2])
       else:
         plot.plot(*data[0:2], color=self.first_graph_color )
 
-      if self.second_graph_color == None:
+      if self.second_graph_color is None:
         if len(data) > 2:
           plot.plot(*data[2:4])
       else:
-        plot.plot(*data[2:4], color=self.second_graph_color )
+        plot.plot(*data[2:4], color=self.second_graph_color)
 
-      if self.third_graph_color == None:
+      if self.third_graph_color is None:
         if len(data) > 4:
           plot.plot(*data[4:6])
       else:
-        plot.plot(*data[4:6], color=self.third_graph_color )
+        plot.plot(*data[4:6], color=self.third_graph_color)
 
       #plot.plot(data[0],data[1],data[2],data[3])
       #plot.plot(*data[2:4])
       axes = f.gca()
       axes.set_xlim(0, x_range)
       axes.set_ylim(0, y_domain)
-      for x in range(self.data_args,len(data)):
+      for x in range(self.data_args, len(data)):
         if x % 2 == 0:
-          bars = data[x:x+2]
+          bars = data[x:x + 2]
           plot.plot(*bars, color='xkcd:cement', linestyle="-.")
-      if self.scheduled != None:
+      if self.scheduled is not None:
         vb = self.scheduled['vertical_bars']
         colour = self.scheduled['colour']
-        for x in range(0,len(vb)):
+        for x in range(0, len(vb)):
           if x % 2 == 0:
-            bars = vb[x:x+2]
+            bars = vb[x:x + 2]
             plot.plot(*bars, color=colour, linestyle="-.")
 
       plot.axes.set_ylabel(self.y_label)
@@ -247,20 +250,20 @@ class SpaceRepetitionPlotDaysFromZero(SpaceRepetitionBasePlotClass):
 
 class ErrorPlot(SpaceRepetitionBasePlotClass):
 
-  def __init__(self,*data,**kwargs):
+  def __init__(self, *data, **kwargs):
     if 'epoch' in kwargs:
-      from_epoch     = ErrorPlotFromEpoch(*data,**kwargs)
+      from_epoch     = ErrorPlotFromEpoch(*data, **kwargs)
       self.ppd       = from_epoch.ppd
       self.ppd.epoch = kwargs['epoch']
     else:
-      from_zero      = ErrorPlotFromZero(*data,**kwargs)
+      from_zero      = ErrorPlotFromZero(*data, **kwargs)
       self.ppd       = from_zero.ppd
       self.ppd.epoch = None
 
 class ErrorPlotFromZero(SpaceRepetitionBasePlotClass):
 
-  def __init__(self,*data,**kwargs):
-    SpaceRepetitionBasePlotClass.__init__(self,*data,**kwargs)
+  def __init__(self, *data, **kwargs):
+    SpaceRepetitionBasePlotClass.__init__(self, *data, **kwargs)
     axarr          = self.ppd.axarr
     i              = self.ppd.graph_location
     f              = self.ppd.figure
@@ -269,7 +272,6 @@ class ErrorPlotFromZero(SpaceRepetitionBasePlotClass):
     plot        = axarr[i]
 
     x_range  = kwargs['x_range']
-    y_domain = kwargs['y_domain']
 
     if 'title' in kwargs:
       plot.title(kwargs['title'])
@@ -284,18 +286,13 @@ class ErrorPlotFromZero(SpaceRepetitionBasePlotClass):
     else:
       y_label = ''
 
-    if 'epoch' in kwargs:
-      epoch = kwargs['epoch']
-    else:
-      epoch = None
-
     if len(data) >= 3:
       plot.plot(*data[0:2])
       axes = f.gca()
       axes.set_xlim(0, x_range)
       axes.set_ylim(-0.4, 0.4)
-      plot.plot([0,x_range],[0,0], color='xkcd:cement')
-      for x in range(2,len(data)):
+      plot.plot([0, x_range], [0, 0], color='xkcd:cement')
+      for x in range(2, len(data)):
         bars = data[x]
         plot.plot(*bars, color='xkcd:cement', linestyle="-.")
 
@@ -304,8 +301,8 @@ class ErrorPlotFromZero(SpaceRepetitionBasePlotClass):
 
 class ErrorPlotFromEpoch(SpaceRepetitionBasePlotClass):
 
-  def __init__(self,*data,**kwargs):
-    SpaceRepetitionBasePlotClass.__init__(self,*data,**kwargs)
+  def __init__(self, *data, **kwargs):
+    SpaceRepetitionBasePlotClass.__init__(self, *data, **kwargs)
     axarr = self.ppd.axarr
     i     = self.ppd.graph_location
     f     = self.ppd.figure
@@ -315,7 +312,6 @@ class ErrorPlotFromEpoch(SpaceRepetitionBasePlotClass):
     axes        = f.gca()
 
     x_range  = kwargs['x_range']
-    y_domain = kwargs['y_domain']
 
     date_min = self.ppd.epoch
     date_max = self.days_to_time(self.ppd.epoch, x_range)
@@ -335,13 +331,13 @@ class ErrorPlotFromEpoch(SpaceRepetitionBasePlotClass):
     else:
       y_label = ''
     if len(data) >= 3:
-      new_data = ftime_series(data[0],data[1])
+      new_data = ftime_series(data[0], data[1])
       plot.plot(*new_data[0:2])
 
-      new_data = ftime_series([0,x_range],[0,0])
+      new_data = ftime_series([0, x_range], [0, 0])
       plot.plot(*new_data, color='xkcd:cement')
-      for x in range(2,len(data)):
-        new_data = ftime_series(data[x][0],data[x][1])
+      for x in range(2, len(data)):
+        new_data = ftime_series(data[x][0], data[x][1])
         plot.plot(*new_data, color='xkcd:cement', linestyle="-.")
 
     plot.axes.set_ylabel(y_label)
