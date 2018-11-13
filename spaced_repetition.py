@@ -4,18 +4,17 @@ import matplotlib.animation as animation
 from datetime import datetime
 from datetime import timedelta
 import numpy as np
-from workers.pid import *
-from workers.graph import *
+from pid import *
+from graph import *
 from functools import reduce
 from scipy.optimize import fsolve
 from scipy.optimize import curve_fit
 import os
 import json
 import pprint
-from workers.animate import *
+from animate import *
 import matplotlib
 matplotlib.use("Agg")
-
 
 ppp = pprint.PrettyPrinter(indent=2)
 def pp(thing):

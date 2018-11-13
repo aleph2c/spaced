@@ -12,10 +12,11 @@ setuptools.setup(
     'pytest',
     'pyreadline',
     'numpy',
+    'scipy',
     'matplotlib',
   ],
   entry_points='''
     [console_scripts]
-    spaced=cli:cli
-  '''
+    l=cli:cli
+  ''',
 )
