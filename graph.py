@@ -6,30 +6,30 @@ from datetime import timedelta
 
 class PlotPaneData(object):
 
-  def __init__(self,*args,**kwargs):
+  def __init__(self, *args, **kwargs):
     self.graph_location = -1
     self.figure         = None
     self.axarr          = None
     self.epoch          = None
 
-    if( "graph_location" in kwargs ):
+    if("graph_location" in kwargs):
       self.graph_location = kwargs["graph_location"]
 
-    if( "figure" in kwargs ):
+    if("figure" in kwargs):
       self.figure = kwargs["figure"]
 
-    if( "axarr" in kwargs ):
+    if("axarr" in kwargs):
       self.axarr = kwargs["axarr"]
 
-    if( "epoch" in kwargs ):
+    if("epoch" in kwargs):
       self.epoch = kwargs["epoch"]
 
 class SpaceRepetitionBasePlotClass:
-  def __init__(self,*data,**kwargs):
+  def __init__(self, *data, **kwargs):
     self.figure         = None
     self.data_args      = 0
 
-    if( "epoch" in kwargs ):
+    if "epoch" in kwargs):
       epoch = kwargs["epoch"]
     else:
       epoch = None
@@ -37,12 +37,11 @@ class SpaceRepetitionBasePlotClass:
     if 'plot_pane_data' in kwargs and kwargs['plot_pane_data'] is not None:
       self.ppd = kwargs['plot_pane_data']
     else:
-      figure,axarr = plt.subplots(kwargs['panes'],1,sharex=True,figsize=(11,8.5),facecolor='#07000d')
-      self.ppd = PlotPaneData(
-                     graph_location=-1,
-                     figure=figure,
-                     axarr=axarr,
-                     epoch=epoch)
+      figure, axarr = plt.subplots(kwargs['panes'], 1, sharex=True, figsize=(11, 8.5), facecolor='#07000d')
+      self.ppd = PlotPaneData(graph_location=-1,
+       figure=figure,
+       axarr=axarr,
+       epoch=epoch)
 
     self.ppd.graph_location += 1
 
@@ -307,9 +306,9 @@ class ErrorPlotFromEpoch(SpaceRepetitionBasePlotClass):
 
   def __init__(self,*data,**kwargs):
     SpaceRepetitionBasePlotClass.__init__(self,*data,**kwargs)
-    axarr          = self.ppd.axarr
-    i              = self.ppd.graph_location
-    f              = self.ppd.figure
+    axarr = self.ppd.axarr
+    i     = self.ppd.graph_location
+    f     = self.ppd.figure
 
     f.fmt_xdata = mdates.DateFormatter('%y-%m-%d')
     plot        = axarr[i]
