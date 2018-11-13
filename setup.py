@@ -17,6 +17,6 @@ setuptools.setup(
   ],
   entry_points='''
     [console_scripts]
-    l=cli:cli
+    space=cli:cli
   ''',
 )

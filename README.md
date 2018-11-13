@@ -11,4 +11,4 @@ A control system for spaced memory repetition
 
 # run tests
 
-    spaced test
+    space test
