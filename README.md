@@ -12,3 +12,7 @@ A control system for spaced memory repetition
 # run tests
 
     space test
+
+# example
+
+![example animition](animate.mp4)
