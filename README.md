@@ -15,4 +15,4 @@ A control system for spaced memory repetition
 
 # example
 
-![example animation](animate.mp4)
+![example animation](animate.gif)
