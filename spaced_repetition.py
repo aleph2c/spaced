@@ -881,7 +881,7 @@ class LearningTracker(object):
     self.feedback_y.append(event_y)
     self.frame = np.arange(1, len(self.feedback_x))
 
-  def animate(self):
+  def animate(self, name_of_mp4=None, artist=None):
     self.data_file     = "animate.json"
     self.base          = {}
     self.base["frame"] = {}
@@ -894,6 +894,16 @@ class LearningTracker(object):
 
     #self.base["frame"]["0"] = dict(data_dict)
     #data_dict.clear()
+    if name_of_mp4 is None:
+      self.name_of_mp4 = "animate.mp4"
+    else:
+      self.name_of_mp4 = name_of_mp4
+
+    if artist is None:
+      self.artist = "example"
+    else:
+      self.artist = artist
+
     for item in range(0, len(self.feedback_x)):
       hr = SpaceRepetitionReference(
             plot=False,
@@ -920,7 +930,7 @@ class LearningTracker(object):
 
     lt  = LearningTrackerAnimation('animate.json')
     Writer = animation.writers['ffmpeg']
-    writer = Writer(fps=1, metadata=dict(artist='Scott Volk'), bitrate=1800)
+    writer = Writer(fps=1, metadata=dict(artist=self.artist), bitrate=1800)
     ani = animation.FuncAnimation(lt.fig, lt.animate, np.arange(0, lt.frames), interval=1000, repeat=True)
     ani.save('animate.mp4', writer=writer)
     os.system('animate.mp4')
