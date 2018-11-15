@@ -37,11 +37,12 @@ class SpaceRepetitionBasePlotClass:
     if 'plot_pane_data' in kwargs and kwargs['plot_pane_data'] is not None:
       self.ppd = kwargs['plot_pane_data']
     else:
-      figure, axarr = plt.subplots(kwargs['panes'], 1, sharex=True, figsize=(11, 8.5), facecolor='#07000d')
+      #figure, axarr = plt.subplots(kwargs['panes'], 1, sharex=True, figsize=(11, 8.5), facecolor='#07000d')
+      figure, axarr = plt.subplots(kwargs['panes'], 1, sharex=True, figsize=(11, 8.5), facecolor='white')
       self.ppd = PlotPaneData(graph_location=-1,
-       figure=figure,
-       axarr=axarr,
-       epoch=epoch)
+        figure=figure,
+        axarr=axarr,
+        epoch=epoch)
 
     self.ppd.graph_location += 1
 
