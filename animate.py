@@ -20,6 +20,7 @@ class LearningTrackerAnimation():
     self.axarr[3].set_xlim(0, self.data['range'])
     self.axarr[3].set_ylim(0, 1.1)
     plt.setp([a.get_xticklabels() for a in self.fig.axes[:-1]], visible=False)
+    self.json_file = json_file
 
     self.frames = self.data['frames']
 
@@ -28,7 +29,7 @@ class LearningTrackerAnimation():
     axarr = self.axarr
     data  = self.data
 
-    json_data = open('animate.json', 'r').read()
+    json_data = open(self.json_file, 'r').read()
     data = json.loads(json_data)
     for pane in range(0, len(axarr)):
       axarr[pane].clear()

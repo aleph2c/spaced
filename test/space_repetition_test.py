@@ -246,8 +246,8 @@ def test_series():
 
 def test_learning_tracker():
   lt  = LearningTracker()
-  x,y = get_feedback1()
-  for x_,y_ in zip(x,y):
-    lt.add_event(x_,y_)
-  lt.animate()
+  x, y = get_feedback1()
+  for x_, y_ in zip(x, y):
+    lt.add_event(x_, y_)
+  lt.animate(name_of_mp4="example.mp4", artist="7 learning events")
 

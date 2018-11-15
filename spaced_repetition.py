@@ -474,11 +474,7 @@ class SpaceRepetitionFeedback(SpaceRepetition):
         weights[-2] = 0.1
         weights[-1] = 0.1
 
-    try:
-      rparams, rcov = self.fitting_parameters(self.recollection_curve_profile, rx, ry, weights)
-    except:
-      raise
-      #rparams, rcov = self.fitting_parameters(self.recollection_line_profile, rx, ry, weights)
+    rparams, rcov = self.fitting_parameters(self.recollection_curve_profile, rx, ry, weights)
 
     def fn(x):
       return self.recollection_curve_profile(x, *rparams)
@@ -836,6 +832,7 @@ class SpaceRepetitionController(SpaceRepetition):
     data_dict, h = self.plot_error(epoch=self.epoch, plot_pane_data=hdl.ppd)
     db.append_to_base(base, data_dict)
 
+    #data_dict, h = self.plot_control(epoch=self.epoch, plot_pane_data=hdl.ppd)
     data_dict, h = self.plot_control(epoch=self.epoch, plot_pane_data=hdl.ppd)
     db.append_to_base(base, data_dict)
 
@@ -885,7 +882,6 @@ class LearningTracker(object):
     self.frame = np.arange(1, len(self.feedback_x))
 
   def animate(self, name_of_mp4=None, artist=None):
-    self.data_file     = "animate.json"
     self.base          = {}
     self.base["frame"] = {}
     range_    = self.feedback_x[-1] + self.feedback_x[-1] * 0.5
@@ -901,6 +897,9 @@ class LearningTracker(object):
       self.name_of_mp4 = "animate.mp4"
     else:
       self.name_of_mp4 = name_of_mp4
+
+    #basename = os.path.basename(self.data_file)
+    #self.data_file = os.path.splitext(basename)[0] + ".json"
 
     if artist is None:
       self.artist = "example"
@@ -931,11 +930,9 @@ class LearningTracker(object):
     with open(self.data_file, 'w') as outfile:
       json.dump(self.base, outfile, ensure_ascii=False, sort_keys=True, indent=2)
 
-    lt = LearningTrackerAnimation('animate.json')
+    lt = LearningTrackerAnimation(json_file=self.data_file)
     Writer = animation.writers['ffmpeg']
     writer = Writer(fps=1, metadata=dict(artist=self.artist), bitrate=1800)
     ani = animation.FuncAnimation(lt.fig, lt.animate, np.arange(0, lt.frames), interval=1000, repeat=True)
-    ani.save('animate.mp4', writer=writer)
-    os.system('animate.mp4')
-    #plt.show()
+    ani.save(self.name_of_mp4, writer=writer)
 
