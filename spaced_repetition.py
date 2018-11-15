@@ -2,6 +2,7 @@
 import os
 import json
 import pprint
+import warnings
 import matplotlib
 import numpy as np
 from pid import PID
@@ -456,7 +457,9 @@ class SpaceRepetitionFeedback(SpaceRepetition):
     self.rfn = self.longterm_potentiation_curve()
 
   def fitting_parameters(self, fn, xdata, ydata, weights):
-    popt, pcov = curve_fit(fn, xdata, ydata, sigma=weights, method='dogbox')
+    with warnings.catch_warnings():
+      warnings.simplefilter("ignore")
+      popt, pcov = curve_fit(fn, xdata, ydata, sigma=weights, method='dogbox')
     return [popt, pcov]
 
   def longterm_potentiation_curve(self):
@@ -928,7 +931,7 @@ class LearningTracker(object):
     with open(self.data_file, 'w') as outfile:
       json.dump(self.base, outfile, ensure_ascii=False, sort_keys=True, indent=2)
 
-    lt  = LearningTrackerAnimation('animate.json')
+    lt = LearningTrackerAnimation('animate.json')
     Writer = animation.writers['ffmpeg']
     writer = Writer(fps=1, metadata=dict(artist=self.artist), bitrate=1800)
     ani = animation.FuncAnimation(lt.fig, lt.animate, np.arange(0, lt.frames), interval=1000, repeat=True)
