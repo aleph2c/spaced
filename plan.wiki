@@ -1,0 +1,39 @@
+*Space Repetition Algorithm*
+= Observe =
+  *What defines Success?*
+  * fix the axis
+  * make a prediction from controller [see self.forgetting_functions which are relative to epoch in days]
+  * draw whatever you want on the curve when it's down
+  * simple generation of animations
+
+  *What is the problem?*
+  * fix the axis
+
+  The x axis has a weird non-even number of ticks
+
+  *Evidence that contradicts Assumptions:*
+  
+= Orient =
+  *Symptoms:*
+  quick description of symptoms that lead your belief
+  *Questions for Space Repetition Algorithm:*
+    Can you simplify your test?
+    Do you have enough information?
+    What recently changed?
+
+  *Assumptions:*
+
+= Decide =
+  *Idea/Hypotheses for Space Repetition Algorithm: >=5*
+  * [ ] 
+  * [ ] 
+  * [ ] 
+  * [ ] 
+  * [ ] 
+  *Chosen Idea/Hypothesis*
+    
+
+  *Plan to Expand-on-Idea/Disprove-Hypothesis*
+
+= Act =
+

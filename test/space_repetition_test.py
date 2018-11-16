@@ -232,7 +232,6 @@ def test_series():
   hf = SpaceRepetitionFeedback(t[0:7],y,range=range_,epoch=start_time)
   hctrl.initialize_feedback(feedback=hf)
   data_dict, _ = hctrl.plot_graphs()
-  import pdb; pdb.set_trace()
   base["frame"]["5"] = dict(data_dict)
   data_dict.clear()
   hctrl.save_figure("spaced_5.pdf")
