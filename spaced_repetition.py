@@ -12,6 +12,7 @@ from datetime import datetime
 from datetime import timedelta
 import matplotlib.pyplot as plt
 from scipy.optimize import fsolve
+from collections import OrderedDict
 from scipy.optimize import curve_fit
 from graph import SpaceRepetitionPlot
 import matplotlib.animation as animation
@@ -248,6 +249,8 @@ class SpaceRepetitionReference(SpaceRepetition):
     self.forgetting_decay_tau               = SpaceRepetitionReference.Forgetting_Decay_Tau
     self.forgetting_decay_initial_value     = SpaceRepetitionReference.Forgetting_Decay_Initial_Value
 
+    self.forgetting_functions = OrderedDict()
+
     # Let the caller over-ride some of our default values
     if("range" in kwargs):
       self.range = kwargs['range']
@@ -300,6 +303,7 @@ class SpaceRepetitionReference(SpaceRepetition):
 
     # Our first training schedule is set at time self.initial_forgetting_offset
     self.ref_events_x.append(initial_forgetting_offset)
+    self.forgetting_functions[initial_forgetting_offset] = ffn
     self.ref_events_y.append(1)
     self.x_and_y = self.make_data(self.x_and_y, self.samples, ffn, self.range)
     # The function used to generate the next set of forgetting curves at their
@@ -312,7 +316,7 @@ class SpaceRepetitionReference(SpaceRepetition):
           return array[idx]
 
       # Solve fn and rfn with their given tuning parameters
-      equation              = self.generate_equations(fn0, self.rfn0)
+      equation = self.generate_equations(fn0, self.rfn0)
       solution_x, solution_y = fsolve(equation, (1, 1))
 
       # we an intersection between our rfn curve and our latest forgetting
@@ -326,8 +330,15 @@ class SpaceRepetitionReference(SpaceRepetition):
         # generate our next forgetting curve
         fn_next, ffn0_next = self.forgetting_curves(fdfn(index), target_x)
 
+        # save the forgetting function for the ref_events_x identified.  This
+        # will be needed to make predictions about a student's ability to
+        # recollect something at a given time in the future
+        self.forgetting_functions[target_x] = fn_next
+
         # eclipse the previous forgetting curve with our new one
         self.x_and_y = self.make_data(self.x_and_y, self.samples, fn_next, self.range)
+
+        # this is where we know the function
       else:
         # if we didn't find a solution our search is complete
         fn_next, ffn0_next = [None, None]
@@ -600,7 +611,6 @@ class ControlData(object):
     del self._domain
 
 
-
 class SpaceRepetitionController(SpaceRepetition):
 
   def __init__(self, *args, **kwargs):
@@ -632,11 +642,12 @@ class SpaceRepetitionController(SpaceRepetition):
       self.range = kwargs['range']
 
     # not tuned or used yet
-    self.pid_forgetting_decay_tau           = PID(1.2, 0.3, 0.01)
-    self.pid_forgetting_decay_initial_value = PID(1.1, 0.1, 0.01)
-    updated_reference, x_reference_shift    = self.control(control_x=control_x)
-    self.schedule = []
-    for day in updated_reference.ref_events_x:
+    self.pid_forgetting_decay_tau             = PID(1.2, 0.3, 0.01)
+    self.pid_forgetting_decay_initial_value   = PID(1.1, 0.1, 0.01)
+    self.updated_reference, x_reference_shift = self.control(control_x = control_x)
+    self.schedule                             = []
+
+    for day in self.updated_reference.ref_events_x:
       self.schedule.append(self.days_to_time(day))
 
   def initialize_feedback(self, feedback, *args, **kwargs):
@@ -750,7 +761,6 @@ class SpaceRepetitionController(SpaceRepetition):
   def plot_control(self, **kwargs):
     control_x = self.control_x
     updated_reference, x_reference_shift = self.control(control_x=control_x)
-
     x_ref = updated_reference.x_and_y[0]
     y_ref = updated_reference.x_and_y[1]
 
@@ -789,13 +799,12 @@ class SpaceRepetitionController(SpaceRepetition):
     x = np.linspace(0, self.range, 500)
     rx = x[:]
     ry = self.reference.fn(rx - x_reference_shift)
-    feedback_x   = x[:]
-    feedback_y   = self.feedback.fn(x)
+    feedback_x = x[:]
+    feedback_y = self.feedback.fn(x)
     args = [feedback_x, feedback_y, rx, ry, control_ref_x, control_ref_y]
     args += self.feedback.o.vertical_bars
     args += self.schedule_vertical_bars
-    vertical_bars = {'vertical_bars': self.schedule_vertical_bars,
-                     'colour': "orange"}
+    vertical_bars = {'vertical_bars': self.schedule_vertical_bars, 'colour': "orange"}
 
     data_dict = {}
     add_x_y = SpaceRepetitionDataBuilder().create_add_x_y_fn_for(data_dict, "control")
@@ -836,7 +845,8 @@ class SpaceRepetitionController(SpaceRepetition):
     data_dict, h = self.plot_control(epoch=self.epoch, plot_pane_data=hdl.ppd)
     db.append_to_base(base, data_dict)
 
-    return base
+    graph_handle = h.ppd
+    return base, graph_handle
 
   def show(self):
     mng = plt.get_current_fig_manager()
@@ -889,7 +899,7 @@ class LearningTracker(object):
     #hr        = SpaceRepetitionReference(plot=False, range=range_, epoch=self.start_time)
     #hf        = SpaceRepetitionFeedback(self.feedback_x[0:2], self.feedback_y[0:2], range=range_, epoch=self.start_time)
     #hctrl     = SpaceRepetitionController(reference=hr, feedback=hf, range=range_, epoch=self.start_time)
-    #data_dict = hctrl.plot_graphs()
+    #data_dict, _ = hctrl.plot_graphs()
 
     #self.base["frame"]["0"] = dict(data_dict)
     #data_dict.clear()
@@ -923,7 +933,7 @@ class LearningTracker(object):
       else:
         hctrl.initialize_feedback(feedback=hf)
 
-      data_dict = hctrl.plot_graphs()
+      data_dict, _ = hctrl.plot_graphs()
       self.base["frame"][str(item)] = dict(data_dict)
     data_dict.clear()
     self.base["frames"] = len(self.feedback_x)

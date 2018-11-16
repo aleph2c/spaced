@@ -139,7 +139,7 @@ def test_controller():
          epoch=start_time)
   hctrl.plot_graphs()
 
-  pp(hctrl.schedule)
+  #pp(hctrl.schedule)
 
   #hctrl.show()
   #hctrl.save_figure()
@@ -186,7 +186,7 @@ def test_series():
   hf         = SpaceRepetitionFeedback(t[0:2], y, range=range_, epoch=start_time)
   hctrl      = SpaceRepetitionController(reference=hr, feedback=hf, range=range_, epoch=start_time)
   # print(hctrl.schedule)  # this is what you want
-  data_dict  = hctrl.plot_graphs()
+  data_dict, _  = hctrl.plot_graphs()
 
   base["frame"]["0"] = dict(data_dict)
   data_dict.clear()
@@ -195,7 +195,7 @@ def test_series():
   hr = SpaceRepetitionReference(plot=False, range=range_, epoch=start_time)
   hf = SpaceRepetitionFeedback(t[0:3], y ,range=range_, epoch=start_time)
   hctrl.initialize_feedback(feedback=hf)
-  data_dict  = hctrl.plot_graphs()
+  data_dict, _  = hctrl.plot_graphs()
 
   base["frame"]["1"] = dict(data_dict)
   data_dict.clear()
@@ -204,7 +204,7 @@ def test_series():
   hr = SpaceRepetitionReference(plot=False,range=range_,epoch=start_time)
   hf = SpaceRepetitionFeedback(t[0:4],y,range=range_,epoch=start_time)
   hctrl.initialize_feedback(feedback=hf)
-  data_dict = hctrl.plot_graphs()
+  data_dict, _ = hctrl.plot_graphs()
 
   base["frame"]["2"] = dict(data_dict)
   data_dict.clear()
@@ -213,7 +213,7 @@ def test_series():
   hr = SpaceRepetitionReference(plot=False,range=range_,epoch=start_time)
   hf = SpaceRepetitionFeedback(t[0:5],y,range=range_,epoch=start_time)
   hctrl.initialize_feedback(feedback=hf)
-  data_dict = hctrl.plot_graphs()
+  data_dict, _ = hctrl.plot_graphs()
 
   base["frame"]["3"] = dict(data_dict)
   data_dict.clear()
@@ -222,7 +222,7 @@ def test_series():
   hr = SpaceRepetitionReference(plot=False,range=range_,epoch=start_time)
   hf = SpaceRepetitionFeedback(t[0:6],y,range=range_,epoch=start_time)
   hctrl.initialize_feedback(feedback=hf)
-  data_dict = hctrl.plot_graphs()
+  data_dict, _ = hctrl.plot_graphs()
 
   base["frame"]["4"] = dict(data_dict)
   data_dict.clear()
@@ -231,18 +231,32 @@ def test_series():
   hr = SpaceRepetitionReference(plot=False,range=range_,epoch=start_time)
   hf = SpaceRepetitionFeedback(t[0:7],y,range=range_,epoch=start_time)
   hctrl.initialize_feedback(feedback=hf)
-  #data_dict = hctrl.plot_graphs()
-
+  data_dict, _ = hctrl.plot_graphs()
+  import pdb; pdb.set_trace()
   base["frame"]["5"] = dict(data_dict)
   data_dict.clear()
   hctrl.save_figure("spaced_5.pdf")
   #hctrl.open_figure("spaced_5.pdf")
 
+  hr = SpaceRepetitionReference(plot=False,range=range_,epoch=start_time)
+  hf = SpaceRepetitionFeedback(t[0:8], y, range=range_,epoch=start_time)
+  hctrl.initialize_feedback(feedback=hf)
+  data_dict, graph_handle = hctrl.plot_graphs()
+
+  graph_handle.epoch      # the epoch
+  graph_handle.axarr      # array of matplotlib axes mapping the subplots
+  graph_handle.figure     # the matplotlib figure
+  graph_handle.axarr[-1]  # the control plot
+
+  base["frame"]["6"] = dict(data_dict)
+  data_dict.clear()
+  hctrl.save_figure("spaced_6.pdf")
+
   base['range'] = range_
   with open(data_file, 'w') as outfile:
     json.dump(base, outfile, ensure_ascii=False, sort_keys=True, indent=2)
 
-  pp(hctrl.schedule)
+  #pp(hctrl.schedule)
 
 def test_learning_tracker():
   lt  = LearningTracker()

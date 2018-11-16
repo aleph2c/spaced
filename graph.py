@@ -49,7 +49,6 @@ class SpaceRepetitionBasePlotClass:
     # alias ppd to make it easier to understand from the outside
     self.plot_pane_data = self.ppd
 
-
     if 'x_label' in kwargs:
       self.x_label = kwargs['x_label']
     else:
@@ -126,7 +125,7 @@ class SpaceRepetitionBasePlotClass:
 class SpaceRepetitionPlot(SpaceRepetitionBasePlotClass):
   def __init__(self, *data, **kwargs):
     if 'epoch' in kwargs:
-      from_epoch      = SpaceRepetitionPlotDaysFromEpoch(*data, **kwargs)
+      from_epoch     = SpaceRepetitionPlotDaysFromEpoch(*data, **kwargs)
       self.ppd       = from_epoch.ppd
       self.ppd.epoch = kwargs['epoch']
     else:
