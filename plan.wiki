@@ -1,13 +1,11 @@
 *Space Repetition Algorithm*
 = Observe =
   *What defines Success?*
-  * fix the axis
   * make a prediction from controller [see self.forgetting_functions which are relative to epoch in days]
   * draw whatever you want on the curve when it's down
   * simple generation of animations
 
   *What is the problem?*
-  * fix the axis
 
   The x axis has a weird non-even number of ticks
 

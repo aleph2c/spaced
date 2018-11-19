@@ -19,7 +19,7 @@ def get_feedback1():
           1.7523761880940469,
           3.0240120060030016,
           4.8074037018509257,
-          7.3351675837918959,
+          8.3351675837918959,
           10.932966483241621,
           16.004002001000501,
           23.029014507253628,
@@ -177,90 +177,127 @@ def test_series():
   base = {}
   base["frame"] = {}
 
-  start_time = datetime.now()
-  data_file  = "test_run.json"
-  t, y       = build_time_and_results(start_time, 1)
-  x, y       = get_feedback1()
-  range_     = x[-1] + x[-1] * 0.5
-  hr         = SpaceRepetitionReference(plot=False, range=range_, epoch=start_time)
-  hf         = SpaceRepetitionFeedback(t[0:2], y, range=range_, epoch=start_time)
-  hctrl      = SpaceRepetitionController(reference=hr, feedback=hf, range=range_, epoch=start_time)
-  # print(hctrl.schedule)  # this is what you want
-  data_dict, _  = hctrl.plot_graphs()
-
-  base["frame"]["0"] = dict(data_dict)
-  data_dict.clear()
-  hctrl.save_figure("spaced_0.pdf")
-
-  hr = SpaceRepetitionReference(plot=False, range=range_, epoch=start_time)
-  hf = SpaceRepetitionFeedback(t[0:3], y ,range=range_, epoch=start_time)
-  hctrl.initialize_feedback(feedback=hf)
-  data_dict, _  = hctrl.plot_graphs()
-
-  base["frame"]["1"] = dict(data_dict)
-  data_dict.clear()
-  hctrl.save_figure("spaced_1.pdf")
-
-  hr = SpaceRepetitionReference(plot=False,range=range_,epoch=start_time)
-  hf = SpaceRepetitionFeedback(t[0:4],y,range=range_,epoch=start_time)
-  hctrl.initialize_feedback(feedback=hf)
-  data_dict, _ = hctrl.plot_graphs()
-
-  base["frame"]["2"] = dict(data_dict)
-  data_dict.clear()
-  hctrl.save_figure("spaced_2.pdf")
-
-  hr = SpaceRepetitionReference(plot=False,range=range_,epoch=start_time)
-  hf = SpaceRepetitionFeedback(t[0:5],y,range=range_,epoch=start_time)
-  hctrl.initialize_feedback(feedback=hf)
-  data_dict, _ = hctrl.plot_graphs()
-
-  base["frame"]["3"] = dict(data_dict)
-  data_dict.clear()
-  hctrl.save_figure("spaced_3.pdf")
-
-  hr = SpaceRepetitionReference(plot=False,range=range_,epoch=start_time)
-  hf = SpaceRepetitionFeedback(t[0:6],y,range=range_,epoch=start_time)
-  hctrl.initialize_feedback(feedback=hf)
-  data_dict, _ = hctrl.plot_graphs()
-
-  base["frame"]["4"] = dict(data_dict)
-  data_dict.clear()
-  hctrl.save_figure("spaced_4.pdf")
-
-  hr = SpaceRepetitionReference(plot=False,range=range_,epoch=start_time)
-  hf = SpaceRepetitionFeedback(t[0:7],y,range=range_,epoch=start_time)
-  hctrl.initialize_feedback(feedback=hf)
-  data_dict, _ = hctrl.plot_graphs()
-  base["frame"]["5"] = dict(data_dict)
-  data_dict.clear()
-  hctrl.save_figure("spaced_5.pdf")
-  #hctrl.open_figure("spaced_5.pdf")
-
-  hr = SpaceRepetitionReference(plot=False,range=range_,epoch=start_time)
-  hf = SpaceRepetitionFeedback(t[0:8], y, range=range_,epoch=start_time)
-  hctrl.initialize_feedback(feedback=hf)
-  data_dict, graph_handle = hctrl.plot_graphs()
-
-  graph_handle.epoch      # the epoch
-  graph_handle.axarr      # array of matplotlib axes mapping the subplots
-  graph_handle.figure     # the matplotlib figure
-  graph_handle.axarr[-1]  # the control plot
-
-  base["frame"]["6"] = dict(data_dict)
-  data_dict.clear()
-  hctrl.save_figure("spaced_6.pdf")
-
-  base['range'] = range_
-  with open(data_file, 'w') as outfile:
-    json.dump(base, outfile, ensure_ascii=False, sort_keys=True, indent=2)
+#  start_time = datetime.now()
+#  data_file  = "test_run.json"
+#  t, y       = build_time_and_results(start_time, 1)
+#  x, y       = get_feedback1()
+#  range_     = x[-1] + x[-1] * 0.5
+#  hr         = SpaceRepetitionReference(plot=False, range=range_, epoch=start_time)
+#  hf         = SpaceRepetitionFeedback(t[0:2], y, range=range_, epoch=start_time)
+#  hctrl      = SpaceRepetitionController(reference=hr, feedback=hf, range=range_, epoch=start_time)
+#  # print(hctrl.schedule)  # this is what you want
+#  data_dict, _  = hctrl.plot_graphs()
+#
+#  base["frame"]["0"] = dict(data_dict)
+#  data_dict.clear()
+#  hctrl.save_figure("spaced_0.pdf")
+#
+#  hr = SpaceRepetitionReference(plot=False, range=range_, epoch=start_time)
+#  hf = SpaceRepetitionFeedback(t[0:3], y ,range=range_, epoch=start_time)
+#  hctrl.initialize_feedback(feedback=hf)
+#  data_dict, _  = hctrl.plot_graphs()
+#
+#  base["frame"]["1"] = dict(data_dict)
+#  data_dict.clear()
+#  hctrl.save_figure("spaced_1.pdf")
+#
+#  hr = SpaceRepetitionReference(plot=False,range=range_,epoch=start_time)
+#  hf = SpaceRepetitionFeedback(t[0:4],y,range=range_,epoch=start_time)
+#  hctrl.initialize_feedback(feedback=hf)
+#  data_dict, _ = hctrl.plot_graphs()
+#
+#  base["frame"]["2"] = dict(data_dict)
+#  data_dict.clear()
+#  hctrl.save_figure("spaced_2.pdf")
+#
+#  hr = SpaceRepetitionReference(plot=False,range=range_,epoch=start_time)
+#  hf = SpaceRepetitionFeedback(t[0:5],y,range=range_,epoch=start_time)
+#  hctrl.initialize_feedback(feedback=hf)
+#  data_dict, _ = hctrl.plot_graphs()
+#
+#  base["frame"]["3"] = dict(data_dict)
+#  data_dict.clear()
+#  hctrl.save_figure("spaced_3.pdf")
+#
+#  hr = SpaceRepetitionReference(plot=False,range=range_,epoch=start_time)
+#  hf = SpaceRepetitionFeedback(t[0:6],y,range=range_,epoch=start_time)
+#  hctrl.initialize_feedback(feedback=hf)
+#  data_dict, _ = hctrl.plot_graphs()
+#
+#  base["frame"]["4"] = dict(data_dict)
+#  data_dict.clear()
+#  hctrl.save_figure("spaced_4.pdf")
+#
+#  hr = SpaceRepetitionReference(plot=False,range=range_,epoch=start_time)
+#  hf = SpaceRepetitionFeedback(t[0:7],y,range=range_,epoch=start_time)
+#  hctrl.initialize_feedback(feedback=hf)
+#  data_dict, _ = hctrl.plot_graphs()
+#  base["frame"]["5"] = dict(data_dict)
+#  data_dict.clear()
+#  hctrl.save_figure("spaced_5.pdf")
+#  #hctrl.open_figure("spaced_5.pdf")
+#
+#  hr = SpaceRepetitionReference(plot=False,range=range_,epoch=start_time)
+#  hf = SpaceRepetitionFeedback(t[0:8], y, range=range_,epoch=start_time)
+#  hctrl.initialize_feedback(feedback=hf)
+#  data_dict, graph_handle = hctrl.plot_graphs()
+#
+#  graph_handle.epoch      # the epoch
+#  graph_handle.axarr      # array of matplotlib axes mapping the subplots
+#  graph_handle.figure     # the matplotlib figure
+#  graph_handle.axarr[-1]  # the control plot
+#
+#  base["frame"]["6"] = dict(data_dict)
+#  data_dict.clear()
+#  hctrl.save_figure("spaced_6.pdf")
+#
+#  base['range'] = range_
+#  with open(data_file, 'w') as outfile:
+#    json.dump(base, outfile, ensure_ascii=False, sort_keys=True, indent=2)
 
   #pp(hctrl.schedule)
 
-def test_learning_tracker():
-  lt  = LearningTracker()
-  x, y = get_feedback1()
-  for x_, y_ in zip(x, y):
-    lt.add_event(x_, y_)
-  lt.animate(name_of_mp4="example.mp4", artist="7 learning events")
+#def test_learning_tracker():
+#  lt  = LearningTracker()
+#  x, y = get_feedback1()
+#  for x_, y_ in zip(x, y):
+#    lt.add_event(x_, y_)
+#  lt.animate(name_of_mp4="example.mp4", artist="7 learning events")
 
+def test_predictions():
+  base = {}
+  base["frame"] = {}
+
+  start_time = datetime.now()
+  t, y       = build_time_and_results(start_time, 1)
+  x, y       = get_feedback1()
+  range_     = x[-1] + x[-1] * 0.5
+  hr         = SpaceRepetitionReference(plot=False, range=range_, epoch=None)
+  hf         = SpaceRepetitionFeedback(x[0:5], y, range=range_, epoch=None)
+  hctrl      = SpaceRepetitionController(reference=hr, feedback=hf, range=range_, ephoch=None)
+  # print(hctrl.schedule)  # this is what you want
+  data_dict, graph_handle  = hctrl.plot_graphs()
+  last_feeback_moment = hctrl.control_x
+  training_moments = [start_time + 
+                      timedelta(days=days+1.84) +
+                      timedelta(days=last_feeback_moment) 
+                        for days
+                          in [0] + hctrl.updated_reference.ref_events_x]
+  results = [hctrl.recollect_scalar(training_moment, for_curve=2) for training_moment in training_moments]
+  for result in results:
+    print(result)
+  times = [moment for moment in training_moments]
+  control_plot = graph_handle.axarr[-1]
+  control_plot.plot(times, results, color='xkcd:crimson')
+
+  ref_training_moments = [start_time + timedelta(days=days) for days in [0] + hr.ref_events_x]
+  ref_results = [hr.recollect_scalar(ref_training_moment, for_curve=1) for ref_training_moment in ref_training_moments]
+  reference_plot = graph_handle.axarr[0]
+  reference_plot.plot(ref_training_moments, ref_results, color='xkcd:crimson')
+
+  hctrl.save_figure("spaced_predict.pdf")
+
+#  graph_handle.epoch      # the epoch
+#  graph_handle.axarr      # array of matplotlib axes mapping the subplots
+#  graph_handle.figure     # the matplotlib figure
+#  graph_handle.axarr[-1]  # the control plot

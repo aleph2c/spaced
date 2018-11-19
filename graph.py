@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import matplotlib.dates as mdates
+import matplotlib.ticker as ticker
 from datetime import datetime
 from datetime import timedelta
 
@@ -179,6 +180,7 @@ class SpaceRepetitionPlotDaysFromEpoch(SpaceRepetitionBasePlotClass):
         if x % 2 == 0:
           new_data = ftime_series(data[x], data[x + 1])
           plot.plot(*new_data, color='xkcd:cement', linestyle="-.")
+
       if self.scheduled is not None:
         vb = self.scheduled['vertical_bars']
         colour = self.scheduled['colour']
@@ -191,6 +193,7 @@ class SpaceRepetitionPlotDaysFromEpoch(SpaceRepetitionBasePlotClass):
 
       plot.axes.set_ylabel(self.y_label)
       plot.axes.set_xlabel(self.x_label)
+      #plot.xaxis.set_major_locator(ticker.FixedLocator(([date_min, date_max])))
       for tick in plot.xaxis.get_ticklabels():
         tick.set_rotation(25)
         tick.set_rotation_mode('anchor')
@@ -214,7 +217,7 @@ class SpaceRepetitionPlotDaysFromZero(SpaceRepetitionBasePlotClass):
       if self.first_graph_color is None:
         plot.plot(*data[0:2])
       else:
-        plot.plot(*data[0:2], color=self.first_graph_color )
+        plot.plot(*data[0:2], color=self.first_graph_color)
 
       if self.second_graph_color is None:
         if len(data) > 2:
