@@ -34,10 +34,10 @@ def pp(thing):
 
 class QueryTimeBeforeCurve(Exception):
   '''A query time has been made before a forgetting curve has been activated'''
-  def __init__(self, moment, for_curve, curve_start_datetime):
+  def __init__(self, moment, curve, curve_start_datetime):
     message = "The query to find p at "
     message += "moment {} for curve {} is too soon, it must occur after {}". \
-                 format(moment, for_curve, curve_start_datetime)
+                 format(moment, curve, curve_start_datetime)
     super().__init__(message)
 
 class SpaceRepetitionDataBuilder(object):
@@ -225,6 +225,17 @@ class SpaceRepetition(object):
   def outcome(self, time):
     pass
 
+  def datetime_to_days_offset_from_epoch(self, datetime_):
+    '''convert a datetime into a float, representing the number of days
+    difference between that datetime and when epoch'''
+    result = (datetime_ - self.epoch).total_seconds()
+    result /= (60 * 60 * 24)
+    return result
+
+  def days_offset_from_epoch_to_datetime(self, offset_):
+    result = self.epoch
+    result += timedelta(days=offset_)
+    return result
 
 class SpaceRepetitionReference(SpaceRepetition):
   Title           = "Spaced Memory Reference\n"
@@ -287,6 +298,37 @@ class SpaceRepetitionReference(SpaceRepetition):
 
     if("plot" in kwargs and kwargs["plot"] is True):
       self.plot_graph()
+
+  def schedule(self):
+    schedule = []
+    for target_x in self.ref_events_x:
+      schedule.append(self.epoch + timedelta(days=target_x))
+    return schedule
+
+  def datetime_for(self, curve=None):
+    '''get the datetime stampe of a curve in the stickleback.  Curves are
+    indexed from zero'''
+    if curve is None or curve <= 0:
+      index = 0
+    else:
+      index = curve - 1
+    schedule_ = self.schedule()
+    result  = schedule_[index]
+    return result
+
+  def range_for(self, curve=None, range=None, day_step_size=1):
+    if curve is None or curve < 1:
+      curve = 1
+    datetime_of_curve = self.datetime_for(curve=curve)
+    end_date  = self.epoch 
+    #end_date += (timedelta(days=self.range) - (datetime_of_curve - self.epoch))
+    end_date += (timedelta(days=self.range))
+    result = list(np.arange(datetime_of_curve, end_date,
+      timedelta(days=day_step_size)).astype(datetime))
+    return result
+
+  def next_lesson(self):
+    return self.datetime_for(curve=1)
 
   def stickleback(self, **kwargs):
 
@@ -374,11 +416,11 @@ class SpaceRepetitionReference(SpaceRepetition):
       self.vertical_bars.append([target_x, target_x])
       self.vertical_bars.append([0, target_y])
 
-  def schedule(self):
-    schedule = []
-    for target_x in self.ref_events_x:
-      schedule.append(self.datetime + timedelta(days=target_x))
-    return schedule
+  #def schedule(self):
+  #  schedule = []
+  #  for target_x in self.ref_events_x:
+  #    schedule.append(self.datetime + timedelta(days=target_x))
+  #  return schedule
 
   def plot_graph(self, **kwargs):
     x      = self.x_and_y[0]
@@ -389,7 +431,10 @@ class SpaceRepetitionReference(SpaceRepetition):
     if("epoch" in kwargs):
       epoch = kwargs['epoch']
     else:
-      epoch = None
+      if self.epoch is None:
+        epoch = None
+      else:
+        epoch = self.epoch
 
     if("plot_pane_data" in kwargs):
       plot_pane_data = kwargs['plot_pane_data']
@@ -432,7 +477,7 @@ class SpaceRepetitionReference(SpaceRepetition):
   def show(self):
     plt.show()
 
-  def recollect_scalar(self, moment, for_curve=None):
+  def recollect_scalar(self, moment, curve=None):
     '''
     This will return a scalar representing the probability that a student can
     correctly recall something being tracked by the space repetition algorithm.
@@ -445,7 +490,7 @@ class SpaceRepetitionReference(SpaceRepetition):
       * timedelta - the difference in time from when the client wants to know
                     something and epoch
 
-    The ``moment`` must occur after the ``for_curve`` number has been activated
+    The ``moment`` must occur after the ``curve`` number has been activated
 
     '''
     if(isinstance(moment, datetime)):
@@ -459,25 +504,25 @@ class SpaceRepetitionReference(SpaceRepetition):
 
     moment_as_datetime = moment
 
-    if for_curve is None:
-      for_curve = 1
+    if curve is None:
+      curve = 1
 
-    recollection_function, time_offset_in_days = self.recollect_function(for_curve)
+    recollection_function, time_offset_in_days = self.recollect_function(curve)
     curve_start_datetime = self.epoch + timedelta(days=time_offset_in_days)
     curve_start_datetime = self.epoch + \
                            timedelta(self.control_x) + \
                            timedelta(days=time_offset_in_days)
          
-    if(moment_as_datetime < curve_start_datetime - timedelta(days=0.01)):
-      raise QueryTimeBeforeCurve(moment_as_datetime, for_curve, curve_start_datetime)
+    #if(moment_as_datetime < curve_start_datetime - timedelta(days=0.01)):
+    #  raise QueryTimeBeforeCurve(moment_as_datetime, curve, curve_start_datetime)
 
     return recollection_function(moment_as_datetime)
 
-  def recollect_function(self, for_curve=None):
-    if for_curve is None:
-      for_curve = 1
+  def recollect_function(self, curve=None):
+    if curve is None:
+      curve = 1
 
-    index = for_curve - 1
+    index = curve - 1
     curve_start_times = [day for day in self.forgetting_functions.keys()]
     curves_start_since_epoch = curve_start_times[index]
 
@@ -489,10 +534,9 @@ class SpaceRepetitionReference(SpaceRepetition):
 
     def _tuned_after_feedback(moment, forgetting_function, offset, epoch, control_x):
       moment = moment - timedelta(control_x)
-      query_time = ((moment - epoch).total_seconds() / (60 * 60 * 24))
+      query_time = self.datetime_to_days_offset_from_epoch(moment)
       recollection_scalar = forgetting_function(query_time+offset)
       if recollection_scalar > 1:
-        print(recollection_scalar)
         recollection_scalar = 1
       return recollection_scalar
 
@@ -519,7 +563,12 @@ class SpaceRepetitionFeedback(SpaceRepetition):
       self.add_event(0, 1)
     else:
       for event_x, event_y in zip(args[0], args[1]):
-        self.add_event(event_x, event_y)
+        conditioned_x = None
+        if isinstance(event_x, datetime) is False:
+          conditioned_x = self.days_offset_from_epoch_to_datetime(event_x)
+        else:
+          conditioned_x = event_x
+        self.add_event(conditioned_x, event_y)
 
     if("range" in kwargs):
       self.range = kwargs['range']
@@ -587,12 +636,12 @@ class SpaceRepetitionFeedback(SpaceRepetition):
     if("epoch" in kwargs):
       epoch = kwargs['epoch']
     else:
-      epoch = None
+      epoch = self.epoch
 
     if("panes" in kwargs):
       panes = kwargs['panes']
     else:
-      panes = None
+      panes = 1
 
     if("plot_pane_data" in kwargs):
       plot_pane_data = kwargs['plot_pane_data']
@@ -693,7 +742,6 @@ class ControlData(object):
   def domain(self):
     del self._domain
 
-
 class SpaceRepetitionController(SpaceRepetition):
 
   def __init__(self, *args, **kwargs):
@@ -738,7 +786,7 @@ class SpaceRepetitionController(SpaceRepetition):
     self.feedback.fn      = self.feedback.o.rfn
     self.feedback.range   = self.feedback.o.range
     self.feedback.domain  = self.feedback.o.domain
-    self.range            = self.feedback.range + 0.1 * (self.feedback.range)
+    self.range            = self.feedback.range * 1.1
     self.input_x          = self.feedback.o.a_events_x[:]
     self.input_y          = self.feedback.o.a_events_y[:]
     self.control_x        = self.input_x[-1]
@@ -942,7 +990,7 @@ class SpaceRepetitionController(SpaceRepetition):
   def open_figure(self, filename="spaced.pdf"):
     os.system(filename)
 
-  def recollect_scalar(self, moment, for_curve=None):
+  def recollect_scalar(self, moment, curve=None):
     '''
     This will return a scalar representing the probability that a student can
     correctly recall something being tracked by the space repetition algorithm.
@@ -955,7 +1003,7 @@ class SpaceRepetitionController(SpaceRepetition):
       * timedelta - the difference in time from when the client wants to know
                     something and epoch
 
-    The ``moment`` must occur after the ``for_curve`` number has been activated
+    The ``moment`` must occur after the ``curve`` number has been activated
 
     '''
     if(isinstance(moment, datetime)):
@@ -969,25 +1017,25 @@ class SpaceRepetitionController(SpaceRepetition):
 
     moment_as_datetime = moment
 
-    if for_curve is None:
-      for_curve = 1
+    if curve is None:
+      curve = 1
 
-    recollection_function, time_offset_in_days = self.recollect_function(for_curve)
+    recollection_function, time_offset_in_days = self.recollect_function(curve)
     curve_start_datetime = self.epoch + timedelta(days=time_offset_in_days)
     curve_start_datetime = self.epoch + \
                            timedelta(self.control_x) + \
                            timedelta(days=time_offset_in_days)
          
-    if(moment_as_datetime < curve_start_datetime - timedelta(days=0.01)):
-      raise QueryTimeBeforeCurve(moment_as_datetime, for_curve, curve_start_datetime)
+    #if(moment_as_datetime < curve_start_datetime - timedelta(days=0.01)):
+    #  raise QueryTimeBeforeCurve(moment_as_datetime, curve, curve_start_datetime)
 
     return recollection_function(moment_as_datetime)
 
-  def recollect_function(self, for_curve=None):
-    if for_curve is None:
-      for_curve = 1
+  def recollect_function(self, curve=None):
+    if curve is None:
+      curve = 1
 
-    index = for_curve - 1
+    index = curve - 1
     curve_start_times = [day for day in self.updated_reference.forgetting_functions.keys()]
     curves_start_since_epoch = curve_start_times[index]
 
@@ -999,10 +1047,9 @@ class SpaceRepetitionController(SpaceRepetition):
 
     def _tuned_after_feedback(moment, forgetting_function, offset, epoch, control_x):
       moment = moment - timedelta(control_x)
-      query_time = ((moment - epoch).total_seconds() / (60 * 60 * 24))
+      query_time = self.datetime_to_days_offset_from_epoch(moment)
       recollection_scalar = forgetting_function(query_time+offset)
       if recollection_scalar > 1:
-        print(recollection_scalar)
         recollection_scalar = 1
       return recollection_scalar
 
@@ -1014,6 +1061,32 @@ class SpaceRepetitionController(SpaceRepetition):
 
     return (recollection_function, curves_start_since_epoch)
 
+  def datetime_for(self, curve=None):
+    '''get the datetime stampe of a curve in the stickleback.  Curves are
+    indexed from zero'''
+    if curve is None or curve <= 0:
+      index = 0
+    else:
+      index = curve - 1
+    result  = self.epoch
+    if index >= 1:
+      result += timedelta(days=self.updated_reference.ref_events_x[index-1])
+    result += timedelta(days=self.control_x)
+    return result
+
+  def range_for(self, curve=None, range=None, day_step_size=1):
+    if curve is None or curve < 1:
+      curve = 1
+    datetime_of_curve = self.datetime_for(curve=curve)
+    end_date  = self.epoch 
+    #end_date += (timedelta(days=self.range) - (datetime_of_curve - self.epoch))
+    end_date += (timedelta(days=self.range))
+    result = list(np.arange(datetime_of_curve, end_date,
+      timedelta(days=day_step_size)).astype(datetime))
+    return result
+
+  def next_lesson(self):
+    return self.datetime_for(curve=1)
 
 class LearningTracker(object):
   def __init__(self, *args, **kwargs):

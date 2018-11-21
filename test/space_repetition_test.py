@@ -74,12 +74,21 @@ def time_round_trip(start_time, time_from_start):
   result = float(result_in_seconds/(86400.0))
   return result
 
-#def test_reference():
-#  hdl = SpaceRepetitionReference(range=100,plot=False)
-#  pp(hdl.times())
-#  hdl.plot_graph()
-#  hdl.show()
-#  plt.close('all')
+def test_reference():
+  start_time = datetime.now()
+  x, y       = get_feedback1()
+  range_     = x[-1] * 1.5
+  hr = SpaceRepetitionReference(
+         plot=True,
+         range=range_,
+         epoch=start_time,
+         )
+  hr.plot_graph()
+  result = hr.datetime_for(curve=1)
+  print(result)
+  print(hr.range)
+  print(len(hr.range_for(curve=1)))
+  #plt.close('all')
 #
 #def test_feedback():
 #  x_v,y_v = get_feedback1()
@@ -269,34 +278,65 @@ def test_predictions():
   base["frame"] = {}
 
   start_time = datetime.now()
-  t, y       = build_time_and_results(start_time, 1)
   x, y       = get_feedback1()
+  t          = [start_time + timedelta(days=offset) for offset in x]
   range_     = x[-1] + x[-1] * 0.5
-  hr         = SpaceRepetitionReference(plot=False, range=range_, epoch=None)
-  hf         = SpaceRepetitionFeedback(x[0:5], y, range=range_, epoch=None)
-  hctrl      = SpaceRepetitionController(reference=hr, feedback=hf, range=range_, ephoch=None)
-  # print(hctrl.schedule)  # this is what you want
+  hr         = SpaceRepetitionReference(plot=False, range=range_, epoch=start_time)
+  hf         = SpaceRepetitionFeedback(t[0:5], y, range=range_, epoch=start_time)
+  hctrl      = SpaceRepetitionController(reference=hr, feedback=hf, range=range_, ephoch=start_time)
+  # plot the reference suggestion, the feedback, error and the updated training
+  # suggestions (control)
   data_dict, graph_handle  = hctrl.plot_graphs()
+
+  # Now make some predictions about a students ability to recollect something at
+  # future points of time... ask your question using datetimes and plot your
+  # answer on the same graph made above
   last_feeback_moment = hctrl.control_x
   training_moments = [start_time + 
-                      timedelta(days=days+1.84) +
+                      timedelta(days=days) +
                       timedelta(days=last_feeback_moment) 
                         for days
-                          in [0] + hctrl.updated_reference.ref_events_x]
-  results = [hctrl.recollect_scalar(training_moment, for_curve=2) for training_moment in training_moments]
+                          in hctrl.updated_reference.ref_events_x[2:-1]]
+                          #in [0] + hctrl.updated_reference.ref_events_x]
+
+  results = [hctrl.recollect_scalar(training_moment, curve=3) for training_moment in training_moments]
   for result in results:
     print(result)
   times = [moment for moment in training_moments]
-  control_plot = graph_handle.axarr[-1]
-  control_plot.plot(times, results, color='xkcd:crimson')
+  #control_plot = graph_handle.axarr[-1]
+  #control_plot.plot(times, results, color='xkcd:azure')
 
-  ref_training_moments = [start_time + timedelta(days=days) for days in [0] + hr.ref_events_x]
-  ref_results = [hr.recollect_scalar(ref_training_moment, for_curve=1) for ref_training_moment in ref_training_moments]
+  # Ask the same question using day offsets from epoch
+  curve = 3
+  training_moments = hctrl.range_for(curve=curve, day_step_size=0.5)
+  results = [hctrl.recollect_scalar(training_moment, curve=curve) for training_moment in training_moments]
+  control_plot = graph_handle.axarr[-1]
+  control_plot.plot(training_moments, results, color='xkcd:azure')
+
+  # use the original reference to make a prediction
+  ref_training_moments = [
+    start_time + timedelta(days=days) 
+      for days 
+      #in [0] + hr.ref_events_x
+      in hr.ref_events_x[1:-1]
+  ]
+  ref_results = [hr.recollect_scalar(ref_training_moment, curve=1) for ref_training_moment in ref_training_moments]
   reference_plot = graph_handle.axarr[0]
-  reference_plot.plot(ref_training_moments, ref_results, color='xkcd:crimson')
+  reference_plot.plot(ref_training_moments, ref_results, color='xkcd:teal')
 
   hctrl.save_figure("spaced_predict.pdf")
 
+def test_datetime_for_curve():
+  start_time = datetime.now()
+  x, y       = get_feedback1()
+  t          = [start_time + timedelta(days=offset) for offset in x]
+  range_     = x[-1] + x[-1] * 0.5
+  hr         = SpaceRepetitionReference(plot=False, range=range_, epoch=start_time)
+  hf         = SpaceRepetitionFeedback(t[0:5], y, range=range_, epoch=start_time)
+  hctrl      = SpaceRepetitionController(reference=hr, feedback=hf, range=range_, ephoch=start_time)
+
+  result = hctrl.datetime_for(curve=1)
+  moments = hctrl.range_for(curve=1)
 #  graph_handle.epoch      # the epoch
 #  graph_handle.axarr      # array of matplotlib axes mapping the subplots
 #  graph_handle.figure     # the matplotlib figure

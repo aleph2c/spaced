@@ -21,7 +21,6 @@ class PlotPaneData(object):
 
     if("axarr" in kwargs):
       self.axarr = kwargs["axarr"]
-
     if("epoch" in kwargs):
       self.epoch = kwargs["epoch"]
 
@@ -38,6 +37,11 @@ class SpaceRepetitionBasePlotClass:
     if 'plot_pane_data' in kwargs and kwargs['plot_pane_data'] is not None:
       self.ppd = kwargs['plot_pane_data']
     else:
+      if not 'panes' in kwargs:
+        kwargs['panes'] = 1
+      if kwargs['panes'] is None:
+        kwargs['panes'] = 1
+
       #figure, axarr = plt.subplots(kwargs['panes'], 1, sharex=True, figsize=(11, 8.5), facecolor='#07000d')
       figure, axarr = plt.subplots(kwargs['panes'], 1, sharex=True, figsize=(11, 8.5), facecolor='white')
       self.ppd = PlotPaneData(graph_location=-1,
@@ -145,8 +149,11 @@ class SpaceRepetitionPlotDaysFromEpoch(SpaceRepetitionBasePlotClass):
     y_domain       = kwargs['y_domain']
 
     f.fmt_xdata = mdates.DateFormatter('%y-%m-%d')
-    plot        = axarr[i]
-    axes        = f.gca()
+    try:
+      plot = axarr[i]
+    except:
+      plot = axarr
+    axes = f.gca()
 
     date_min = self.ppd.epoch
     date_max = self.days_to_time(self.ppd.epoch, x_range)
