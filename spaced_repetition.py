@@ -1096,9 +1096,39 @@ class LearningTracker(object):
     self.base["frame"] = {}
     self.start_time    = datetime.now()
 
+    if("datetime" in kwargs):
+      self.epoch = kwargs['epoch']
+    else:
+      self.epoch = datetime.now()
+
+    if("feedback_data" in kwargs):
+      self.feedback_data = kwargs['feedback_data']
+
+    self.plasticity_rate = SpaceRepetitionReference.PlasticityRate
+    self.samples = SpaceRepetitionReference.Default_Samples
+    self.forgetting_decay_tau = SpaceRepetitionReference.Forgetting_Decay_Tau
+    self.forgetting_decay_initial_value = SpaceRepetitionReference.Forgetting_Decay_Initial_Value
+
+    if("plasticity" in kwargs):
+      self.plasticity_rate = kwargs['plasticity']
+    if("fdecaytau" in kwargs):
+      self.forgetting_decay_tau = kwargs['fdecaytau']
+    if("fdecay0" in kwargs):
+      self.forgetting_decay_initial_value = kwargs['fdecay0']
+
+    if("ifo" in kwargs):
+      self.initial_forgetting_offset = kwargs['ifo']
+    else:
+      self.initial_forgetting_offset = 0.0
+
     self.reference = SpaceRepetitionReference(
           plot=False,
-          epoch=self.start_time)
+          epoch=self.epoch,
+          plasticity=self.plasticity_rate,
+          fdecay0=self.forgetting_decay_initial_value,
+          fdecaytau=self.forgetting_decay_tau,
+          ifo=self.initial_forgetting_offset,
+    )
 
     self.feedback = SpaceRepetitionFeedback(
           [],
@@ -1115,12 +1145,18 @@ class LearningTracker(object):
     self.frames     = []
     self.control    = []
 
+    if self.feedback_data:
+      x, y = self.feedback_data
+      for x_, y_, in zip(x, y):
+        self.add_event(x_, y_)
+
   def add_event(self, event_x, event_y):
     self.feedback_x.append(event_x)
     self.feedback_y.append(event_y)
     self.frame = np.arange(1, len(self.feedback_x))
 
-  def animate(self, name_of_mp4=None, artist=None):
+  def animate(self, name_of_mp4=None, student=None,
+      time_per_event_in_seconds=None):
     self.base          = {}
     self.base["frame"] = {}
     range_    = self.feedback_x[-1] + self.feedback_x[-1] * 0.5
@@ -1140,15 +1176,29 @@ class LearningTracker(object):
     #basename = os.path.basename(self.data_file)
     #self.data_file = os.path.splitext(basename)[0] + ".json"
 
-    if artist is None:
-      self.artist = "example"
+    if student is None:
+      self.student = "example"
     else:
-      self.artist = artist
+      self.student = "student: {}".format(student)
+
+    if time_per_event_in_seconds is not None:
+      if time_per_event_in_seconds is 0:
+        time_per_event_in_seconds = 1
+      fps = 1/time_per_event_in_seconds
+      interval = time_per_event_in_seconds * 1000
+    else:
+      fps = 1
+      interval = 1000
 
     for item in range(0, len(self.feedback_x)):
       hr = SpaceRepetitionReference(
-            plot=False,
-            range=range_, epoch=self.start_time)
+          epoch=self.epoch,
+          plasticity=self.plasticity_rate,
+          fdecay0=self.forgetting_decay_initial_value,
+          fdecaytau=self.forgetting_decay_tau,
+          ifo=self.initial_forgetting_offset,
+          plot=False,
+          range=range_)
       hf = SpaceRepetitionFeedback(
             self.feedback_x[0:item + 1],
             self.feedback_y[0:item + 1],
@@ -1171,7 +1221,8 @@ class LearningTracker(object):
 
     lt = LearningTrackerAnimation(json_file=self.data_file)
     Writer = animation.writers['ffmpeg']
-    writer = Writer(fps=1, metadata=dict(artist=self.artist), bitrate=1800)
-    ani = animation.FuncAnimation(lt.fig, lt.animate, np.arange(0, lt.frames), interval=1000, repeat=True)
+    writer = Writer(fps=fps, metadata=dict(artist=self.student), bitrate=600)
+    ani = animation.FuncAnimation(lt.fig, lt.animate, np.arange(0, lt.frames),
+        interval=interval, repeat=True)
     ani.save(self.name_of_mp4, writer=writer)
 

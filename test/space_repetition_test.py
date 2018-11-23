@@ -50,7 +50,9 @@ def get_feedback2():
           7.3351675837918959,
           10.932966483241621,
           16.004002001000501,
-          23.029014507253628
+          23.029014507253628,
+          30.0,
+          60,
         ]
   y_v = [1,
           0.44646101201172317,
@@ -60,7 +62,10 @@ def get_feedback2():
           0.99000147547559727,
           0.99902389355455017,
           1.00000000000000000,
-          0.90000000000000000 ]
+          0.90000000000000000,
+          0.7,
+          0.90000000000000000,
+          ]
   return [x_v,y_v]
 
 def time_round_trip(start_time, time_from_start):
@@ -266,12 +271,20 @@ def test_series():
 
   #pp(hctrl.schedule)
 
-#def test_learning_tracker():
-#  lt  = LearningTracker()
-#  x, y = get_feedback1()
-#  for x_, y_ in zip(x, y):
-#    lt.add_event(x_, y_)
-#  lt.animate(name_of_mp4="example.mp4", artist="7 learning events")
+def test_learning_tracker():
+  epoch = datetime.now()
+  lt = LearningTracker(epoch=epoch,
+    feedback_data=get_feedback1(),
+    plasticity=1.4, 
+    fdecaytau=0.87,
+    fdecay0 = 0.9,
+    )
+  student = "Marnie MacMillan"
+  lt.animate(
+    name_of_mp4="example.mp4",
+    student=student,
+    time_per_event_in_seconds=2.2
+    )
 
 def test_predictions():
   base = {}
