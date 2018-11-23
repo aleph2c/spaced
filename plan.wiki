@@ -1,19 +1,25 @@
 *Space Repetition Algorithm*
 = Observe =
+  
   *What defines Success?*
-  * make a prediction from controller [see self.forgetting_functions which are relative to epoch in days]
-  * draw whatever you want on the curve when it's down
-  * simple generation of animations
-
+    [ ] * The range in the plots is exactly what is asked for.
+    [ ] * The offset/timedate plots are easy to select from.
+    [ ] * The stickleback plots were fixed to match the accurate prediction plots.
+    [ ] * The stickleback plots schedule drops are now all populated.
+    [ ] * That plasticity function is learned over time so that it can be transported
+          to the next training item.
+    [ ] * There is a single interface, instead of 3/4 interfaces as there was before.
+    [ ] * The code is much much faster than it was.
+    [ ] * Spaced was turned into a python package and shipped.
+    
   *What is the problem?*
-
-  The x axis has a weird non-even number of ticks
 
   *Evidence that contradicts Assumptions:*
   
 = Orient =
   *Symptoms:*
   quick description of symptoms that lead your belief
+  
   *Questions for Space Repetition Algorithm:*
     Can you simplify your test?
     Do you have enough information?
