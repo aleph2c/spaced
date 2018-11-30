@@ -431,8 +431,8 @@ class SpaceRepetitionReference(SpaceRepetition):
     self.vertical_bar_information()
 
   def vertical_bar_information(self):
-    self.ref_events_x = self.ref_events_x[:-1]
-    self.ref_events_y = self.ref_events_y[:-1]
+    self.ref_events_x = self.ref_events_x[:]
+    self.ref_events_y = self.ref_events_y[:]
 
     for target_x, target_y in zip(self.ref_events_x, self.ref_events_y):
       self.vertical_bars.append([target_x, target_x])
@@ -468,7 +468,7 @@ class SpaceRepetitionReference(SpaceRepetition):
       panes = None
 
     data_dict = {}
-    add_x_y   = SpaceRepetitionDataBuilder().create_add_x_y_fn_for(data_dict, "recommendation")
+    add_x_y = SpaceRepetitionDataBuilder().create_add_x_y_fn_for(data_dict, "recommendation")
     add_x_y("forgetting", x, y)
     add_x_y("long_term_potentiation", rx, ry)
     add_x_y("moments", self.ref_events_x, self.ref_events_y)
