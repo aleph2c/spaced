@@ -21,8 +21,15 @@ class PlotPaneData(object):
 
     if("axarr" in kwargs):
       self.axarr = kwargs["axarr"]
+
     if("epoch" in kwargs):
       self.epoch = kwargs["epoch"]
+
+    if("plot" in kwargs):
+      self.plot = kwargs["plot"]
+
+  def close(self):
+    self.plot.close()
 
 class SpaceRepetitionBasePlotClass:
   def __init__(self, *data, **kwargs):
@@ -47,7 +54,8 @@ class SpaceRepetitionBasePlotClass:
       self.ppd = PlotPaneData(graph_location=-1,
         figure=figure,
         axarr=axarr,
-        epoch=epoch)
+        epoch=epoch,
+        plot=plt)
 
     self.ppd.graph_location += 1
 
@@ -97,7 +105,7 @@ class SpaceRepetitionBasePlotClass:
     def ftime_series(x, y):
       new_data    = [[], []]
       time_series = []
-      time_series = np.asarray([self.days_to_time(self.ppd.epoch,  days) for days in x])
+      time_series = np.asarray([self.days_to_time(self.ppd.epoch, days) for days in x])
       new_data[0] = time_series[:]
       new_data[1] = y[:]
       return [new_data[0][:], new_data[1][:]]
@@ -161,13 +169,13 @@ class SpaceRepetitionPlotDaysFromEpoch(SpaceRepetitionBasePlotClass):
     axes.set_ylim(0, y_domain)
 
     ftime_series = self.get_time_series_function()
-
     if len(data) > self.data_args:
       new_data = ftime_series(data[0], data[1])
       if self.first_graph_color is None:
         plot.plot(*new_data[0:2])
       else:
         plot.plot(*new_data[0:2], color=self.first_graph_color)
+
 
       new_data = ftime_series(data[2], data[3])
       if self.second_graph_color is None:
