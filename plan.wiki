@@ -2,19 +2,21 @@
 = Observe =
   
   *What defines Success?*
-    [ ] * The range in the plots is exactly what is asked for.
-    [ ] * The offset/timedate plots are easy to select from.
-    [ ] * The stickleback plots were fixed to match the accurate prediction plots.
-    [ ] * The stickleback plots schedule drops are now all populated.
-    [ ] * That plasticity function is learned over time so that it can be transported
+    * [X] The range in the plots is exactly what is asked for.
+    * [X] The stickleback plots were fixed to match the accurate prediction plots.
+    * [ ] The stickleback plots schedule drops are now all populated.
+    * [ ] That plasticity function is learned over time so that it can be transported
           to the next training item.
-    [ ] * There is a single interface, instead of 3/4 interfaces as there was before.
-    [ ] * The code is much much faster than it was.
-    [ ] * Spaced was turned into a python package and shipped.
+    * [ ] There is a single interface, instead of 3/4 interfaces as there was before.
+    * [ ] The code is much much faster than it was.
+    * [ ] Spaced was turned into a python package and shipped.
     
   *What is the problem?*
-
+    If you look at the spaced_predict.pdf file, you see that the last orange
+    line does not drop.
+    
   *Evidence that contradicts Assumptions:*
+    * [ ] The stickleback plots schedule drops are now all populated.
   
 = Orient =
   *Symptoms:*

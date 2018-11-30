@@ -135,6 +135,9 @@ class SpaceRepetitionBasePlotClass:
   def show(self):
     plt.show(block=True)
 
+  def close(self):
+    plt.close()
+
 class SpaceRepetitionPlot(SpaceRepetitionBasePlotClass):
   def __init__(self, *data, **kwargs):
     if 'epoch' in kwargs:
