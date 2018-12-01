@@ -71,7 +71,7 @@ class SpaceRepetition(object):
   Title           = "Spaced Memory Repetition Strategy\n"
   Horizontal_Axis = ""
   Vertical_Axis   = ""
-  Default_Samples = 1000
+  Default_Samples = 100
 
   def __init__(self, *args, **kwargs):
     self.datetime      = None
@@ -1231,9 +1231,13 @@ class LearningTracker(object):
       else:
         hctrl.initialize_feedback(feedback=hf)
 
-      data_dict, _ = hctrl.plot_graphs()
+      graph_handle, data_dict = hctrl.plot_graphs()
       self.base["frame"][str(item)] = dict(data_dict)
+    # save some memory
     data_dict.clear()
+    graph_handle.close()
+
+    # number from frame
     self.base["frames"] = len(self.feedback_x)
     with open(self.data_file, 'w') as outfile:
       json.dump(self.base, outfile, ensure_ascii=False, sort_keys=True, indent=2)

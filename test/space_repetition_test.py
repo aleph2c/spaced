@@ -281,20 +281,20 @@ def test_series():
     json.dump(base, outfile, ensure_ascii=False, sort_keys=True, indent=2)
   graph_handle.close()
 
-#def test_learning_tracker():
-#  epoch = datetime.now()
-#  lt = LearningTracker(epoch=epoch,
-#    feedback_data=get_feedback1(),
-#    plasticity=1.4, 
-#    fdecaytau=0.87,
-#    fdecay0 = 0.9,
-#    )
-#  student = "Marnie MacMillan"
-#  lt.animate(
-#    name_of_mp4="example.mp4",
-#    student=student,
-#    time_per_event_in_seconds=1.0
-#    )
+def test_learning_tracker():
+  epoch = datetime.now()
+  lt = LearningTracker(epoch=epoch,
+    feedback_data=get_feedback1(),
+    plasticity=1.4, 
+    fdecaytau=0.87,
+    fdecay0 = 0.9,
+    )
+  student = "Marnie MacMillan"
+  lt.animate(
+    name_of_mp4="example.mp4",
+    student=student,
+    time_per_event_in_seconds=1.0
+    )
 
 def test_predictions():
   base = {}
