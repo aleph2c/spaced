@@ -425,7 +425,7 @@ class SpaceRepetitionReference(SpaceRepetition):
       index += 1
 
     # Draw our first forgetting curve across our schedule
-    self.recollection_y = list(map(lambda x: self.rfn(x), self.recollection_x))
+    self.recollection_y = [ self.rfn(x) for x in self.recollection_x]
 
     # parse our ref_events into vertical bar information for graphing
     self.vertical_bar_information()
@@ -631,7 +631,7 @@ class SpaceRepetitionFeedback(SpaceRepetition):
   def longterm_potentiation_curve(self):
     rx = self.a_events_x
     ry = self.a_events_y
-    weights = np.linspace(0.1, 1.0, len(rx))
+    weights = np.flip(np.linspace(0.1, 1.0, len(rx)))
     if len(weights) >= 1:
       weights[0] = 0.2
       if len(weights) >= 2:
@@ -796,7 +796,6 @@ class SpaceRepetitionController(SpaceRepetition):
     if("range" in kwargs):
       self.range = kwargs['range']
 
-    # not tuned or used yet
     self.pid_forgetting_decay_tau             = PID(1.2, 0.3, 0.01)
     self.pid_forgetting_decay_initial_value   = PID(1.1, 0.1, 0.01)
     self.updated_reference, x_reference_shift = self.control(control_x = control_x)
@@ -880,7 +879,7 @@ class SpaceRepetitionController(SpaceRepetition):
     return vertical_bars
 
   def control(self, control_x=None):
-    x = np.linspace(0, self.range, 500)
+    x = np.linspace(0, self.range, 50)
     rx = x[:]
 
     if(control_x is None):
@@ -902,17 +901,28 @@ class SpaceRepetitionController(SpaceRepetition):
     x_reference_shift            = control_x - x_reference_feedback_overlap
     self.x_reference_shift       = x_reference_shift
 
-    fdecay0         = self.reference.o.forgetting_decay_initial_value
-    fdecay0        += self.pid_forgetting_decay_initial_value.feedback(self.error(control_x))
-    self.fdecay0    = fdecay0
-    fdecaytau       = self.reference.o.forgetting_decay_tau
-    fdecaytau      += self.pid_forgetting_decay_tau.feedback(self.error(control_x))
-    self.fdecaytau  = fdecaytau
-    updated_reference = SpaceRepetitionReference(ifo=x_reference_feedback_overlap,
-                                                  fdecay0=fdecay0,
-                                                  fdecaytau=fdecaytau)
-    self._schedule_as_offset = [ref_as_offset + x_reference_shift for ref_as_offset in updated_reference.schedule_as_offset_of_days_from_epoch()]
-    self._schedule = [self.epoch + timedelta(days=ref_schedule_item) for ref_schedule_item in self._schedule_as_offset]
+    fdecay0 = self.reference.o.forgetting_decay_initial_value
+    fdecay0 += self.pid_forgetting_decay_initial_value.feedback(self.error(control_x))
+    self.fdecay0 = fdecay0
+    fdecaytau = self.reference.o.forgetting_decay_tau
+    fdecaytau += self.pid_forgetting_decay_tau.feedback(self.error(control_x))
+    self.fdecaytau = fdecaytau
+
+    updated_reference = SpaceRepetitionReference(
+        ifo=x_reference_feedback_overlap,
+        fdecay0=fdecay0,
+        fdecaytau=fdecaytau)
+
+    self._schedule_as_offset = [
+        ref_as_offset + x_reference_shift for 
+        ref_as_offset in 
+        updated_reference.schedule_as_offset_of_days_from_epoch()]
+
+    self._schedule = [
+        self.epoch + timedelta(days=ref_schedule_item) for
+        ref_schedule_item in
+        self._schedule_as_offset]
+
     return [updated_reference, x_reference_shift]
 
   def schedule(self):
