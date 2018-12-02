@@ -351,3 +351,31 @@ def test_closing_features():
   hdl, _ = hr.plot_graph()
   hdl.close()
   
+def test_predictions_2():
+  epoch = datetime.now()
+  hr = SpaceRepetitionReference(
+    epoch=epoch,
+    plasticity=1.4, 
+    fdecaytau=0.87,
+    fdecay0 = 0.9,
+    )
+  x, y = get_feedback1()
+  range_ = x[-1] + x[-1] * 0.5
+  for index in range(0, len(x)):
+
+    hf = SpaceRepetitionFeedback(
+      x[0:index], 
+      y, 
+      range=range_, 
+      epoch=epoch)
+
+    hctrl = SpaceRepetitionController(
+      reference=hr, 
+      feedback=hf, 
+      range=range_, 
+      epoch=epoch)
+
+    graph_handle, data_dict = hctrl.plot_graphs()
+    hctrl.save_figure("spaced_2_{}.pdf".format(index))
+    graph_handle.close()
+    data_dict.clear()

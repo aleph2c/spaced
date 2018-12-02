@@ -967,12 +967,12 @@ class SpaceRepetitionController(SpaceRepetition):
     for target_x, target_y in zip(updated_reference.ref_events_x, updated_reference.ref_events_y):
       new_x = target_x + x_reference_shift
       if(new_x <= self.range):
-        schedule_x.append(target_x + new_x)
+        schedule_x.append(new_x)
         schedule_y.append(target_y)
         self.schedule_vertical_bars.append([new_x, new_x])
         self.schedule_vertical_bars.append([0, target_y])
 
-    x = np.linspace(0, self.range, 50)
+    x = np.linspace(0, self.range, 500)
     rx = x[:]
     ry = self.reference.fn(rx - x_reference_shift)
     feedback_x = x[:]
