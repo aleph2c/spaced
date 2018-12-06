@@ -68,16 +68,35 @@ def get_feedback2():
           ]
   return [x_v,y_v]
 
-def time_round_trip(start_time, time_from_start):
-  time =  start_time
-  time += timedelta(seconds=(time_from_start*86400.0))
-  round_trip = 0
-  if isinstance(time, datetime):
-    round_trip =  time
-    round_trip -= start_time
-  result_in_seconds = round_trip.total_seconds()
-  result = float(result_in_seconds/(86400.0))
-  return result
+def get_feedback3():
+  x_v = [
+          0,
+          0.80640320160080037,
+          1.20640320160080037,
+          1.7523761880940469,
+          3.0240120060030016,
+          4.8074037018509257,
+          8.3351675837918959,
+          10.932966483241621,
+          16.004002001000501,
+          23.029014507253628,
+          29.029014507253628
+        ]
+
+  y_v = [
+          0.0,
+          0.40,
+          1.0,
+          0.64510969552772512-0.1,
+          0.76106659335521121-0.2,
+          0.83741905134093808-0.3,
+          0.89000147547559727,
+          1.00000000000000000,
+          0.99994393927347419,
+          0.99929261332375605,
+          1.00
+          ]
+  return [x_v,y_v]
 
 def test_reference():
   start_time = datetime.now()
@@ -135,9 +154,6 @@ def test_controller():
   range_     = x[-1] + x[-1] * 0.5
   # here is appears that he was testing to see if his timedelta code was working
   # as expected.
-  assert abs(time_round_trip(start_time, 0) - 0) < 0.001
-  result = time_round_trip(start_time, 1.1)
-  assert abs(result - 1.1) < 0.001
   hr = SpaceRepetitionReference(
          plot=False,
          range=range_,
@@ -209,7 +225,7 @@ def test_series():
 
   base["frame"]["0"] = dict(data_dict)
   data_dict.clear()
-  hctrl.save_figure("spaced_0.pdf")
+  hctrl.save_figure("results/spaced_0.pdf")
   graph_handle.close()
 
   #hr = SpaceRepetitionReference(plot=False, range=range_, epoch=start_time)
@@ -219,7 +235,7 @@ def test_series():
 
   base["frame"]["1"] = dict(data_dict)
   data_dict.clear()
-  hctrl.save_figure("spaced_1.pdf")
+  hctrl.save_figure("results/spaced_1.pdf")
   graph_handle.close()
 
   #hr = SpaceRepetitionReference(plot=False,range=range_,epoch=start_time)
@@ -229,7 +245,7 @@ def test_series():
 
   base["frame"]["2"] = dict(data_dict)
   data_dict.clear()
-  hctrl.save_figure("spaced_2.pdf")
+  hctrl.save_figure("results/spaced_2.pdf")
   graph_handle.close()
 
   #hr = SpaceRepetitionReference(plot=False,range=range_,epoch=start_time)
@@ -239,7 +255,7 @@ def test_series():
 
   base["frame"]["3"] = dict(data_dict)
   data_dict.clear()
-  hctrl.save_figure("spaced_3.pdf")
+  hctrl.save_figure("results/spaced_3.pdf")
   graph_handle.close()
 
   #hr = SpaceRepetitionReference(plot=False,range=range_,epoch=start_time)
@@ -249,7 +265,7 @@ def test_series():
 
   base["frame"]["4"] = dict(data_dict)
   data_dict.clear()
-  hctrl.save_figure("spaced_4.pdf")
+  hctrl.save_figure("results/spaced_4.pdf")
   graph_handle.close()
 
   #hr = SpaceRepetitionReference(plot=False,range=range_,epoch=start_time)
@@ -258,7 +274,7 @@ def test_series():
   graph_handle, data_dict = hctrl.plot_graphs()
   base["frame"]["5"] = dict(data_dict)
   data_dict.clear()
-  hctrl.save_figure("spaced_5.pdf")
+  hctrl.save_figure("results/spaced_5.pdf")
   graph_handle.close()
   #hctrl.open_figure("spaced_5.pdf")
 
@@ -274,7 +290,7 @@ def test_series():
 
   base["frame"]["6"] = dict(data_dict)
   data_dict.clear()
-  hctrl.save_figure("spaced_6.pdf")
+  hctrl.save_figure("results/spaced_6.pdf")
 
   base['range'] = range_
   with open(data_file, 'w') as outfile:
@@ -291,7 +307,7 @@ def test_learning_tracker():
     )
   student = "Marnie MacMillan"
   lt.animate(
-    name_of_mp4="example.mp4",
+    name_of_mp4="results/example.mp4",
     student=student,
     time_per_event_in_seconds=1.0
     )
@@ -303,13 +319,18 @@ def test_predictions():
   start_time = datetime.now()
   x, y       = get_feedback1()
   t          = [start_time + timedelta(days=offset) for offset in x]
-  range_     = x[-1] + x[-1] * 0.5
+  range_     = x[0] + x[-1] * 0.5
   hr         = SpaceRepetitionReference(plot=False, range=range_, epoch=start_time)
   hf         = SpaceRepetitionFeedback(t[0:5], y, range=range_, epoch=start_time)
   hctrl      = SpaceRepetitionController(reference=hr, feedback=hf, range=range_, epoch=start_time)
   # plot the reference suggestion, the feedback, error and the updated training
   # suggestions (control)
   graph_handle, data_dict  = hctrl.plot_graphs()
+
+  print(hctrl.x_reference_shift)
+  print([hctrl.days_from_start(scheduled) for scheduled in hctrl.schedule()])
+  print([hctrl.days_from_start(scheduled)-hctrl.x_reference_shift for scheduled in hctrl.schedule()])
+  print([hctrl.days_from_start(scheduled)+hctrl.x_reference_shift for scheduled in hctrl.schedule()])
 
   # Ask a question using day offsets from epoch
   curve = 2
@@ -318,12 +339,13 @@ def test_predictions():
   control_plot = graph_handle.axarr[-1]
   control_plot.plot(training_moments, results, color='xkcd:azure')
 
-  ref_training_moments = hr.range_for(curve=2, day_step_size=0.5)
-  ref_results = [hr.recollect_scalar(ref_training_moment, curve=2) for ref_training_moment in ref_training_moments]
+  curve = 2
+  ref_training_moments = hr.range_for(curve=curve, day_step_size=0.5)
+  ref_results = [hr.recollect_scalar(ref_training_moment, curve=curve) for ref_training_moment in ref_training_moments]
   reference_plot = graph_handle.axarr[0]
   reference_plot.plot(ref_training_moments, ref_results, color='xkcd:teal')
 
-  hctrl.save_figure("spaced_predict.pdf")
+  hctrl.save_figure("results/spaced_predict.pdf")
   graph_handle.close()
 
 def test_datetime_for_curve():
@@ -359,14 +381,14 @@ def test_predictions_2():
     fdecaytau=0.87,
     fdecay0 = 0.9,
     )
-  x, y = get_feedback1()
+  x, y = get_feedback3()
   range_ = x[-1] + x[-1] * 0.5
-  for index in range(0, len(x)):
+  for index in range(1, len(x)):
 
     hf = SpaceRepetitionFeedback(
-      x[0:index], 
-      y, 
-      range=range_, 
+      x[0:index],
+      y,
+      range=range_,
       epoch=epoch)
 
     hctrl = SpaceRepetitionController(
@@ -376,6 +398,6 @@ def test_predictions_2():
       epoch=epoch)
 
     graph_handle, data_dict = hctrl.plot_graphs()
-    hctrl.save_figure("spaced_2_{}.pdf".format(index))
+    hctrl.save_figure("results/spaced_b_{}.pdf".format(index))
     graph_handle.close()
     data_dict.clear()

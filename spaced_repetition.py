@@ -71,7 +71,7 @@ class SpaceRepetition(object):
   Title           = "Spaced Memory Repetition Strategy\n"
   Horizontal_Axis = ""
   Vertical_Axis   = ""
-  Default_Samples = 100
+  Default_Samples = 1000
 
   def __init__(self, *args, **kwargs):
     self.datetime      = None
@@ -188,35 +188,28 @@ class SpaceRepetition(object):
 
     return fn
 
-  def y_data(self, range_x, fn):
-    y1 = [fn(x) for x in range_x]
-    y1 = [0 if y > 1 else y for y in y1]
-    return y1
-
-  def x_data(self, samples, range_=1):
-    x1 = np.linspace(0, range_, samples)
-    return x1
-
-  def make_data(self, set_, samples, fn, range_, solution_x=None):
+  def make_data(self, set1, samples, fn, range_, solution_x=None):
     return_set = [[], []]
-    range_x2   = self.x_data(samples, range_)
+    range_x2   = np.linspace(0, range_, samples)
 
     if solution_x is not None:
-      target_x, nearest_index = self.find_nearest(range_x2, solution_x)
-      range_x2[nearest_index] = solution_x
+      range_x2 = np.append(range_x2, solution_x)
+      range_x2.sort()
 
-    domain_y2  = self.y_data(range_x2, fn)
+    y1 = [fn(x) for x in range_x2]
+    y1 = [0 if y > 1 else y for y in y1]
+    domain_y2  = y1
     set2       = [range_x2, domain_y2]
 
-    if len(set_[0]) == 0:
+    if len(set1[0]) == 0:
       empty_x = range_x2[:]
       empty_y = list(map(lambda x: 0, range_x2))
-      set_ = [empty_x, empty_y]
+      set1 = [empty_x, empty_y]
 
-    for index in range(len(set_[0])):
-      if(set_[1][index] > set2[1][index]):
-        return_set[0].append(set_[0][index])
-        return_set[1].append(set_[1][index])
+    for index in range(len(set1[0])):
+      if(set1[1][index] > set2[1][index]):
+        return_set[0].append(set1[0][index])
+        return_set[1].append(set1[1][index])
       else:
         return_set[0].append(set2[0][index])
         return_set[1].append(set2[1][index])
@@ -234,6 +227,9 @@ class SpaceRepetition(object):
     result = (datetime_ - self.epoch).total_seconds()
     result /= (60 * 60 * 24)
     return result
+
+  def days_from_start(self, datetime_):
+    return self.datetime_to_days_offset_from_epoch(datetime_)
 
   def days_offset_from_epoch_to_datetime(self, offset_):
     result = self.epoch
@@ -293,7 +289,7 @@ class SpaceRepetitionReference(SpaceRepetition):
     else:
       self.initial_forgetting_offset = 0.0
 
-    self.rfn, self.rfn0, self.invrfn = self.longterm_potentiation_curve(self.plasticity_rate)
+    self.rfn, self.rfn0, self.invfn = self.longterm_potentiation_curve(self.plasticity_rate)
 
     self.stickleback(fdecaytau = self.forgetting_decay_tau,
                      fdecay0   = self.forgetting_decay_initial_value,
@@ -312,7 +308,7 @@ class SpaceRepetitionReference(SpaceRepetition):
     return self.ref_events_x
 
   def datetime_for(self, curve=None):
-    '''get the datetime stampe of a curve in the stickleback.  Curves are
+    '''get the datetime stamp of a curve in the stickleback.  Curves are
     indexed from zero'''
     if curve is None or curve <= 0:
       index = 0
@@ -356,23 +352,28 @@ class SpaceRepetitionReference(SpaceRepetition):
 
     # describes how the student gets worse at forgetting after a refresh
     fdfn = self.forgetting_decay_curve(forgetting_decay_initial_value, forgetting_decay_tau)
+    self.fdfn = fdfn
 
     # construct our first forgetting curve, they haven't see this information before.
     ffn, ffn0 = self.forgetting_curves(fdfn(initial_forgetting_offset), initial_forgetting_offset)
-
 
     # Our first training schedule is set at time self.initial_forgetting_offset
     self.ref_events_x.append(initial_forgetting_offset)
     self.forgetting_functions.append(ffn)
     self.ref_events_y.append(1)
-    self.x_and_y = self.make_data(self.x_and_y, self.samples, ffn, self.range)
+    self.x_and_y = self.make_data(
+        self.x_and_y,
+        self.samples,
+        ffn,
+        self.range,
+        solution_x=initial_forgetting_offset)
+
     # The function used to generate the next set of forgetting curves at their
     # prescribed locations in time
 
-    # create a reasonable x_data range to start with
-    self.recollection_x = self.x_data(self.samples, self.range)
+    self.recollection_x = np.linspace(0, self.range, self.samples)
 
-    def generate_targets(fn, fn0, fdfn, index):
+    def generate_targets(fn, fn0):
 
       # Solve fn and rfn with their given tuning parameters
       equation = self.generate_equations(fn0, self.rfn0)
@@ -386,15 +387,13 @@ class SpaceRepetitionReference(SpaceRepetition):
         target_x, nearest_index = self.find_nearest(self.recollection_x, solution_x)
         self.recollection_x[nearest_index] = solution_x
         # we want to replace an item in self.recollection_x with our solution,
-        # yet we want to keep the same number of samples.
 
-
-        #self.ref_events_x.append(target_x)
-        self.ref_events_x.append(solution_x)
-        self.ref_events_y.append(solution_y)
 
         # generate our next forgetting curve
-        fn_next, ffn0_next = self.forgetting_curves(fdfn(index), solution_x)
+        fn_next, ffn0_next = self.forgetting_curves(self.fdfn(solution_x), solution_x)
+
+        self.ref_events_x.append(solution_x)
+        self.ref_events_y.append(solution_y)
 
         # save the forgetting function for the ref_events_x identified.  This
         # will be needed to make predictions about a student's ability to
@@ -407,7 +406,8 @@ class SpaceRepetitionReference(SpaceRepetition):
             self.samples,
             fn_next,
             self.range,
-            solution_x=solution_x)
+            solution_x=solution_x
+            )
 
         # this is where we know the function
       else:
@@ -416,16 +416,15 @@ class SpaceRepetitionReference(SpaceRepetition):
       return [fn_next, ffn0_next]
 
     # get ready to generate the second forgetting curve
-    index, ffn_next, ffn0_next = [1 + initial_forgetting_offset, ffn, ffn0]
+    ffn_next, ffn0_next = [ffn, ffn0]
 
     # generate as many forgetting curves that we need for the time over which we
     # are looking
     while(ffn_next is not None):
-      ffn_next, ffn0_next = generate_targets(ffn_next, ffn0_next, fdfn, index)
-      index += 1
+      ffn_next, ffn0_next = generate_targets(ffn_next, ffn0_next)
 
     # Draw our first forgetting curve across our schedule
-    self.recollection_y = [ self.rfn(x) for x in self.recollection_x]
+    self.recollection_y = [self.rfn(x) for x in self.recollection_x]
 
     # parse our ref_events into vertical bar information for graphing
     self.vertical_bar_information()
@@ -556,11 +555,10 @@ class SpaceRepetitionReference(SpaceRepetition):
       previous_offset = 0
 
     def _tuned_after_feedback(moment, forgetting_function, offset, epoch, control_x):
-      moment = moment - timedelta(control_x)
       query_time = self.datetime_to_days_offset_from_epoch(moment)
       recollection_scalar = forgetting_function(query_time+offset)
-      if recollection_scalar > 1:
-        recollection_scalar = 1
+      #if recollection_scalar > 1:
+      #  recollection_scalar = 1
       return recollection_scalar
 
     recollection_function = functools.partial(_tuned_after_feedback,
@@ -695,7 +693,6 @@ class SpaceRepetitionFeedback(SpaceRepetition):
     data_args += [rx, ry]
     self.vertical_bars = vertical_bars[:]
     data_args += vertical_bars
-    # feedback
 
     self.plot = SpaceRepetitionPlot(
                     *data_args,
@@ -775,7 +772,7 @@ class SpaceRepetitionController(SpaceRepetition):
 
     self.reference        = ControlData(kwargs['reference'])
     self.reference.fn     = self.reference.o.rfn
-    self.reference.invfn  = self.reference.o.invrfn
+    self.reference.invfn  = self.reference.o.invfn
     self.reference.range  = self.reference.o.range
     self.reference.domain = self.reference.o.domain
 
@@ -796,10 +793,16 @@ class SpaceRepetitionController(SpaceRepetition):
     if("range" in kwargs):
       self.range = kwargs['range']
 
-    self.pid_forgetting_decay_tau             = PID(1.2, 0.3, 0.01)
-    self.pid_forgetting_decay_initial_value   = PID(1.1, 0.1, 0.01)
-    self.updated_reference, x_reference_shift = self.control(control_x = control_x)
-    self._schedule                            = []
+    # Our PID controller actually don't do a lot, there isn't time in a training
+    # series to tune them properly.  They are mosting just proportial scalars
+    # which effect two tuning parameters for our updated reference.
+
+    # The majority of our system's response to a student training comes from
+    # finding the intersection between our modelled graph of their plasticity
+    # and the original reference as a training goal
+    self.pid_forgetting_decay_tau             = PID(1.2, 0.3, 0.04)
+    self.pid_forgetting_decay_initial_value   = PID(1.1, 0.1, 0.03)
+    self.control(control_x = control_x)
 
     for day in self.updated_reference.ref_events_x:
       self._schedule.append(self.days_to_time(day))
@@ -901,29 +904,52 @@ class SpaceRepetitionController(SpaceRepetition):
     x_reference_shift            = control_x - x_reference_feedback_overlap
     self.x_reference_shift       = x_reference_shift
 
+    # What we want is determined by our reference
+    # What we are provided, is first used to build a model about the actual
+    # plasticity curve, then we take the difference between what we want and
+    # what we have been observing and use that as our error signal
+    error_y = self.reference.fn(control_x) - self.feedback.fn(control_x)
+
+    # fdecay0, seen it before?  Then pick a lower number (lower is better)
     fdecay0 = self.reference.o.forgetting_decay_initial_value
-    fdecay0 += self.pid_forgetting_decay_initial_value.feedback(self.error(control_x))
+    fdecay0 -= self.pid_forgetting_decay_initial_value.feedback(error_y)
+    #try:
+    #  # if our student is making mistakes we want to assume they can't learn
+    #  # as fast as we want them to learn
+    #  print("1: for positive error {}: this diff should be pos: {}".format(error_y, self.fdecay0 - fdecay0))
+    #except:
+    #  pass
     self.fdecay0 = fdecay0
+
+    # fdecaytau, ability to improve after a lesson, (lower is better)
     fdecaytau = self.reference.o.forgetting_decay_tau
-    fdecaytau += self.pid_forgetting_decay_tau.feedback(self.error(control_x))
+    fdecaytau -= self.pid_forgetting_decay_tau.feedback(error_y)
+    #try:
+    #  # if our student is making mistakes we want to assume they can't learn
+    #  # as fast as we want them to learn
+    #  print("2: for positive error {}: this diff should be pos: {}".format(error_y, self.fdecaytau - fdecaytau))
+    #except:
+    #  pass
     self.fdecaytau = fdecaytau
 
-    updated_reference = SpaceRepetitionReference(
+    self.updated_reference = SpaceRepetitionReference(
         ifo=x_reference_feedback_overlap,
         fdecay0=fdecay0,
         fdecaytau=fdecaytau)
 
+    x_reference_feedback_overlap = self.updated_reference.invfn(y_input)
+    # the reference must be shift to the left for positive overlap
+    self.x_reference_shift = self.control_x - x_reference_feedback_overlap
+
     self._schedule_as_offset = [
-        ref_as_offset + x_reference_shift for 
+        ref_as_offset + self.x_reference_shift for 
         ref_as_offset in 
-        updated_reference.schedule_as_offset_of_days_from_epoch()]
+        self.updated_reference.schedule_as_offset_of_days_from_epoch()]
 
     self._schedule = [
         self.epoch + timedelta(days=ref_schedule_item) for
         ref_schedule_item in
         self._schedule_as_offset]
-
-    return [updated_reference, x_reference_shift]
 
   def schedule(self):
     return self._schedule
@@ -933,9 +959,9 @@ class SpaceRepetitionController(SpaceRepetition):
 
   def plot_control(self, **kwargs):
     control_x = self.control_x
-    updated_reference, x_reference_shift = self.control(control_x=control_x)
-    x_ref = updated_reference.x_and_y[0]
-    y_ref = updated_reference.x_and_y[1]
+    #updated_reference, x_reference_shift = self.control(control_x=control_x)
+    x_ref = self.updated_reference.x_and_y[0]
+    y_ref = self.updated_reference.x_and_y[1]
 
     if("epoch" in kwargs):
       epoch = kwargs['epoch']
@@ -955,7 +981,7 @@ class SpaceRepetitionController(SpaceRepetition):
     control_ref_x = []
     control_ref_y = []
     for x_data, y_data in zip(x_ref, y_ref):
-      x_new = x_reference_shift + x_data
+      x_new = self.x_reference_shift + x_data
       if(x_new <= self.range):
         if(x_new >= control_x):
           control_ref_x.append(x_new)
@@ -964,8 +990,8 @@ class SpaceRepetitionController(SpaceRepetition):
     self.schedule_vertical_bars = []
     schedule_x = []
     schedule_y = []
-    for target_x, target_y in zip(updated_reference.ref_events_x, updated_reference.ref_events_y):
-      new_x = target_x + x_reference_shift
+    for target_x, target_y in zip(self.updated_reference.ref_events_x, self.updated_reference.ref_events_y):
+      new_x = target_x + self.x_reference_shift
       if(new_x <= self.range):
         schedule_x.append(new_x)
         schedule_y.append(target_y)
@@ -974,7 +1000,7 @@ class SpaceRepetitionController(SpaceRepetition):
 
     x = np.linspace(0, self.range, 500)
     rx = x[:]
-    ry = self.reference.fn(rx - x_reference_shift)
+    ry = self.reference.fn(rx - self.x_reference_shift)
     feedback_x = x[:]
     feedback_y = self.feedback.fn(x)
     data_args = [feedback_x, feedback_y, rx, ry, control_ref_x, control_ref_y]
@@ -1067,34 +1093,16 @@ class SpaceRepetitionController(SpaceRepetition):
     if curve is None:
       curve = 1
 
-    recollection_function = self.recollect_function(curve)
     index = curve-1
-    time_offset_in_days = self.schedule_as_offset_of_days_from_epoch()[index]
-    curve_start_datetime = self.epoch + \
-                           timedelta(self.control_x) + \
-                           timedelta(days=time_offset_in_days)
-    y = recollection_function(moment_as_datetime)
+    offsets = [self.days_from_start(scheduled)-self.x_reference_shift for
+        scheduled in self.schedule()]
+    # self.updated_reference.ref_events_x
+    offset = offsets[index]
+    forgetting_function, _ = self.updated_reference.forgetting_curves(
+        self.updated_reference.fdfn(offset), offset)
+    query_time_in_days = self.days_from_start(moment) - self.x_reference_shift
+    y = forgetting_function(query_time_in_days)
     return y
-
-  def recollect_function(self, curve=None):
-    if curve is None:
-      curve = 1
-
-    index = curve - 1
-    forgetting_function = self.updated_reference.forgetting_functions[index]
-    curves_start_since_epoch = \
-      self.datetime_to_days_offset_from_epoch(self._schedule[index])
-
-    def _tuned_after_feedback(moment, forgetting_function, offset):
-      moment = self.datetime_to_days_offset_from_epoch(moment) - offset
-      recollection_scalar = forgetting_function(moment)
-      return recollection_scalar
-
-    recollection_function = functools.partial(_tuned_after_feedback,
-        forgetting_function=forgetting_function,
-        offset=self.x_reference_shift)
-
-    return recollection_function
 
   def datetime_for(self, curve=None):
     '''get the datetime stampe of a curve in the stickleback.  Curves are
