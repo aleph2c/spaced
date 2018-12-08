@@ -187,32 +187,33 @@ class SpaceRepetition(object):
       return result
 
     return fn
-
-  def make_data(self, set1, samples, fn, range_, solution_x=None):
+  def make_data(self, forgetting_functions, solutions):
     return_set = [[], []]
-    range_x2   = np.linspace(0, range_, samples)
 
-    if solution_x is not None:
-      range_x2 = np.append(range_x2, solution_x)
-      range_x2.sort()
+    solutions = np.array(solutions)
+    solutions_left_shifted = np.array([solution-0.0001 for solution in solutions])
+    x_range   = np.array(np.linspace(0, self.range, self.samples))
+    x_data = np.concatenate(
+      (
+        solutions.flatten(),
+        x_range.flatten(),
+        solutions_left_shifted.flatten()
+      ))
+    x_data.sort()
+    y_data = np.zeros(len(x_data))
 
-    y1 = [fn(x) for x in range_x2]
-    y1 = [0 if y > 1 else y for y in y1]
-    domain_y2  = y1
-    set2       = [range_x2, domain_y2]
+    return_set = [x_data, y_data]
 
-    if len(set1[0]) == 0:
-      empty_x = range_x2[:]
-      empty_y = list(map(lambda x: 0, range_x2))
-      set1 = [empty_x, empty_y]
+    y = np.clip(np.array([forgetting_functions[0](x) for x in x_data]), 0, 1)
+    return_set = [x_data, y[:]]
+    for fn in forgetting_functions[1:]:
+      y_ = [fn(x) for x in x_data]
+      y = [ 0 if y > 1 else y for y in y_]
+      overlap_set = [x_data, y[:]]
 
-    for index in range(len(set1[0])):
-      if(set1[1][index] > set2[1][index]):
-        return_set[0].append(set1[0][index])
-        return_set[1].append(set1[1][index])
-      else:
-        return_set[0].append(set2[0][index])
-        return_set[1].append(set2[1][index])
+      for index in range(len(return_set[0])):
+        if(return_set[1][index] < overlap_set[1][index]):
+          return_set[1][index] = overlap_set[1][index]
     return return_set
 
   def times(self):
@@ -240,7 +241,7 @@ class SpaceRepetitionReference(SpaceRepetition):
   Title           = "Spaced Memory Reference\n"
   Horizontal_Axis = ""
   Vertical_Axis   = "recommendation"
-  Default_Samples = 1000
+  Default_Samples = 50
   Default_Range   = 40
 
   StickleBackColor          = 'xkcd:orangered'
@@ -361,16 +362,9 @@ class SpaceRepetitionReference(SpaceRepetition):
     self.ref_events_x.append(initial_forgetting_offset)
     self.forgetting_functions.append(ffn)
     self.ref_events_y.append(1)
-    self.x_and_y = self.make_data(
-        self.x_and_y,
-        self.samples,
-        ffn,
-        self.range,
-        solution_x=initial_forgetting_offset)
 
     # The function used to generate the next set of forgetting curves at their
     # prescribed locations in time
-
     self.recollection_x = np.linspace(0, self.range, self.samples)
 
     def generate_targets(fn, fn0):
@@ -400,20 +394,11 @@ class SpaceRepetitionReference(SpaceRepetition):
         # recollect something at a given time in the future
         self.forgetting_functions.append(fn_next)
 
-        # eclipse the previous forgetting curve with our new one
-        self.x_and_y = self.make_data(
-            self.x_and_y,
-            self.samples,
-            fn_next,
-            self.range,
-            solution_x=solution_x
-            )
-
-        # this is where we know the function
       else:
         # if we didn't find a solution our search is complete
         fn_next, ffn0_next = [None, None]
       return [fn_next, ffn0_next]
+
 
     # get ready to generate the second forgetting curve
     ffn_next, ffn0_next = [ffn, ffn0]
@@ -422,6 +407,12 @@ class SpaceRepetitionReference(SpaceRepetition):
     # are looking
     while(ffn_next is not None):
       ffn_next, ffn0_next = generate_targets(ffn_next, ffn0_next)
+
+    # create the stickleback x and y data that can be plotted
+    self.x_and_y = self.make_data(
+      forgetting_functions = self.forgetting_functions,
+      solutions=self.ref_events_x
+    )
 
     # Draw our first forgetting curve across our schedule
     self.recollection_y = [self.rfn(x) for x in self.recollection_x]
