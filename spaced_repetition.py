@@ -19,18 +19,54 @@ from graph import SpaceRepetitionPlot
 import matplotlib.animation as animation
 from animate import LearningTrackerAnimation
 
-# from graph import PlotPaneData
-# from graph import ErrorPlotFromZero
-# from graph import ErrorPlotFromEpoch
-# from graph import SpaceRepetitionBasePlotClass
-# from graph import SpaceRepetitionPlotDaysFromZero
-# from graph import SpaceRepetitionPlotDaysFromEpoch
-
 matplotlib.use("Agg")
 
 ppp = pprint.PrettyPrinter(indent=2)
 def pp(thing):
   ppp.pprint(thing)
+
+class SpacedKwargInterface():
+  def __init__(self, *args, **kwargs):
+    if("datetime" in kwargs):
+      self.epoch = kwargs['epoch']
+    if("range" in kwargs):
+      self.range = kwargs['range']
+    if("samples" in kwargs):
+      self.samples = kwargs['samples']
+    if("plasticity" in kwargs):
+      self.plasticity_rate = kwargs['plasticity']
+
+    # forgetting decay tau
+    if("fdecaytau" in kwargs):
+      self.fdecaytau = kwargs['fdecaytau']
+
+    # forgetting decay initital value
+    if("fdecay0" in kwargs):
+      self.fdecay0 = kwargs['fdecay0']
+
+    # initial forgetting offset
+    if("ifo" in kwargs):
+      self.ifo = kwargs['ifo']
+
+    if("feedback_data" in kwargs):
+      self.feedback_data = kwargs['feedback_data']
+
+    # PID control
+    if("fdecaytau_kp" in kwargs):
+      self.fdecaytau_kp = kwargs['fdecaytau_kp']
+    if("fdecaytau_ki" in kwargs):
+      self.fdecaytau_ki = kwargs['fdecaytau_ki']
+    if("fdecaytau_kd" in kwargs):
+      self.fdecaytau_kd = kwargs['fdecaytau_kd']
+
+    if("fdecay0_kp  " in kwargs):
+      self.fdecay0_kp = kwargs['fdecay0_kp']
+    if("fdecay0_ki  " in kwargs):
+      self.fdecay0_ki = kwargs['fdecay0_ki']
+    if("fdecay0_kd  " in kwargs):
+      self.fdecay0_kd = kwargs['fdecay0_kd']
+    if("control_x" in kwargs):
+      control_x = kwargs["control_x"]
 
 class QueryTimeBeforeCurve(Exception):
   '''A query time has been made before a forgetting curve has been activated'''
@@ -40,7 +76,7 @@ class QueryTimeBeforeCurve(Exception):
                  format(moment, curve, curve_start_datetime)
     super().__init__(message)
 
-class SpaceRepetitionDataBuilder(object):
+class SpaceRepetitionDataBuilder():
   def __init__(self, *args, **kwargs):
     self.dictionary = {}
 
@@ -66,7 +102,7 @@ class SpaceRepetitionDataBuilder(object):
       base[key] = data_dict[key][:]
     return base
 
-class SpaceRepetition(object):
+class SpaceRepetition():
 
   Title           = "Spaced Memory Repetition Strategy\n"
   Horizontal_Axis = ""
@@ -74,23 +110,37 @@ class SpaceRepetition(object):
   Default_Samples = 1000
 
   def __init__(self, *args, **kwargs):
-    self.datetime      = None
-    self.plot          = None
-    self.range         = None
-    self.domain        = None
-    self.x_and_y       = None
-    self.vertical_bars = None
-    self.samples       = 0
-    self.ref_events_x  = []  # recommended events x
-    self.ref_events_y  = []  # recommended events y
-    self.a_events_x    = []  # actual events x
-    self.a_events_y    = []
-    self.control_x     = 0
+    self.epoch                              = datetime.now()
+    self.datetime                           = None
+    self.plot                               = None
+    self.range                              = None
+    self.ref_events_x                       = []  # recommended events x
+    self.ref_events_y                       = []  # recommended events y
+    self.a_events_x                         = []  # actual events x
+    self.a_events_y                         = []
+    self.control_x                          = 0
+    self.domain                             = 1
+    self.vertical_bars                      = []
+    self.x_and_y                            = [[], []]
+    self.forgetting_properties              = {}
+    self.forgetting_properties["fdecay"]    = {}
+    self.forgetting_properties["fdecaytau"] = {}
+    self.range                              = SpaceRepetitionReference.Default_Range
+    self.plasticity_rate                    = SpaceRepetitionReference.PlasticityRate
+    self.samples                            = SpaceRepetitionReference.Default_Samples
+    self.fdecaytau                          = SpaceRepetitionReference.Forgetting_Decay_Tau
+    self.fdecay0                            = SpaceRepetitionReference.Forgetting_Decay_Initial_Value
+    self.ifo                                = SpaceRepetitionReference.Initial_Forgetting_Offset
+    self.forgetting_functions               = []
 
-    if("datetime" in kwargs):
-      self.epoch = kwargs['epoch']
-    else:
-      self.epoch = datetime.now()
+    self.fdecaytau_kp = SpaceRepetitionController.DECAY_TAU_KP
+    self.fdecaytau_ki = SpaceRepetitionController.DECAY_TAU_KI
+    self.fdecaytau_kd = SpaceRepetitionController.DECAY_TAU_KD
+    self.fdecay0_kp   = SpaceRepetitionController.DECAY_INITIAL_VALUE_KP
+    self.fdecay0_ki   = SpaceRepetitionController.DECAY_INITIAL_VALUE_KI
+    self.fdecay0_kd   = SpaceRepetitionController.DECAY_INITIAL_VALUE_KD
+
+    SpacedKwargInterface.__init__(self, *args, **kwargs)
 
   def plot_graph(self, **kwargs):
     pass
@@ -250,15 +300,18 @@ class SpaceRepetitionReference(SpaceRepetition):
   # fdecay0
   Forgetting_Decay_Initial_Value = 1.4
   # fdecaytau
-  Forgetting_Decay_Tau           = 1.2
+  Forgetting_Decay_Tau = 1.2
   # plasticity
-  PlasticityRate                 = 1.8
+  PlasticityRate = 1.8
+
+  # initial forgetting offset
+  Initial_Forgetting_Offset = 0.0
 
   def __init__(self, *args, **kwargs):
-    # Run our super class
+
+    # Run our super initializations
     SpaceRepetition.__init__(self, *args, **kwargs)
 
-    # initialization and defaults
     self.domain                             = 1
     self.vertical_bars                      = []
     self.x_and_y                            = [[], []]
@@ -268,33 +321,17 @@ class SpaceRepetitionReference(SpaceRepetition):
     self.range                              = SpaceRepetitionReference.Default_Range
     self.plasticity_rate                    = SpaceRepetitionReference.PlasticityRate
     self.samples                            = SpaceRepetitionReference.Default_Samples
-    self.forgetting_decay_tau               = SpaceRepetitionReference.Forgetting_Decay_Tau
-    self.forgetting_decay_initial_value     = SpaceRepetitionReference.Forgetting_Decay_Initial_Value
+    self.fdecaytau                          = SpaceRepetitionReference.Forgetting_Decay_Tau
+    self.fdecay0                            = SpaceRepetitionReference.Forgetting_Decay_Initial_Value
+    self.forgetting_functions               = []
 
-    self.forgetting_functions = []
-
-    # Let the caller over-ride some of our default values
-    if("range" in kwargs):
-      self.range = kwargs['range']
-    if("samples" in kwargs):
-      self.samples = kwargs['samples']
-    if("plasticity" in kwargs):
-      self.plasticity_rate = kwargs['plasticity']
-    if("fdecaytau" in kwargs):
-      self.forgetting_decay_tau = kwargs['fdecaytau']
-    if("fdecay0" in kwargs):
-      self.forgetting_decay_initial_value = kwargs['fdecay0']
-
-    if("ifo" in kwargs):
-      self.initial_forgetting_offset = kwargs['ifo']
-    else:
-      self.initial_forgetting_offset = 0.0
+    SpacedKwargInterface.__init__(self, *args, **kwargs)
 
     self.rfn, self.rfn0, self.invfn = self.longterm_potentiation_curve(self.plasticity_rate)
 
-    self.stickleback(fdecaytau = self.forgetting_decay_tau,
-                     fdecay0   = self.forgetting_decay_initial_value,
-                     ifo       = self.initial_forgetting_offset)
+    self.stickleback(fdecaytau = self.fdecaytau,
+                     fdecay0   = self.fdecay0,
+                     ifo       = self.ifo)
 
     if("plot" in kwargs and kwargs["plot"] is True):
       self.plot_graph()
@@ -339,27 +376,27 @@ class SpaceRepetitionReference(SpaceRepetition):
 
   def stickleback(self, **kwargs):
 
-    forgetting_decay_tau           = kwargs['fdecaytau']
-    forgetting_decay_initial_value = kwargs['fdecay0']
+    fdecaytau = kwargs['fdecaytau']
+    fdecay0 = kwargs['fdecay0']
 
     if("ifo" in kwargs):
-      initial_forgetting_offset = kwargs['ifo']
+      ifo = kwargs['ifo']
     else:
-      initial_forgetting_offset = 0.0
+      ifo = 0.0
 
     # salt away our results
-    self.forgetting_properties["fdecaytau"][initial_forgetting_offset] = forgetting_decay_tau
-    self.forgetting_properties["fdecay"][initial_forgetting_offset]    = forgetting_decay_initial_value
+    self.forgetting_properties["fdecaytau"][ifo] = fdecaytau
+    self.forgetting_properties["fdecay"][ifo]    = fdecay0
 
     # describes how the student gets worse at forgetting after a refresh
-    fdfn = self.forgetting_decay_curve(forgetting_decay_initial_value, forgetting_decay_tau)
+    fdfn = self.forgetting_decay_curve(fdecay0, fdecaytau)
     self.fdfn = fdfn
 
     # construct our first forgetting curve, they haven't see this information before.
-    ffn, ffn0 = self.forgetting_curves(fdfn(initial_forgetting_offset), initial_forgetting_offset)
+    ffn, ffn0 = self.forgetting_curves(fdfn(ifo), ifo)
 
-    # Our first training schedule is set at time self.initial_forgetting_offset
-    self.ref_events_x.append(initial_forgetting_offset)
+    # Our first training schedule is set at time self.ifo
+    self.ref_events_x.append(ifo)
     self.forgetting_functions.append(ffn)
     self.ref_events_y.append(1)
 
@@ -523,13 +560,6 @@ class SpaceRepetitionReference(SpaceRepetition):
     curve_start_datetime = self.epoch + timedelta(days=time_offset_in_days)
 
     y = recollection_function(moment_as_datetime-timedelta(days=time_offset_in_days) )
-    #curve_start_datetime = self.epoch + \
-    #                       timedelta(self.control_x) + \
-    #                       timedelta(days=time_offset_in_days)
-         
-    #if(moment_as_datetime < curve_start_datetime - timedelta(days=0.01)):
-    #  raise QueryTimeBeforeCurve(moment_as_datetime, curve, curve_start_datetime)
-
     return y
 
   def recollect_function(self, curve=None):
@@ -548,8 +578,6 @@ class SpaceRepetitionReference(SpaceRepetition):
     def _tuned_after_feedback(moment, forgetting_function, offset, epoch, control_x):
       query_time = self.datetime_to_days_offset_from_epoch(moment)
       recollection_scalar = forgetting_function(query_time+offset)
-      #if recollection_scalar > 1:
-      #  recollection_scalar = 1
       return recollection_scalar
 
     recollection_function = functools.partial(_tuned_after_feedback,
@@ -582,6 +610,8 @@ class SpaceRepetitionFeedback(SpaceRepetition):
           conditioned_x = event_x
         self.add_event(conditioned_x, event_y)
 
+    SpacedKwargInterface.__init__(self, *args, **kwargs)
+
     if("range" in kwargs):
       self.range = kwargs['range']
     else:
@@ -594,6 +624,7 @@ class SpaceRepetitionFeedback(SpaceRepetition):
     with np.errstate(all="ignore"):
       result  = np.power(x, 1.0 / pdiv_)
       result /= np.power(x + adder_, 1.0 / pdiv_)
+    #result = np.clip(result, 0, 1)
     return result
 
   def recollection_line_profile(self, x, m, b):
@@ -625,7 +656,6 @@ class SpaceRepetitionFeedback(SpaceRepetition):
       weights[0] = 0.2
       if len(weights) >= 2:
         pass
-        #weights[-3] = 0.85
         weights[-2] = 0.1
         weights[-1] = 0.1
 
@@ -702,7 +732,7 @@ class SpaceRepetitionFeedback(SpaceRepetition):
   def show(self):
     plt.show()
 
-class ControlData(object):
+class ControlData():
   def __init__(self, object_handle, *args, **kwargs):
     self._long_term_potentiation = None
     self._obj = object_handle
@@ -756,6 +786,13 @@ class ControlData(object):
 
 class SpaceRepetitionController(SpaceRepetition):
 
+  DECAY_TAU_KP = 1.0
+  DECAY_TAU_KI = 0.1
+  DECAY_TAU_KD = 0.04
+  DECAY_INITIAL_VALUE_KP = 1.0
+  DECAY_INITIAL_VALUE_KI = 0.1
+  DECAY_INITIAL_VALUE_KD = 0.03
+
   def __init__(self, *args, **kwargs):
     # Run our super class
     SpaceRepetition.__init__(self, *args, **kwargs)
@@ -767,22 +804,21 @@ class SpaceRepetitionController(SpaceRepetition):
     self.reference.range  = self.reference.o.range
     self.reference.domain = self.reference.o.domain
 
-    self.initialize_feedback(kwargs['feedback'])
-    #self.feedback         = ControlData(kwargs['feedback'])
-    #self.feedback.fn      = self.feedback.o.rfn
-    #self.feedback.range   = self.feedback.o.range
-    #self.feedback.domain  = self.feedback.o.domain
-    #self.range            = self.feedback.range+0.1*(self.feedback.range)
-    #self.input_x          = self.feedback.o.a_events_x[:]
-    #self.input_y          = self.feedback.o.a_events_y[:]
+    self.feedback         = ControlData(kwargs['feedback'])
+    self.feedback.fn      = self.feedback.o.rfn
+    self.feedback.range   = self.feedback.o.range
+    self.feedback.domain  = self.feedback.o.domain
+    self.range            = self.feedback.range
+    self.input_x          = self.feedback.o.a_events_x[:]
+    self.input_y          = self.feedback.o.a_events_y[:]
+    self.control_x        = self.input_x[-1]
+
+    SpacedKwargInterface.__init__(self, *args, **kwargs)
 
     if("control_x" in kwargs):
       control_x = kwargs["control_x"]
     else:
       control_x = self.input_x[-1]
-
-    if("range" in kwargs):
-      self.range = kwargs['range']
 
     # Our PID controller actually don't do a lot, there isn't time in a training
     # series to tune them properly.  They are mosting just proportial scalars
@@ -791,12 +827,18 @@ class SpaceRepetitionController(SpaceRepetition):
     # The majority of our system's response to a student training comes from
     # finding the intersection between our modelled graph of their plasticity
     # and the original reference as a training goal
-    self.pid_forgetting_decay_tau             = PID(1.2, 0.3, 0.04)
-    self.pid_forgetting_decay_initial_value   = PID(1.1, 0.1, 0.03)
+    self.pid_forgetting_decay_tau = PID(
+      kp=self.fdecaytau_kp,
+      ki=self.fdecaytau_ki,
+      kd=self.fdecaytau_kd)
+
+    self.pid_forgetting_decay_initial_value = PID(
+      kp=self.fdecay0_kp,
+      ki=self.fdecay0_ki,
+      kd=self.fdecay0_kd)
+        
     self.control(control_x = control_x)
 
-    for day in self.updated_reference.ref_events_x:
-      self._schedule.append(self.days_to_time(day))
 
   def initialize_feedback(self, feedback, *args, **kwargs):
     self.feedback         = ControlData(feedback)
@@ -807,6 +849,10 @@ class SpaceRepetitionController(SpaceRepetition):
     self.input_x          = self.feedback.o.a_events_x[:]
     self.input_y          = self.feedback.o.a_events_y[:]
     self.control_x        = self.input_x[-1]
+    self.control(control_x = self.control_x)
+
+    for day in self.updated_reference.ref_events_x:
+      self._schedule.append(self.days_to_time(day))
 
   def error(self, x):
     # a positive error means we need to push harder
@@ -902,7 +948,7 @@ class SpaceRepetitionController(SpaceRepetition):
     error_y = self.reference.fn(control_x) - self.feedback.fn(control_x)
 
     # fdecay0, seen it before?  Then pick a lower number (lower is better)
-    fdecay0 = self.reference.o.forgetting_decay_initial_value
+    fdecay0 = self.reference.o.fdecay0
     fdecay0 -= self.pid_forgetting_decay_initial_value.feedback(error_y)
     #try:
     #  # if our student is making mistakes we want to assume they can't learn
@@ -913,7 +959,7 @@ class SpaceRepetitionController(SpaceRepetition):
     self.fdecay0 = fdecay0
 
     # fdecaytau, ability to improve after a lesson, (lower is better)
-    fdecaytau = self.reference.o.forgetting_decay_tau
+    fdecaytau = self.reference.o.fdecaytau
     fdecaytau -= self.pid_forgetting_decay_tau.feedback(error_y)
     #try:
     #  # if our student is making mistakes we want to assume they can't learn
@@ -1116,46 +1162,36 @@ class SpaceRepetitionController(SpaceRepetition):
   def next_lesson(self):
     return self.schedule()[0]
 
-class LearningTracker(object):
+class LearningTracker():
   def __init__(self, *args, **kwargs):
-
+    SpaceRepetition.__init__(self, *args, **kwargs)
     self.data_file     = "test_run.json"
     self.base          = {}
     self.base["frame"] = {}
-    self.start_time    = datetime.now()
+    SpaceRepetition.__init__(self, *args, **kwargs)
 
-    if("datetime" in kwargs):
-      self.epoch = kwargs['epoch']
+    if not self.epoch:
+      self.start_time = datetime.now()
     else:
-      self.epoch = datetime.now()
-
-    if("feedback_data" in kwargs):
-      self.feedback_data = kwargs['feedback_data']
+      self.start_time = self.epoch
 
     self.plasticity_rate = SpaceRepetitionReference.PlasticityRate
     self.samples = SpaceRepetitionReference.Default_Samples
-    self.forgetting_decay_tau = SpaceRepetitionReference.Forgetting_Decay_Tau
-    self.forgetting_decay_initial_value = SpaceRepetitionReference.Forgetting_Decay_Initial_Value
+    self.fdecaytau = SpaceRepetitionReference.Forgetting_Decay_Tau
+    self.fdecay0 = SpaceRepetitionReference.Forgetting_Decay_Initial_Value
+    self.feedback_x = []
+    self.feedback_y = []
+    self.frames     = []
 
-    if("plasticity" in kwargs):
-      self.plasticity_rate = kwargs['plasticity']
-    if("fdecaytau" in kwargs):
-      self.forgetting_decay_tau = kwargs['fdecaytau']
-    if("fdecay0" in kwargs):
-      self.forgetting_decay_initial_value = kwargs['fdecay0']
-
-    if("ifo" in kwargs):
-      self.initial_forgetting_offset = kwargs['ifo']
-    else:
-      self.initial_forgetting_offset = 0.0
+    SpacedKwargInterface.__init__(self, *args, **kwargs)
 
     self.reference = SpaceRepetitionReference(
           plot=False,
           epoch=self.epoch,
           plasticity=self.plasticity_rate,
-          fdecay0=self.forgetting_decay_initial_value,
-          fdecaytau=self.forgetting_decay_tau,
-          ifo=self.initial_forgetting_offset,
+          fdecay0=self.fdecay0,
+          fdecaytau=self.fdecaytau,
+          ifo=self.ifo,
     )
 
     self.feedback = SpaceRepetitionFeedback(
@@ -1168,20 +1204,47 @@ class LearningTracker(object):
           feedback=self.feedback,
           epoch=self.start_time)
 
-    self.feedback_x = []
-    self.feedback_y = []
-    self.frames     = []
-    self.control    = []
-
-    if self.feedback_data:
-      x, y = self.feedback_data
-      for x_, y_, in zip(x, y):
-        self.add_event(x_, y_)
+    if "feedback_data" in kwargs:
+      self.feedback_data = kwargs['feedback_data']
+      if self.feedback_data:
+        x, y = self.feedback_data
+        for x_, y_, in zip(x, y):
+          self.add_event(x_, y_)
 
   def add_event(self, event_x, event_y):
     self.feedback_x.append(event_x)
     self.feedback_y.append(event_y)
     self.frame = np.arange(1, len(self.feedback_x))
+    hf = SpaceRepetitionFeedback(self.feedback_x,
+        self.feedback_y,
+        range=self.range,
+        epoch=self.epoch)
+    self.control.initialize_feedback(feedback=hf)
+
+  def plot_graphs(self):
+    return self.control.plot_graphs()
+
+  def save_figure(self, filename=None):
+    self.control.save_figure(filename)
+
+  def learned(self, when, result):
+    moment = when
+    if(isinstance(moment, datetime)):
+      assert(moment + timedelta(days=0.01) > self.epoch)
+      moment_as_datetime = moment
+    elif(isinstance(moment, timedelta)):
+      moment_as_datetime = self.epoch + timedelta
+    elif(isinstance(moment, float) or isinstance(moment, int)):
+      moment_as_datetime = self.epoch + timedelta(days=float(moment))
+    else:
+      raise
+
+    moment_as_offset_in_days = self.control.days_from_epoch(moment_as_datetime)
+
+    assert(0.0 <= result <= 1.0)
+    self.add_event(
+      moment_as_offset_in_days,
+      result)
 
   def animate(self, name_of_mp4=None, student=None,
       time_per_event_in_seconds=None):
@@ -1189,20 +1252,11 @@ class LearningTracker(object):
     self.base["frame"] = {}
     range_    = self.feedback_x[-1] + self.feedback_x[-1] * 0.5
     self.base["range"] = range_
-    #hr        = SpaceRepetitionReference(plot=False, range=range_, epoch=self.start_time)
-    #hf        = SpaceRepetitionFeedback(self.feedback_x[0:2], self.feedback_y[0:2], range=range_, epoch=self.start_time)
-    #hctrl     = SpaceRepetitionController(reference=hr, feedback=hf, range=range_, epoch=self.start_time)
-    #data_dict, _ = hctrl.plot_graphs()
 
-    #self.base["frame"]["0"] = dict(data_dict)
-    #data_dict.clear()
     if name_of_mp4 is None:
       self.name_of_mp4 = "animate.mp4"
     else:
       self.name_of_mp4 = name_of_mp4
-
-    #basename = os.path.basename(self.data_file)
-    #self.data_file = os.path.splitext(basename)[0] + ".json"
 
     if student is None:
       self.student = "example"
@@ -1222,9 +1276,9 @@ class LearningTracker(object):
       hr = SpaceRepetitionReference(
           epoch=self.epoch,
           plasticity=self.plasticity_rate,
-          fdecay0=self.forgetting_decay_initial_value,
-          fdecaytau=self.forgetting_decay_tau,
-          ifo=self.initial_forgetting_offset,
+          fdecay0=self.fdecay0,
+          fdecaytau=self.fdecaytau,
+          ifo=self.ifo,
           plot=False,
           range=range_)
       hf = SpaceRepetitionFeedback(
@@ -1250,11 +1304,12 @@ class LearningTracker(object):
     self.base["frames"] = len(self.feedback_x)
     with open(self.data_file, 'w') as outfile:
       json.dump(self.base, outfile, ensure_ascii=False, sort_keys=True, indent=2)
-
     lt = LearningTrackerAnimation(json_file=self.data_file)
     Writer = animation.writers['ffmpeg']
     writer = Writer(fps=fps, metadata=dict(artist=self.student), bitrate=600)
     ani = animation.FuncAnimation(lt.fig, lt.animate, np.arange(0, lt.frames),
         interval=interval, repeat=True)
     ani.save(self.name_of_mp4, writer=writer)
+
+
 
