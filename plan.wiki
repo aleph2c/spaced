@@ -6,10 +6,12 @@
     * [X] The stickleback plots were fixed to match the accurate prediction plots.
     * [X] The stickleback plots schedule drops are now all populated.
     * [X] The code is much much faster than it was.
-    * [ ] Find out what we are controlling anyway, write it up.
-    * [ ] That plasticity function is learned over time so that it can be transported
+    * [X] Find out what we are controlling anyway, write it up.
+    * [X] Reduce the number of samples, and increase it's speed of execution.
+    * [X] That plasticity function is learned over time so that it can be transported
           to the next training item.
     * [ ] There is a single interface, instead of 3-4 interfaces as there was before.
+    * [ ] Create something where you just add the results of a new lesson
     * [ ] Spaced was turned into a python package and shipped.
     
   *What is the problem?*
