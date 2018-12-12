@@ -276,7 +276,7 @@ def test_learning_tracker():
   lt = LearningTracker(
     epoch=epoch,
     feedback_data=get_feedback1(),
-    plasticity=1.4, 
+    plasticity_root=1.4, 
     fdecaytau=1.87,
     fdecay0 = 0.9,
   ).animate(
@@ -293,9 +293,20 @@ def test_predictions():
   x, y       = get_feedback1()
   t          = [start_time + timedelta(days=offset) for offset in x]
   range_     = x[0] + x[-1] * 0.5
-  hr         = SpaceRepetitionReference(plot=False, range=range_, epoch=start_time)
-  hf         = SpaceRepetitionFeedback(x[0:5], y, range=range_, epoch=start_time)
-  hctrl      = SpaceRepetitionController(reference=hr, feedback=hf, range=range_, epoch=start_time)
+  hr = SpaceRepetitionReference(
+      plot=False,
+      range=range_,
+      epoch=start_time,
+      plasticity_root=0.00699,
+      plasticity_denominator_offset=0.0054,
+      )
+  hf = SpaceRepetitionFeedback(x[0:5], y, range=range_, epoch=start_time)
+  hctrl = SpaceRepetitionController(
+      reference=hr,
+      feedback=hf,
+      range=range_,
+      epoch=start_time,
+  )
   # plot the reference suggestion, the feedback, error and the updated training
   # suggestions (control)
   graph_handle, data_dict  = hctrl.plot_graphs()
@@ -306,7 +317,7 @@ def test_predictions():
   #print([hctrl.days_from_start(scheduled)+hctrl.x_reference_shift for scheduled in hctrl.schedule()])
 
   # Ask a question using day offsets from epoch
-  curve = 2
+  curve = 1
   training_moments = hctrl.range_for(curve=curve, day_step_size=0.01)
   results = [hctrl.recollect_scalar(training_moment, curve=curve) for training_moment in training_moments]
   control_plot = graph_handle.axarr[-1]
@@ -350,7 +361,7 @@ def test_predictions_2():
   epoch = datetime.now()
   hr = SpaceRepetitionReference(
     epoch=epoch,
-    plasticity=1.4, 
+    plasticity_root=1.4, 
     fdecaytau=1.87,
     fdecay0 = 0.9,
     )
@@ -380,15 +391,35 @@ def test_simplified_interface():
 
     lt = LearningTracker(
       epoch = datetime.now(),
-      plasticity=1.4, 
-      fdecaytau=1.87,
-      fdecay0 = 0.9
+      plasticity_root=1.8, 
     )
 
     moments, results = get_feedback1()
-    for moment, result in zip(moments, results):
+    for index, (moment, result) in enumerate(zip(moments, results)):
+      #print(lt.feedback.discovered_plasticity_root, lt.feedback.discovered_plasticity_denominator_offset)
+      #if index == 4:
+      # break
       lt.learned(when=moment, result=result)
 
     hdl, _ = lt.plot_graphs()
-    lt.save_figure("results/learning_tracker.pdf")
+    lt.save_figure("results/learning_tracker_guessed_parameters.pdf")
     hdl.close()
+
+    lt_next = LearningTracker(
+      epoch = datetime.now(),
+      plasticity_root=lt.discovered_plasticity_root(), 
+      plasticity_denominator_offset=lt.discovered_plasticity_denominator_offset(), 
+      fdecay0=lt.discovered_fdecay0(),
+      fdecaytau=lt.discovered_fdecaytau()
+    )
+
+    moments, results = get_feedback1()
+    for index, (moment, result) in enumerate(zip(moments, results)):
+      lt_next.learned(when=moment, result=result)
+      if index == 3:
+        break
+
+    hdl, _ = lt_next.plot_graphs()
+    lt_next.save_figure("results/learning_tracker_learned_parameters.pdf")
+    hdl.close()
+

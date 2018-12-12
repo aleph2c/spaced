@@ -33,8 +33,10 @@ class SpacedKwargInterface():
       self.range = kwargs['range']
     if("samples" in kwargs):
       self.samples = kwargs['samples']
-    if("plasticity" in kwargs):
-      self.plasticity_rate = kwargs['plasticity']
+    if("plasticity_root" in kwargs):
+      self.plasticity_root = kwargs['plasticity_root']
+    if("plasticity_denominator_offset" in kwargs):
+      self.plasticity_denominator_offset = kwargs['plasticity_denominator_offset']
 
     # forgetting decay tau
     if("fdecaytau" in kwargs):
@@ -126,7 +128,8 @@ class SpaceRepetition():
     self.forgetting_properties["fdecay"]    = {}
     self.forgetting_properties["fdecaytau"] = {}
     self.range                              = SpaceRepetitionReference.Default_Range
-    self.plasticity_rate                    = SpaceRepetitionReference.PlasticityRate
+    self.plasticity_root                    = SpaceRepetitionReference.PlasticityRoot
+    self.plasticity_denominator_offset      = SpaceRepetitionReference.PlasticityDenominatorOffset
     self.samples                            = SpaceRepetitionReference.Default_Samples
     self.fdecaytau                          = SpaceRepetitionReference.Forgetting_Decay_Tau
     self.fdecay0                            = SpaceRepetitionReference.Forgetting_Decay_Initial_Value
@@ -186,7 +189,7 @@ class SpaceRepetition():
       time             += timedelta(seconds=(days * 86400))
     return time
 
-  def longterm_potentiation_curve(self, factor):
+  def longterm_potentiation_curve(self, denominator_offset, root):
     def is_array(var):
       return isinstance(var, (np.ndarray))
 
@@ -195,8 +198,8 @@ class SpaceRepetition():
     zero'd form """
     def fn(x, shift=0):
       with np.errstate(all="ignore"):
-        result = np.power(x, 1.0 / factor)
-        result /= np.power(x + 1, 1.0 / factor)
+        result = np.power(x, 1.0 / root)
+        result /= np.power(x + denominator_offset, 1.0 / root)
       result = np.clip(result, 0, 1)
 
       if is_array(x):
@@ -212,13 +215,13 @@ class SpaceRepetition():
 
     def invfn(y):
       assert 0 <= y <= 1, "only 0 <= y <=1 supported by this function"
-      result = -1
-      result *= np.power(y, factor)
-      result /= (np.power(y, factor) - 1)
+      result = -1 * denominator_offset
+      result *= np.power(y, root)
+      result /= (np.power(y, root) - 1)
       return result
 
     def fn0(x, y):
-      return y - np.power(x, 1.0 / factor) / (np.power(x + 1, 1.0 / factor))
+      return y - np.power(x, 1.0 / root) / (np.power(x + denominator_offset, 1.0 / root))
 
     return [fn, fn0, invfn]
 
@@ -237,6 +240,7 @@ class SpaceRepetition():
       return result
 
     return fn
+
   def make_data(self, forgetting_functions, solutions):
     return_set = [[], []]
 
@@ -302,7 +306,8 @@ class SpaceRepetitionReference(SpaceRepetition):
   # fdecaytau
   Forgetting_Decay_Tau = 1.2
   # plasticity
-  PlasticityRate = 1.8
+  PlasticityRoot = 1.8
+  PlasticityDenominatorOffset = 1.0
 
   # initial forgetting offset
   Initial_Forgetting_Offset = 0.0
@@ -319,7 +324,8 @@ class SpaceRepetitionReference(SpaceRepetition):
     self.forgetting_properties["fdecay"]    = {}
     self.forgetting_properties["fdecaytau"] = {}
     self.range                              = SpaceRepetitionReference.Default_Range
-    self.plasticity_rate                    = SpaceRepetitionReference.PlasticityRate
+    self.plasticity_root                    = SpaceRepetitionReference.PlasticityRoot
+    self.plasticity_denominator_offset      = SpaceRepetitionReference.PlasticityDenominatorOffset
     self.samples                            = SpaceRepetitionReference.Default_Samples
     self.fdecaytau                          = SpaceRepetitionReference.Forgetting_Decay_Tau
     self.fdecay0                            = SpaceRepetitionReference.Forgetting_Decay_Initial_Value
@@ -327,11 +333,16 @@ class SpaceRepetitionReference(SpaceRepetition):
 
     SpacedKwargInterface.__init__(self, *args, **kwargs)
 
-    self.rfn, self.rfn0, self.invfn = self.longterm_potentiation_curve(self.plasticity_rate)
+    self.rfn, self.rfn0, self.invfn = self.longterm_potentiation_curve(
+      self.plasticity_denominator_offset,
+      self.plasticity_root
+    )
 
-    self.stickleback(fdecaytau = self.fdecaytau,
-                     fdecay0   = self.fdecay0,
-                     ifo       = self.ifo)
+    self.stickleback(
+      fdecaytau=self.fdecaytau,
+      fdecay0=self.fdecay0,
+      ifo=self.ifo
+    )
 
     if("plot" in kwargs and kwargs["plot"] is True):
       self.plot_graph()
@@ -342,7 +353,7 @@ class SpaceRepetitionReference(SpaceRepetition):
       schedule.append(self.epoch + timedelta(days=target_x))
     return schedule
 
-  def schedule_as_offset_of_days_from_epoch(self):
+  def schedule_as_offset_in_days_from_epoch(self):
     return self.ref_events_x
 
   def datetime_for(self, curve=None):
@@ -404,21 +415,25 @@ class SpaceRepetitionReference(SpaceRepetition):
     # prescribed locations in time
     self.recollection_x = np.linspace(0, self.range, self.samples)
 
+    # make an initial guess to help the solver
+    self.solution_x, self.solution_y = 1.0, 0.5
     def generate_targets(fn, fn0):
-
       # Solve fn and rfn with their given tuning parameters
       equation = self.generate_equations(fn0, self.rfn0)
-      solution_x, solution_y = fsolve(equation, (1.0, 1.0))
+      with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        # use the previous answers as our first guess to find the solutions for our next
+        # problem
+        solution_x, solution_y = fsolve(equation, (self.solution_x, self.solution_y))
+      self.solution_x = solution_x
+      self.solution_y = solution_y
 
       # we an intersection between our rfn curve and our latest forgetting
       # curve.
       if(solution_x <= self.range):
         # get an x value in our data close to solution_x
-        
         target_x, nearest_index = self.find_nearest(self.recollection_x, solution_x)
         self.recollection_x[nearest_index] = solution_x
-        # we want to replace an item in self.recollection_x with our solution,
-
 
         # generate our next forgetting curve
         fn_next, ffn0_next = self.forgetting_curves(self.fdfn(solution_x), solution_x)
@@ -556,7 +571,7 @@ class SpaceRepetitionReference(SpaceRepetition):
 
     recollection_function = self.recollect_function(curve)
     index = curve-1
-    time_offset_in_days = self.schedule_as_offset_of_days_from_epoch()[index]
+    time_offset_in_days = self.schedule_as_offset_in_days_from_epoch()[index]
     curve_start_datetime = self.epoch + timedelta(days=time_offset_in_days)
 
     y = recollection_function(moment_as_datetime-timedelta(days=time_offset_in_days) )
@@ -567,11 +582,11 @@ class SpaceRepetitionReference(SpaceRepetition):
       curve = 1
 
     index = curve - 1
-    curves_start_since_epoch = self.schedule_as_offset_of_days_from_epoch()[index]
+    curves_start_since_epoch = self.schedule_as_offset_in_days_from_epoch()[index]
     forgetting_function = self.forgetting_functions[index]
 
     if index > 0:
-      previous_offset = self.schedule_as_offset_of_days_from_epoch()[index-1]
+      previous_offset = self.schedule_as_offset_in_days_from_epoch()[index-1]
     else:
       previous_offset = 0
 
@@ -599,6 +614,11 @@ class SpaceRepetitionFeedback(SpaceRepetition):
     SpaceRepetition.__init__(self, *args, **kwargs)
     self.range = 0
 
+    self.discovered_plasticity_denominator_offset = \
+      self.plasticity_denominator_offset
+
+    self.discovered_plasticity_root = self.plasticity_root
+
     if(len(args[0]) == 0):
       self.add_event(0, 1)
     else:
@@ -612,13 +632,16 @@ class SpaceRepetitionFeedback(SpaceRepetition):
 
     SpacedKwargInterface.__init__(self, *args, **kwargs)
 
+
     if("range" in kwargs):
       self.range = kwargs['range']
     else:
       self.range = 10
 
     self.domain = 1.01
-    self.rfn    = self.longterm_potentiation_curve()
+    self.rfn, dpo, dpr = self.longterm_potentiation_curve()
+    self.discovered_plasticity_root = dpr
+    self.discovered_plasticity_denominator_offset = dpo
 
   def recollection_curve_profile(self, x, adder_, pdiv_):
     with np.errstate(all="ignore"):
@@ -640,12 +663,17 @@ class SpaceRepetitionFeedback(SpaceRepetition):
     self.a_events_y.append(event_y)
     if c_event_x > self.range:
       self.range = c_event_x
-    self.rfn = self.longterm_potentiation_curve()
+
+    self.rfn, dpo, dpr = self.longterm_potentiation_curve()
+    self.discovered_plasticity_denominator_offset = dpo
+    self.discovered_plasticity_root = dpr
+    return [self.rfn, dpo, dpr]
 
   def fitting_parameters(self, fn, xdata, ydata, weights):
     with warnings.catch_warnings():
       warnings.simplefilter("ignore")
-      popt, pcov = curve_fit(fn, xdata, ydata, sigma=weights, method='dogbox')
+      popt, pcov = curve_fit(fn, xdata, ydata, sigma=weights, method='dogbox',
+          bounds=(0, [2.0, 2.0]))
     return [popt, pcov]
 
   def longterm_potentiation_curve(self):
@@ -661,15 +689,21 @@ class SpaceRepetitionFeedback(SpaceRepetition):
 
     rparams, rcov = self.fitting_parameters(self.recollection_curve_profile, rx, ry, weights)
 
+    # if we can't fit the parameters
+    if not np.isinf(rcov[0][0]):
+      # rparams[0] = self.plasticity_denominator_offset
+      # rparams[1] = self.plasticity_root
+      pass
+
     def fn(x):
       return self.recollection_curve_profile(x, *rparams)
 
-    return fn
+    return fn, rparams[0], rparams[1]
 
   def plot_graph(self, **kwargs):
     observed_events = [[], []]
 
-    rfn   = self.longterm_potentiation_curve()
+    rfn   = self.rfn
     x     = self.a_events_x
     fillx = np.linspace(0, self.range, 50)
     rx    = np.union1d(fillx, x)
@@ -786,10 +820,11 @@ class ControlData():
 
 class SpaceRepetitionController(SpaceRepetition):
 
-  DECAY_TAU_KP = 1.0
+  DECAY_TAU_KP = 0.5
   DECAY_TAU_KI = 0.1
   DECAY_TAU_KD = 0.04
-  DECAY_INITIAL_VALUE_KP = 1.0
+
+  DECAY_INITIAL_VALUE_KP = 0.5
   DECAY_INITIAL_VALUE_KI = 0.1
   DECAY_INITIAL_VALUE_KD = 0.03
 
@@ -803,6 +838,8 @@ class SpaceRepetitionController(SpaceRepetition):
     self.reference.invfn  = self.reference.o.invfn
     self.reference.range  = self.reference.o.range
     self.reference.domain = self.reference.o.domain
+    self.plasticity_root  = self.reference.o.plasticity_root
+    self.plasticity_denominator_offset = self.reference.o.plasticity_denominator_offset
 
     self.feedback         = ControlData(kwargs['feedback'])
     self.feedback.fn      = self.feedback.o.rfn
@@ -814,6 +851,10 @@ class SpaceRepetitionController(SpaceRepetition):
     self.control_x        = self.input_x[-1]
 
     SpacedKwargInterface.__init__(self, *args, **kwargs)
+
+    self.discovered_plasticity_root = self.feedback.o.discovered_plasticity_root
+    self.discovered_plasticity_denominator_offset = \
+      self.feedback.o.discovered_plasticity_denominator_offset
 
     if("control_x" in kwargs):
       control_x = kwargs["control_x"]
@@ -839,7 +880,6 @@ class SpaceRepetitionController(SpaceRepetition):
         
     self.control(control_x = control_x)
 
-
   def initialize_feedback(self, feedback, *args, **kwargs):
     self.feedback         = ControlData(feedback)
     self.feedback.fn      = self.feedback.o.rfn
@@ -851,8 +891,14 @@ class SpaceRepetitionController(SpaceRepetition):
     self.control_x        = self.input_x[-1]
     self.control(control_x = self.control_x)
 
+    self.discovered_plasticity_root = feedback.discovered_plasticity_root
+
+    self.discovered_plasticity_denominator_offset = \
+      feedback.discovered_plasticity_denominator_offset
+
     for day in self.updated_reference.ref_events_x:
       self._schedule.append(self.days_to_time(day))
+
 
   def error(self, x):
     # a positive error means we need to push harder
@@ -953,6 +999,8 @@ class SpaceRepetitionController(SpaceRepetition):
     #try:
     #  # if our student is making mistakes we want to assume they can't learn
     #  # as fast as we want them to learn
+    #  print("\noriginal fdecay0 {}".format(self.reference.o.fdecay0))
+    #  print("new      fdecay0 {}".format(fdecay0))
     #  print("1: for positive error {}: this diff should be pos: {}".format(error_y, self.fdecay0 - fdecay0))
     #except:
     #  pass
@@ -964,6 +1012,8 @@ class SpaceRepetitionController(SpaceRepetition):
     #try:
     #  # if our student is making mistakes we want to assume they can't learn
     #  # as fast as we want them to learn
+    #  print("\noriginal fdecaytau {}".format(self.reference.o.fdecaytau))
+    #  print("new      fdecaytau {}".format(fdecaytau))
     #  print("2: for positive error {}: this diff should be pos: {}".format(error_y, self.fdecaytau - fdecaytau))
     #except:
     #  pass
@@ -972,7 +1022,10 @@ class SpaceRepetitionController(SpaceRepetition):
     self.updated_reference = SpaceRepetitionReference(
         ifo=x_reference_feedback_overlap,
         fdecay0=fdecay0,
-        fdecaytau=fdecaytau)
+        fdecaytau=fdecaytau,
+        plasticity_denominator_offset=self.plasticity_denominator_offset,
+        plasticity_root=self.plasticity_root,
+        )
 
     x_reference_feedback_overlap = self.updated_reference.invfn(y_input)
     # the reference must be shift to the left for positive overlap
@@ -981,17 +1034,16 @@ class SpaceRepetitionController(SpaceRepetition):
     self._schedule_as_offset = [
         ref_as_offset + self.x_reference_shift for 
         ref_as_offset in 
-        self.updated_reference.schedule_as_offset_of_days_from_epoch()]
-
+        self.updated_reference.schedule_as_offset_in_days_from_epoch()][1:]
     self._schedule = [
         self.epoch + timedelta(days=ref_schedule_item) for
         ref_schedule_item in
-        self._schedule_as_offset]
+        self._schedule_as_offset][1:]
 
   def schedule(self):
     return self._schedule
 
-  def schedule_as_offset_of_days_from_epoch(self):
+  def schedule_as_offset_in_days_from_epoch(self):
     return self._schedule_as_offset
 
   def plot_control(self, **kwargs):
@@ -1027,7 +1079,9 @@ class SpaceRepetitionController(SpaceRepetition):
     self.schedule_vertical_bars = []
     schedule_x = []
     schedule_y = []
-    for target_x, target_y in zip(self.updated_reference.ref_events_x, self.updated_reference.ref_events_y):
+    for target_x, target_y in zip(
+        self.updated_reference.ref_events_x[1:],
+        self.updated_reference.ref_events_y[1:]):
       new_x = target_x + self.x_reference_shift
       if(new_x <= self.range):
         schedule_x.append(new_x)
@@ -1175,7 +1229,8 @@ class LearningTracker():
     else:
       self.start_time = self.epoch
 
-    self.plasticity_rate = SpaceRepetitionReference.PlasticityRate
+    self.plasticity_root = SpaceRepetitionReference.PlasticityRoot
+    self.plasticity_denominator_offset = SpaceRepetitionReference.PlasticityDenominatorOffset
     self.samples = SpaceRepetitionReference.Default_Samples
     self.fdecaytau = SpaceRepetitionReference.Forgetting_Decay_Tau
     self.fdecay0 = SpaceRepetitionReference.Forgetting_Decay_Initial_Value
@@ -1188,21 +1243,36 @@ class LearningTracker():
     self.reference = SpaceRepetitionReference(
           plot=False,
           epoch=self.epoch,
-          plasticity=self.plasticity_rate,
+          plasticity_denominator_offset=self.plasticity_denominator_offset,
+          plasticity_root=self.plasticity_root,
           fdecay0=self.fdecay0,
           fdecaytau=self.fdecaytau,
           ifo=self.ifo,
     )
 
-    self.feedback = SpaceRepetitionFeedback(
+    self._feedback = SpaceRepetitionFeedback(
           [],
           [],
-          epoch=self.start_time)
+          epoch=self.start_time,
+          plasticity_denominator_offset=self.plasticity_denominator_offset,
+          plasticity_root=self.plasticity_root,
+          )
 
     self.control = SpaceRepetitionController(
           reference=self.reference,
-          feedback=self.feedback,
-          epoch=self.start_time)
+          feedback=self._feedback,
+          epoch=self.start_time,
+          plasticity_root=self.plasticity_root,
+          fdecay0=self.fdecay0,
+          fdecaytau=self.fdecaytau,
+          ifo=self.ifo,
+          fdecaytau_kp=self.fdecaytau_kp,
+          fdecaytau_ki=self.fdecaytau_ki,
+          fdecaytau_kd=self.fdecaytau_kd,
+          fdecay0_kp=self.fdecay0_kp,
+          fdecay0_ki=self.fdecay0_ki,
+          fdecay0_kd=self.fdecay0_kd,
+          )
 
     if "feedback_data" in kwargs:
       self.feedback_data = kwargs['feedback_data']
@@ -1226,6 +1296,12 @@ class LearningTracker():
 
   def save_figure(self, filename=None):
     self.control.save_figure(filename)
+
+  def schedule(self):
+    return self.control.schedule()
+
+  def schedule_as_offset_in_days_from_epoch(self):
+    return self.control.schedule_as_offset_in_days_from_epoch()
 
   def learned(self, when, result):
     moment = when
@@ -1275,9 +1351,10 @@ class LearningTracker():
     for item in range(0, len(self.feedback_x)):
       hr = SpaceRepetitionReference(
           epoch=self.epoch,
-          plasticity=self.plasticity_rate,
           fdecay0=self.fdecay0,
           fdecaytau=self.fdecaytau,
+          plasticity_root=self.plasticity_root,
+          plasticity_denominator_offset=self.plasticity_denominator_offset,
           ifo=self.ifo,
           plot=False,
           range=range_)
@@ -1290,6 +1367,8 @@ class LearningTracker():
             reference=hr,
             feedback=hf,
             range=range_,
+            plasticity_root=self.plasticity_root,
+            plasticity_denominator_offset=self.plasticity_denominator_offset,
             epoch=self.start_time)
       else:
         hctrl.initialize_feedback(feedback=hf)
@@ -1311,5 +1390,26 @@ class LearningTracker():
         interval=interval, repeat=True)
     ani.save(self.name_of_mp4, writer=writer)
 
+  def epoch_fdecaytau(self):
+    return self.reference.fdecaytau
 
+  def epoch_fdecay0(self):
+    return self.reference.fdecaytau
 
+  def epoch_plasticity_root(self):
+    return self.reference.plasticity_root
+
+  def epoch_plasticity_root(self):
+    return self.reference.plasticity_denominator_offset
+
+  def discovered_fdecaytau(self):
+    return self.control.fdecaytau
+
+  def discovered_fdecay0(self):
+    return self.control.fdecay0
+
+  def discovered_plasticity_root(self):
+    return self.control.discovered_plasticity_root
+
+  def discovered_plasticity_denominator_offset(self):
+    return self.control.discovered_plasticity_denominator_offset

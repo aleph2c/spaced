@@ -10,8 +10,10 @@
     * [X] Reduce the number of samples, and increase it's speed of execution.
     * [X] That plasticity function is learned over time so that it can be transported
           to the next training item.
-    * [ ] There is a single interface, instead of 3-4 interfaces as there was before.
-    * [ ] Create something where you just add the results of a new lesson
+    * [X] There is a single interface, instead of 3-4 interfaces as there was before.
+    * [ ] Get the epoch parameters
+    * [ ] Get the tuned parameters
+    * [ ] Provide a simple feedback api
     * [ ] Spaced was turned into a python package and shipped.
     
   *What is the problem?*
