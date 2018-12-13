@@ -1,6 +1,7 @@
 # spaced_repetition
 import os
 import json
+import enum
 import pprint
 import warnings
 import functools
@@ -24,6 +25,10 @@ matplotlib.use("Agg")
 ppp = pprint.PrettyPrinter(indent=2)
 def pp(thing):
   ppp.pprint(thing)
+
+class TimeFormat(enum.Enum):
+  OFFSET = 1,
+  DATE_TIME = 2
 
 class SpacedKwargInterface():
   def __init__(self, *args, **kwargs):
@@ -1413,3 +1418,15 @@ class LearningTracker():
 
   def discovered_plasticity_denominator_offset(self):
     return self.control.discovered_plasticity_denominator_offset
+
+  def feedback(self, time_format=None):
+    result = None
+
+    if time_format is None:
+      time_format = TimeFormat.OFFSET
+
+    if time_format is TimeFormat.OFFSET:
+      results = self.feedback_x, self.feedback_y
+    elif time_format is TimeFormat.DATE_TIME:
+      results = [self.epoch + timedelta(days=f) for f in self.feedback_x], self.feedback_y 
+    return results

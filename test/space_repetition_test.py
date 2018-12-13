@@ -1,4 +1,4 @@
-from spaced_repetition import *
+from repetition import *
 from graph import *
 import numpy as np
 from datetime import datetime
