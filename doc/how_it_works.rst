@@ -1,0 +1,23 @@
+.. _how_it_works:
+
+  *Simple things should be simple, complex things should be possible.* 
+  
+  -- Alan Kay
+
+How it Works
+=======
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents:
+
+
+.. raw:: html
+
+  <a class="reference internal" href="recipes.html"<span class="std-ref">prev</span></a>, <a class="reference internal" href="index.html#top"><span class="std std-ref">top</span></a>, <a class="reference internal" href="testing.html"><span class="std std-ref">next</span></a>
+
+.. _umlet: http://www.umlet.com/
+.. _umletino: http://www.umlet.com/umletino/umletino.html
+.. _OMG: https://en.wikipedia.org/wiki/Object_Management_Group
+.. _mandala: https://en.wikipedia.org/wiki/Sand_mandala
+.. _drawit: https://github.com/vim-scripts/DrawIt
