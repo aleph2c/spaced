@@ -3,6 +3,7 @@ import os
 import json
 import enum
 import pprint
+import pickle
 import warnings
 import functools
 import matplotlib
@@ -72,8 +73,6 @@ class SpacedKwargInterface():
       self.fdecay0_ki = kwargs['fdecay0_ki']
     if("fdecay0_kd  " in kwargs):
       self.fdecay0_kd = kwargs['fdecay0_kd']
-    if("control_x" in kwargs):
-      control_x = kwargs["control_x"]
 
 class QueryTimeBeforeCurve(Exception):
   '''A query time has been made before a forgetting curve has been activated'''
@@ -1234,6 +1233,29 @@ class LearningTracker():
     else:
       self.start_time = self.epoch
 
+    # The d_<name> are used to hang onto the discoveries made through the
+    # serialization process.  If you unpickle an object, you can still ask it
+    # for it's previous model parameter discovered prior to it being pickled
+    if 'd_fdecay0' in kwargs:
+      self.d_fdecay0 = kwargs['d_fdecay0']
+    else:
+      self.d_fdecay0 = self.fdecay0
+
+    if 'd_fdecaytau' in kwargs:
+      self.d_fdecaytau = kwargs['d_fdecaytau']
+    else:
+      self.d_fdecaytau = self.fdecaytau
+
+    if 'd_plasticity_root' in kwargs:
+      self.d_plasticity_root = kwargs['d_plasticity_root']
+    else:
+      self.d_plasticity_root = self.plasticity_root
+
+    if 'd_plasticity_denominator_offset' in kwargs:
+      self.d_plasticity_denominator_offset = kwargs['d_plasticity_denominator_offset']
+    else:
+      self.d_plasticity_denominator_offset = self.plasticity_denominator_offset
+
     self.plasticity_root = SpaceRepetitionReference.PlasticityRoot
     self.plasticity_denominator_offset = SpaceRepetitionReference.PlasticityDenominatorOffset
     self.samples = SpaceRepetitionReference.Default_Samples
@@ -1261,7 +1283,7 @@ class LearningTracker():
           epoch=self.start_time,
           plasticity_denominator_offset=self.plasticity_denominator_offset,
           plasticity_root=self.plasticity_root,
-          )
+    )
 
     self.control = SpaceRepetitionController(
           reference=self.reference,
@@ -1277,7 +1299,7 @@ class LearningTracker():
           fdecay0_kp=self.fdecay0_kp,
           fdecay0_ki=self.fdecay0_ki,
           fdecay0_kd=self.fdecay0_kd,
-          )
+    )
 
     if "feedback_data" in kwargs:
       self.feedback_data = kwargs['feedback_data']
@@ -1404,7 +1426,7 @@ class LearningTracker():
   def epoch_plasticity_root(self):
     return self.reference.plasticity_root
 
-  def epoch_plasticity_root(self):
+  def epoch_plasticity_denominator_offset(self):
     return self.reference.plasticity_denominator_offset
 
   def discovered_fdecaytau(self):
@@ -1420,7 +1442,7 @@ class LearningTracker():
     return self.control.discovered_plasticity_denominator_offset
 
   def feedback(self, time_format=None):
-    result = None
+    results = None
 
     if time_format is None:
       time_format = TimeFormat.OFFSET
@@ -1428,5 +1450,50 @@ class LearningTracker():
     if time_format is TimeFormat.OFFSET:
       results = self.feedback_x, self.feedback_y
     elif time_format is TimeFormat.DATE_TIME:
-      results = [self.epoch + timedelta(days=f) for f in self.feedback_x], self.feedback_y 
+      results = [self.epoch + timedelta(days=f) for f in self.feedback_x], self.feedback_y
+
     return results
+
+  def __getstate__(self):
+    '''This magic method over-writes the load, or pickling process, by returning
+    a custom dictionary that the pickle process can work with.  Without this
+    method, the LearningTracker __dict__ object would be used by the pickler.
+
+    If this method returns false, then the __setstate__ method will not be
+    called
+
+    keywords:
+      custom pickling
+      load loads
+    '''
+    p_dict = {}
+    p_dict['epoch'] = self.start_time
+    p_dict['plasticity_root'] = self.plasticity_root
+    p_dict['plasticity_denominator_offset'] = self.plasticity_denominator_offset
+    p_dict['samples'] = self.samples
+    p_dict['fdecay0'] = self.fdecay0
+    p_dict['fdecaytau'] = self.fdecaytau
+    p_dict['d_fdecaytau'] = self.discovered_fdecaytau()
+    p_dict['d_fdecay0'] = self.discovered_fdecay0()
+    p_dict['d_plasticity_root'] = self.discovered_plasticity_root()
+    p_dict['d_plasticity_denominator_offset'] = self.discovered_plasticity_denominator_offset()
+    p_dict['feedback'] = self.feedback()
+    return p_dict
+
+  def __setstate__(self, state):
+    '''
+    Upon unpickling, this method will be called with the unpickled state.
+    '''
+    self.__init__(
+        epoch=state['epoch'],
+        plasticity_root=state['plasticity_root'],
+        plasticity_denominator_offset=state['plasticity_denominator_offset'],
+        fdecay0=state['fdecay0'],
+        fdecaytau=state['fdecaytau'],
+        feedback_data=state['feedback'],
+        d_fdecaytau=state['d_fdecaytau'],
+        d_fdecay0=state['d_fdecay0'],
+        d_plasticity_root=state['d_plasticity_root'],
+        d_plasticity_denominator_offset=state['d_plasticity_denominator_offset'],
+    )
+

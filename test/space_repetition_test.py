@@ -3,6 +3,8 @@ from graph import *
 import numpy as np
 from datetime import datetime
 from datetime import timedelta
+import pickle
+import pytest
 
 def get_feedback1():
   '''
@@ -389,37 +391,49 @@ def test_predictions_2():
 
 def test_simplified_interface():
 
-    lt = LearningTracker(
-      epoch = datetime.now(),
-      plasticity_root=1.8, 
-    )
+  lt = LearningTracker(
+    epoch = datetime.now(),
+    plasticity_root=1.8, 
+  )
 
-    moments, results = get_feedback1()
-    for index, (moment, result) in enumerate(zip(moments, results)):
-      #print(lt.feedback.discovered_plasticity_root, lt.feedback.discovered_plasticity_denominator_offset)
-      #if index == 4:
-      # break
-      lt.learned(when=moment, result=result)
+  moments, results = get_feedback1()
+  for index, (moment, result) in enumerate(zip(moments, results)):
+    #print(lt.feedback.discovered_plasticity_root, lt.feedback.discovered_plasticity_denominator_offset)
+    #if index == 4:
+    # break
+    lt.learned(when=moment, result=result)
 
-    hdl, _ = lt.plot_graphs()
-    lt.save_figure("results/learning_tracker_guessed_parameters.pdf")
-    hdl.close()
+  hdl, _ = lt.plot_graphs()
+  lt.save_figure("results/learning_tracker_guessed_parameters.pdf")
+  hdl.close()
 
-    lt_next = LearningTracker(
-      epoch = datetime.now(),
-      plasticity_root=lt.discovered_plasticity_root(), 
-      plasticity_denominator_offset=lt.discovered_plasticity_denominator_offset(), 
-      fdecay0=lt.discovered_fdecay0(),
-      fdecaytau=lt.discovered_fdecaytau()
-    )
+  lt_next = LearningTracker(
+    epoch = datetime.now(),
+    plasticity_root=lt.discovered_plasticity_root(), 
+    plasticity_denominator_offset=lt.discovered_plasticity_denominator_offset(), 
+    fdecay0=lt.discovered_fdecay0(),
+    fdecaytau=lt.discovered_fdecaytau()
+  )
 
-    moments, results = get_feedback1()
-    for index, (moment, result) in enumerate(zip(moments, results)):
-      lt_next.learned(when=moment, result=result)
-      if index == 3:
-        break
+  moments, results = get_feedback1()
+  for index, (moment, result) in enumerate(zip(moments, results)):
+    lt_next.learned(when=moment, result=result)
+    if index == 3:
+      break
 
-    hdl, _ = lt_next.plot_graphs()
-    lt_next.save_figure("results/learning_tracker_learned_parameters.pdf")
-    hdl.close()
+  hdl, _ = lt_next.plot_graphs()
+  lt_next.save_figure("results/learning_tracker_learned_parameters.pdf")
+  hdl.close()
+
+@pytest.mark.pickle
+def test_serialization_epoch():
+  lt = LearningTracker(
+    epoch = datetime.now(),
+  )
+  byte_stream = pickle.dumps(lt)
+  unpickled_learning_tracker = pickle.loads(byte_stream)
+  hdl, _ = unpickled_learning_tracker.plot_graphs()
+  unpickled_learning_tracker.save_figure("results/post_pickle.pdf")
+  hdl.close()
+
 
