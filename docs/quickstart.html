@@ -42,7 +42,8 @@ conditions:</p>
 <span class="kn">from</span> <span class="nn">space.repitition</span> <span class="kn">import</span> <span class="n">pp</span>
 <span class="kn">from</span> <span class="nn">space.repitition</span> <span class="kn">import</span> <span class="n">LearningTracker</span>
 
-<span class="n">days_to_track</span> <span class="o">=</span> <span class="mi">43</span>
+<span class="n">days_to_track</span> <span class="o">=</span> <span class="mi">43</span>  <span class="c1"># used for graphing</span>
+
 <span class="n">lt</span> <span class="o">=</span> <span class="n">LearningTracker</span><span class="p">(</span>
   <span class="n">epoch</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">new</span><span class="p">(),</span>
   <span class="nb">range</span><span class="o">=</span><span class="n">days_to_track</span>
@@ -55,81 +56,171 @@ conditions:</p>
 </pre></div>
 </div>
 <p>Something like this would appear in your terminal window:</p>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Scheduled as dates:
-[ datetime.datetime(2018, 12, 18, 6, 9, 22, 858534),
-  datetime.datetime(2018, 12, 18, 17, 10, 15, 643548),
-  datetime.datetime(2018, 12, 19, 3, 38, 30, 456706),
-  datetime.datetime(2018, 12, 19, 14, 43, 41, 666247),
-  datetime.datetime(2018, 12, 20, 3, 18, 28, 942419),
-  datetime.datetime(2018, 12, 20, 18, 35, 2, 771460),
-  datetime.datetime(2018, 12, 21, 14, 48, 26, 153166),
-  datetime.datetime(2018, 12, 22, 21, 24, 41, 875893),
-  datetime.datetime(2018, 12, 25, 9, 0, 36, 549251),
-  datetime.datetime(2019, 1, 3, 9, 6, 30, 129684)]
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Scheduled as dates
+[ datetime.datetime(2018, 12, 22, 4, 23, 42, 247300),
+        datetime.datetime(2018, 12, 22, 15, 28, 53, 456841),
+        datetime.datetime(2018, 12, 23, 4, 3, 40, 733013),
+        datetime.datetime(2018, 12, 23, 19, 20, 14, 562054),
+        datetime.datetime(2018, 12, 24, 15, 33, 37, 943760),
+        datetime.datetime(2018, 12, 25, 22, 9, 53, 666487),
+        datetime.datetime(2018, 12, 28, 9, 45, 48, 339845),
+        datetime.datetime(2019, 1, 6, 9, 51, 41, 920278)]
 </pre></div>
 </div>
-<p>This isn’t that useful, since it has nothing to do with the student and their
-ability, or the quality of their course material, or their environment.  It’s
-just an initial guess about what might work.</p>
-<p>To get the learning tracker to perform a bit better, we need to give it some
-data about your student’s performance.</p>
-<p>Let’s build a feedback function that we can use to demonstrate how to make your
-learning tracker respond to a student’s memory:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">feedback</span><span class="p">():</span>
-<span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">Here are 10 actual training moments with corresponding results.</span>
-<span class="sd">&#39;&#39;&#39;</span>
-<span class="n">offset_in_days_from_introduction_to_idea</span> <span class="o">=</span> <span class="p">[</span>
-  <span class="mi">0</span><span class="p">,</span>
-  <span class="mf">0.80640320160080037</span><span class="p">,</span>
-  <span class="mf">1.7523761880940469</span><span class="p">,</span>
-  <span class="mf">3.0240120060030016</span><span class="p">,</span>
-  <span class="mf">4.8074037018509257</span><span class="p">,</span>
-  <span class="mf">7.3351675837918959</span><span class="p">,</span>
-  <span class="mf">10.932966483241621</span><span class="p">,</span>
-  <span class="mf">16.004002001000501</span><span class="p">,</span>
-  <span class="mf">23.029014507253628</span><span class="p">,</span>
-  <span class="mf">29.029014507253628</span>
-<span class="p">]</span>
-<span class="c1"># how well they could remember the thing prior to training on it</span>
-<span class="c1"># so as to get perfect recollection.</span>
-<span class="n">results</span> <span class="o">=</span> <span class="p">[</span>
-  <span class="mf">0.40</span><span class="p">,</span>
-  <span class="mf">0.44646101201172317</span><span class="p">,</span>
-  <span class="mf">0.64510969552772512</span><span class="o">-</span><span class="mf">0.1</span><span class="p">,</span>
-  <span class="mf">0.76106659335521121</span><span class="o">-</span><span class="mf">0.2</span><span class="p">,</span>
-  <span class="mf">0.83741905134093808</span><span class="o">-</span><span class="mf">0.3</span><span class="p">,</span>
-  <span class="mf">0.89000147547559727</span><span class="p">,</span>
-  <span class="mf">1.00000000000000000</span><span class="p">,</span>
-  <span class="mf">0.99994393927347419</span><span class="p">,</span>
-  <span class="mf">0.99929261332375605</span><span class="p">,</span>
-  <span class="mf">1.00</span>
-<span class="p">]</span>
-<span class="k">return</span> <span class="p">[</span><span class="n">offset_in_days_from_introduction_to_idea</span><span class="p">,</span> <span class="n">results</span><span class="p">]</span>
+<p>To see the graph from which this schedule was derived:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">hdl</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">reference</span><span class="o">.</span><span class="n">plot_graph</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>This feedback function returns two lists: timing-information and results.
-Each of these lists contains 10 items.</p>
-<p>The timing information is a set of offset-in-days from when the training
-started.  The start time for the training was set as your <code class="docutils literal notranslate"><span class="pre">epoch</span></code> parameter
-of the LearningTracker initialization.</p>
-<p>The numbers representing the results are in the range of 0 to 1.  A result of 0
-means that the student has perfectly forgotten the tracked idea, while a 1 means they have
-a perfect recollection of the idea.</p>
-<p>Now that we have some feedback, let’s express how this student learns to the
-learning tracker.  The following code will simulate what would happen over the
-span of the 43 days of training we are tracking:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># feed the learning tracker</span>
-<span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="p">(</span><span class="n">moment</span><span class="p">,</span> <span class="n">result</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">feedback</span><span class="p">())):</span>
+<a class="reference external image-reference" href="_static/quickstart_reference.pdf"><div align="center" class="align-center"><img alt="_images/quickstart_reference.svg" src="_images/quickstart_reference.svg" /></div>
+</a>
+<p>The graph’s x-axis represents time while the y-axis represents the amount a
+student can remember about the thing they are trying to learn. The student has
+perfectly remembered an idea if its score is one and they have utterly forgotten
+an idea if its score is zero.</p>
+<p>The red stickleback looking graph represents how a students recollection ability
+will rise and fall as a function of training events and the passage of time from
+a given training event. At first, a student forgets something quickly, but as
+they train on an idea, that idea will fade slower from their memory. The sudden
+vertical-rise of this red line represents a moment when the student studies.
+There is an assumption that they will review an idea long enough that their
+immediate recollection of that idea will be perfect before they stop thinking
+about it.</p>
+<p>The blue line maps to plasticity, or how fast an idea can be mapped into a mind
+as a function over time.  It can be thought of as representing how memories form
+over the long term.</p>
+<p>The training events occur where the forgetting curves of the stickleback
+approach the plasticity line. At each intersection of the forgetting curve and
+the plasticity curve, orange lines are projected downward to the x-axis to
+provide the suggested times of study. Collectively, these times are called the
+schedule.</p>
+<p>To begin with the schedule is completely arbitrary.  This is because the model
+doesn’t understand anything about the student yet.  But each time you give it
+student data it adapts its schedule to the student’s behavior, and how they
+appear to be forgetting things.</p>
+<p>Imagine that immediately after looking at the material for the first time; our
+student tries to remember what they just learned.  They determine that they can
+recall about 40 percent of the material.  To tell <code class="docutils literal notranslate"><span class="pre">spaced</span></code> about this, we
+would write the following code:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">days_since_training_epoch</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">lt</span><span class="o">.</span><span class="n">learned</span><span class="p">(</span><span class="n">result</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span> <span class="n">when</span><span class="o">=</span><span class="n">days_since_training_epoch</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Immediately after finishing their test, the student reviews the material until
+they understand all of it.</p>
+<p>Suppose that 19 hours later (0.8 days later), the student tests themselves
+again.  This time they can remember 44 percent of it.  Let’s feed this into the
+learning tracker, by writing the following code:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">days_since_training_epoch</span> <span class="o">=</span> <span class="mf">0.8</span>
+<span class="n">lt</span><span class="o">.</span><span class="n">learned</span><span class="p">(</span><span class="n">result</span><span class="o">=</span><span class="mf">0.44</span><span class="p">,</span> <span class="n">when</span><span class="o">=</span><span class="n">days_since_training_epoch</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>As before, the student reviews the material after they have tested themselves.</p>
+<p>Now that <code class="docutils literal notranslate"><span class="pre">spaced</span></code> has more data, let’s ask it for its new schedule:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">print</span><span class="p">(</span><span class="s2">&quot;Scheduled as dates&quot;</span><span class="p">)</span>
+<span class="n">pp</span><span class="p">(</span><span class="n">lt</span><span class="o">.</span><span class="n">schedule</span><span class="p">())</span>
+</pre></div>
+</div>
+<p>In your terminal you will see something like this:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Scheduled as dates
+[ datetime.datetime(2018, 12, 23, 1, 53, 3, 865177),
+        datetime.datetime(2018, 12, 23, 16, 32, 43, 271301),
+        datetime.datetime(2018, 12, 24, 11, 49, 1, 151759),
+        datetime.datetime(2018, 12, 25, 17, 9, 28, 362910),
+        datetime.datetime(2018, 12, 28, 3, 57, 43, 777324),
+        datetime.datetime(2019, 1, 7, 0, 21, 16, 69957),
+        datetime.datetime(2018, 12, 21, 14, 0, 13, 200220),
+        datetime.datetime(2018, 12, 22, 1, 26, 21, 259959),
+        datetime.datetime(2018, 12, 22, 13, 46, 42, 422666),
+        datetime.datetime(2018, 12, 23, 4, 26, 21, 828789),
+        datetime.datetime(2018, 12, 23, 23, 42, 39, 709248),
+        datetime.datetime(2018, 12, 25, 5, 3, 6, 920399),
+        datetime.datetime(2018, 12, 27, 15, 51, 22, 334813),
+        datetime.datetime(2019, 1, 6, 12, 14, 54, 627446)]
+</pre></div>
+</div>
+<p>It is different than it was when we started.  We can ask the learning tracker
+for a plot so we can see where these datetime values are coming from:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">hdl</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">plot_graphs</span><span class="p">()</span>
+</pre></div>
+</div>
+<a class="reference external image-reference" href="_static/quickstart_control_after_two_events.pdf"><img alt="_images/quickstart_control_after_two_events.png" class="align-center" src="_images/quickstart_control_after_two_events.png" /></a>
+<p>The diagram above contains four different graphs.  The first graph is called the
+recommendation.  It represents the goal of our training engagement with this
+student for the thing that they are trying to learn.  It is exactly the same as
+the reference graph we plotted above.</p>
+<p>The 2nd graph represents the observed data that the student has given us.  At
+time zero they could remember 40 percent of an idea after their initial
+training session.  They retrained, then retested themselves 0.8 days later and
+got 44 percent. Then they retrained again.  The light blue line on the observed
+curve is an analogue to the dark blue line on the recommendation curve.  It is
+a plasticity curve, but unlike the reference-plasticity curve in the
+recommendation graph, the observed-plasticity curve is discovered by fitting a
+line to the data provided as feedback from the student.  It is describing how a
+long term memory is actually forming in the student’s mind, not how we wish it
+would be formed (represented by the dark blue line in the recommendation graph).</p>
+<p>The 3rd graph down the page, labeled “error signal” is the difference between
+what we want and what we got.  Specifically it is the difference between the
+recommendation graphs plasticity curve and the observed plasticity curve (the
+dark blue line in the first graph minus the light blue graph in the second graph).
+The y-axis of this plot can be positive, if a memory isn’t forming as fast as we
+want, or negative, if the student is studying too much or doesn’t really forget
+things; causing a memory to form faster than our recommendation.</p>
+<p>The final graph, the 4th graph, is labeled “control”.  This is because it
+describes how the <code class="docutils literal notranslate"><span class="pre">spaced</span></code> algorithm tries to drive its error signal to zero
+by controlling the world in the only way it can: by shifting its schedule
+recommendations.  It does this in two ways, it tunes the forgetting curves (the
+red stickleback lines) to match how a student actually forgets things and it
+finds the intersection between the observed plasticity curve and the
+reference-plasticity curve, then redraws the updated-forgetting-stickleback on
+the reference-plasticity curve at this intersection point.</p>
+<p>Lets see what happens if the student continues to train.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># students tests themselves 1.75 days after they start training</span>
+<span class="c1"># they recall about 64 percent of the thing they are studying</span>
+<span class="n">days_since_training_epoch</span> <span class="o">=</span> <span class="mf">1.75</span>
+<span class="n">lt</span><span class="o">.</span><span class="n">learned</span><span class="p">(</span><span class="n">result</span><span class="o">=</span><span class="mf">0.64</span><span class="p">,</span> <span class="n">when</span><span class="o">=</span><span class="n">days_since_training_epoch</span><span class="p">)</span>
+<span class="c1"># the student reviews their material until</span>
+<span class="c1"># they have a perfect recollection</span>
 
-  <span class="c1"># you would use this api to give your learning tracker its feedback</span>
-  <span class="n">lt</span><span class="o">.</span><span class="n">learned</span><span class="p">(</span><span class="n">result</span><span class="o">=</span><span class="n">result</span><span class="p">,</span> <span class="n">when</span><span class="o">=</span><span class="n">moment</span><span class="p">)</span>
+<span class="c1"># students tests themselves 3.02 days after they start training</span>
+<span class="c1"># they recall about 76 percent of the thing they are studying</span>
+<span class="n">days_since_training_epoch</span> <span class="o">=</span> <span class="mf">3.02</span>
+<span class="n">lt</span><span class="o">.</span><span class="n">learned</span><span class="p">(</span><span class="n">result</span><span class="o">=</span><span class="mf">0.76</span><span class="p">,</span> <span class="n">when</span><span class="o">=</span><span class="n">days_since_training_epoch</span><span class="p">)</span>
+<span class="c1"># the student reviews their material until</span>
+<span class="c1"># they have a perfect recollection</span>
 </pre></div>
 </div>
-<p>After each training event, the learning tracker will respond with a new
-schedule.  Since there is so much going on, <code class="docutils literal notranslate"><span class="pre">spaced</span></code> lets you create a kind
-of report card, which is actually just a video.  To make a video, using the
-<code class="docutils literal notranslate"><span class="pre">animate</span></code> api:</p>
+<a class="reference external image-reference" href="_static/quickstart_control_after_four_events.pdf"><img alt="_images/quickstart_control_after_four_events.png" class="align-center" src="_images/quickstart_control_after_four_events.png" /></a>
+<p>Now suppose the student trains six more times:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">days_and_results</span> <span class="o">=</span> <span class="p">[</span>
+  <span class="p">[</span><span class="mf">4.8</span><span class="p">,</span>  <span class="mf">7.33</span><span class="p">,</span> <span class="mf">10.93</span><span class="p">,</span> <span class="mf">16.00</span><span class="p">,</span> <span class="mf">23.00</span><span class="p">,</span> <span class="mf">29.00</span><span class="p">],</span>
+  <span class="p">[</span><span class="mf">0.83</span><span class="p">,</span> <span class="mf">0.89</span><span class="p">,</span>  <span class="mf">1.00</span><span class="p">,</span>  <span class="mf">0.99</span><span class="p">,</span> <span class="mf">0.99</span><span class="p">,</span>   <span class="mf">1.00</span><span class="p">],</span>
+<span class="p">]</span>
+
+<span class="k">for</span> <span class="n">d</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">days_and_results</span><span class="p">):</span>
+  <span class="n">days_since_training_epoch</span><span class="p">,</span> <span class="n">result</span> <span class="o">=</span> <span class="n">d</span><span class="p">,</span> <span class="n">r</span>
+  <span class="n">lt</span><span class="o">.</span><span class="n">learned</span><span class="p">(</span><span class="n">result</span><span class="o">=</span><span class="n">result</span><span class="p">,</span> <span class="n">when</span><span class="o">=</span><span class="n">days_since_training_epoch</span><span class="p">)</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">lt</span><span class="o">.</span><span class="n">schedule</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2019</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">18</span><span class="p">,</span> <span class="mi">21</span><span class="p">,</span> <span class="mi">24</span><span class="p">,</span> <span class="mi">51</span><span class="p">,</span> <span class="mi">192016</span><span class="p">)]</span>
+</pre></div>
+</div>
+<p>Let’s take a look at the graph:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">hdl</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">plot_graphs</span><span class="p">()</span>
+</pre></div>
+</div>
+<a class="reference external image-reference" href="_static/quickstart_control_after_ten_events.pdf"><img alt="_images/quickstart_control_after_ten_events.png" class="align-center" src="_images/quickstart_control_after_ten_events.png" /></a>
+<p>This last graph really isn’t that useful: the next recommended training date
+isn’t on its control plot.</p>
+<p>In fact, it’s hard to get a clear idea about what is going on by looking at any
+of these plots, since you really have to see the graph from the previous
+feedback event, to understand the current context.  What would be nice would be
+an animation of each training event followed by the next.  You could watch it
+for 10 seconds and get a good idea about their training history.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">spaced</span></code> package can write <code class="docutils literal notranslate"><span class="pre">mp4</span></code> encoded videos using the <code class="docutils literal notranslate"><span class="pre">ffmpeg</span></code>
+animation plugin provided by matplotlib.</p>
+<p>To make a video, using the <code class="docutils literal notranslate"><span class="pre">animate</span></code> api:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">lt</span><span class="o">.</span><span class="n">animate</span><span class="p">(</span>
   <span class="n">student</span><span class="o">=</span><span class="s2">&quot;Name of Student&quot;</span><span class="p">,</span>
   <span class="n">name_of_mp4</span><span class="o">=</span><span class="s2">&quot;results/report_card.mp4&quot;</span><span class="p">,</span>
@@ -137,12 +228,37 @@ of report card, which is actually just a video.  To make a video, using the
 </pre></div>
 </div>
 <p>If you were to write this code, the results of this session would be used to
-make a video in <code class="docutils literal notranslate"><span class="pre">results/report_card.mp4</span></code>.  That video would look like this:</p>
+make a video in <code class="docutils literal notranslate"><span class="pre">results/report_card.mp4</span></code>.  That video would look something like this:</p>
 <center>
 <iframe width="560" height="315" src="https://www.youtube.com/embed/H8llYuwH5L0" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-</center><p>Let’s take a look at</p>
-<p>Now that you have completed a learning cycle, you can ask spaced for the model
-parameters it has discovered so that it can make a better model.</p>
+</center><p>As you play the video, you see a story unfold about the relationship between our
+model and the student’s reaction to it. In the first five days of their
+training, we see that they made more mistakes than we would have liked, then,
+around the seventh day, something clicks for them, and they do better than what
+was predicted by the original model.</p>
+<p>We can see that the control system tried to get them to do much more training
+when they were doing poorly, and less training when they started to understand
+the material. When the dark blue reference curve in the control box moved to the
+left, the student was doing better than expected, and when it shifted to the
+right, the student was doing worse than expected.</p>
+<p>We also see that our initial forgetting curves were too pessimistic, and as a
+result our initial schedule was too aggressive. But after a few training events,
+the spaced algorithm began to match the forgetting parameters to how the student
+actually forgot things.</p>
+<p>The video plays a training event every second, which means that we are
+accelerating time since the training events become more and more spaced out the
+later they occur.</p>
+<p>It is unlikely that you will be using <code class="docutils literal notranslate"><span class="pre">spaced</span></code> to track just one object.  You
+will probably have thousands of them running, and you will have to select from a
+small subset of these thousands of tracked objects to compile a review session for your
+student.  To do this, you need to know which of your tracked <code class="docutils literal notranslate"><span class="pre">spaced</span></code> objects
+are in the most need of attention.</p>
+<p>For this reason you will need to query a <code class="docutils literal notranslate"><span class="pre">spaced</span></code> object so that it can make a
+prediction about a student’s ability to recall it at some datetime.</p>
+<p>Here is how to this:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
 <a class="reference internal" href="introduction.html"<span class="std-ref">prev</span></a>, <a class="reference internal" href="index.html#top"><span class="std std-ref">top</span></a>, <a class="reference internal" href="zero_to_one.html"><span class="std std-ref">next</span></a><div class="toctree-wrapper compound">
 </div>
 </div>

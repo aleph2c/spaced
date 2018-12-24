@@ -2,7 +2,7 @@
 <div class="pageheader">
   <div>
     <a href="{{ pathto('index') }}">
-      <img id="logo" src="{{ pathto('_static/miros_a.svg', 1) }}" alt="SPHINX"/>
+      <img id="logo" src="{{ pathto('_static/spaced_1.svg', 1) }}" alt="SPHINX"/>
     </a>
   </div>
 </div>

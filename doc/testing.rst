@@ -6,7 +6,6 @@
 
 Testing
 =======
-You can use the miros instrumentation to test your designs.
 
 .. raw:: html
 

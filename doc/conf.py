@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# miros documentation build configuration file, created by
+# spaced documentation build configuration file, created by
 # sphinx-quickstart on Mon Oct 16 06:18:38 2017.
 #
 # This file is execfile()d with the current directory set to its
@@ -97,7 +97,7 @@ html_favicon = 'favicon.ico'
 #
 html_theme_options = {
   'github_user': 'aleph2c',
-  'github_repo': 'miros',
+  'github_repo': 'spaced',
   'show_powered_by': False,
 }
 
@@ -121,7 +121,7 @@ html_sidebars = {
 # -- Options for HTMLHelp output ------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'mirosdoc'
+htmlhelp_basename = 'spaceddoc'
 
 
 # -- Options for LaTeX output ---------------------------------------------
