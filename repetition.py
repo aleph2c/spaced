@@ -341,7 +341,6 @@ class SpaceRepetitionReference(SpaceRepetition):
       self.plasticity_denominator_offset,
       self.plasticity_root
     )
-
     self.stickleback(
       fdecaytau=self.fdecaytau,
       fdecay0=self.fdecay0,
@@ -541,6 +540,9 @@ class SpaceRepetitionReference(SpaceRepetition):
 
     return self.plot, data_dict
 
+  def save_figure(self, filename="spaced.pdf"):
+    plt.savefig(filename, dpi=300)
+
   def show(self):
     plt.show()
 
@@ -578,7 +580,7 @@ class SpaceRepetitionReference(SpaceRepetition):
     time_offset_in_days = self.schedule_as_offset_in_days_from_epoch()[index]
     curve_start_datetime = self.epoch + timedelta(days=time_offset_in_days)
 
-    y = recollection_function(moment_as_datetime-timedelta(days=time_offset_in_days) )
+    y = recollection_function(moment_as_datetime-timedelta(days=time_offset_in_days))
     return y
 
   def recollect_function(self, curve=None):
@@ -590,13 +592,13 @@ class SpaceRepetitionReference(SpaceRepetition):
     forgetting_function = self.forgetting_functions[index]
 
     if index > 0:
-      previous_offset = self.schedule_as_offset_in_days_from_epoch()[index-1]
+      previous_offset = self.schedule_as_offset_in_days_from_epoch()[index - 1]
     else:
       previous_offset = 0
 
     def _tuned_after_feedback(moment, forgetting_function, offset, epoch, control_x):
       query_time = self.datetime_to_days_offset_from_epoch(moment)
-      recollection_scalar = forgetting_function(query_time+offset)
+      recollection_scalar = forgetting_function(query_time + offset)
       return recollection_scalar
 
     recollection_function = functools.partial(_tuned_after_feedback,
@@ -663,10 +665,15 @@ class SpaceRepetitionFeedback(SpaceRepetition):
       c_event_x = self.days_from_epoch(event_x)
     else:
       c_event_x = event_x
-    self.a_events_x.append(c_event_x)
-    self.a_events_y.append(event_y)
-    if c_event_x > self.range:
-      self.range = c_event_x
+
+    if event_x in self.a_events_x:
+      # duplicate (should we raise?)
+      pass
+    else:
+      self.a_events_x.append(c_event_x)
+      self.a_events_y.append(event_y)
+      if c_event_x > self.range:
+        self.range = c_event_x
 
     self.rfn, dpo, dpr = self.longterm_potentiation_curve()
     self.discovered_plasticity_denominator_offset = dpo
@@ -988,6 +995,7 @@ class SpaceRepetitionController(SpaceRepetition):
     x_reference_feedback_overlap = 0
     y_input                      = self.feedback.fn(control_x)
     x_reference_feedback_overlap = self.reference.invfn(y_input)
+    self.x_reference_feedback_overlap = x_reference_feedback_overlap
     x_reference_shift            = control_x - x_reference_feedback_overlap
     self.x_reference_shift       = x_reference_shift
 
@@ -1032,17 +1040,19 @@ class SpaceRepetitionController(SpaceRepetition):
         )
 
     x_reference_feedback_overlap = self.updated_reference.invfn(y_input)
+
     # the reference must be shift to the left for positive overlap
     self.x_reference_shift = self.control_x - x_reference_feedback_overlap
 
     self._schedule_as_offset = [
-        ref_as_offset + self.x_reference_shift for 
-        ref_as_offset in 
-        self.updated_reference.schedule_as_offset_in_days_from_epoch()][1:]
+        ref_as_offset + self.x_reference_shift for
+        ref_as_offset in
+        self.updated_reference.schedule_as_offset_in_days_from_epoch()]
+
     self._schedule = [
         self.epoch + timedelta(days=ref_schedule_item) for
         ref_schedule_item in
-        self._schedule_as_offset][1:]
+        self._schedule_as_offset]
 
   def schedule(self):
     return self._schedule
@@ -1183,19 +1193,12 @@ class SpaceRepetitionController(SpaceRepetition):
     else:
       raise
 
-    moment_as_datetime = moment
-
     if curve is None:
       curve = 1
 
-    index = curve-1
-    offsets = [self.days_from_start(scheduled)-self.x_reference_shift for
-        scheduled in self.schedule()]
-    # self.updated_reference.ref_events_x
-    offset = offsets[index]
-    forgetting_function, _ = self.updated_reference.forgetting_curves(
-        self.updated_reference.fdfn(offset), offset)
-    query_time_in_days = self.days_from_start(moment) - self.x_reference_shift
+    index = curve - 1
+    forgetting_function = self.updated_reference.forgetting_functions[index]
+    query_time_in_days = self.days_from_start(moment_as_datetime) - self.x_reference_shift
     y = forgetting_function(query_time_in_days)
     return y
 
@@ -1211,7 +1214,11 @@ class SpaceRepetitionController(SpaceRepetition):
   def range_for(self, curve=None, range=None, day_step_size=1):
     if curve is None or curve < 1:
       curve = 1
-    datetime_of_curve = self.datetime_for(curve=curve)
+
+    if curve is 1:
+      datetime_of_curve = self.epoch + timedelta(days=self.control_x)
+    else:
+      datetime_of_curve = self.datetime_for(curve=curve - 1)
     end_date  = self.epoch + (timedelta(days=self.range))
     result = list(np.arange(datetime_of_curve, end_date,
       timedelta(days=day_step_size)).astype(datetime))
@@ -1416,6 +1423,12 @@ class LearningTracker():
     ani = animation.FuncAnimation(lt.fig, lt.animate, np.arange(0, lt.frames),
         interval=interval, repeat=True)
     ani.save(self.name_of_mp4, writer=writer)
+
+  def range_for(self, curve=None, range=None, day_step_size=1):
+    return self.control.range_for(curve, range, day_step_size)
+
+  def recollect_scalar(self, moment, curve=None):
+    return self.control.recollect_scalar(moment, curve)
 
   def epoch_fdecaytau(self):
     return self.reference.fdecaytau

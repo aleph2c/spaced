@@ -299,7 +299,7 @@ def test_predictions():
       plot=False,
       range=range_,
       epoch=start_time,
-      plasticity_root=0.00699,
+      plasticity_root=0.03699,
       plasticity_denominator_offset=0.0054,
       )
   hf = SpaceRepetitionFeedback(x[0:5], y, range=range_, epoch=start_time)
@@ -313,17 +313,18 @@ def test_predictions():
   # suggestions (control)
   graph_handle, data_dict  = hctrl.plot_graphs()
 
-  #print(hctrl.x_reference_shift)
-  #print([hctrl.days_from_start(scheduled) for scheduled in hctrl.schedule()])
-  #print([hctrl.days_from_start(scheduled)-hctrl.x_reference_shift for scheduled in hctrl.schedule()])
-  #print([hctrl.days_from_start(scheduled)+hctrl.x_reference_shift for scheduled in hctrl.schedule()])
-
   # Ask a question using day offsets from epoch
   curve = 1
+  #import pdb; pdb.set_trace()
   training_moments = hctrl.range_for(curve=curve, day_step_size=0.01)
+  #training_moments = [training_moment - timedelta(days=0.666) for training_moment in training_moments]
+  print(training_moments[0])
+  print(hctrl.schedule())
+  #import pdb; pdb.set_trace()
   results = [hctrl.recollect_scalar(training_moment, curve=curve) for training_moment in training_moments]
   control_plot = graph_handle.axarr[-1]
   control_plot.plot(training_moments, results, color='xkcd:azure')
+  print(hctrl.schedule())
 
   curve = 2
   ref_training_moments = hr.range_for(curve=curve, day_step_size=0.5)
