@@ -13,6 +13,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
     <link rel="shortcut icon" href="_static/favicon.ico"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -36,6 +37,8 @@
             
   <div class="section" id="quick-start">
 <span id="id1"></span><h1>Quick Start<a class="headerlink" href="#quick-start" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="getting-an-initial-schedule">
+<span id="quickstart-getting-an-initial-schedule"></span><h2>Getting an Initial Schedule<a class="headerlink" href="#getting-an-initial-schedule" title="Permalink to this headline">¶</a></h2>
 <p>To build a schedule, import a learning tracker and provide it with its initial
 conditions:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
@@ -67,6 +70,9 @@ conditions:</p>
         datetime.datetime(2019, 1, 6, 9, 51, 41, 920278)]
 </pre></div>
 </div>
+</div>
+<div class="section" id="understanding-where-a-schedule-comes-from">
+<span id="quickstart-understanding-where-a-schedule-comes-from"></span><h2>Understanding where a Schedule Comes from<a class="headerlink" href="#understanding-where-a-schedule-comes-from" title="Permalink to this headline">¶</a></h2>
 <p>To see the graph from which this schedule was derived:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">hdl</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">reference</span><span class="o">.</span><span class="n">plot_graph</span><span class="p">()</span>
 </pre></div>
@@ -93,6 +99,9 @@ approach the plasticity line. At each intersection of the forgetting curve and
 the plasticity curve, orange lines are projected downward to the x-axis to
 provide the suggested times of study. Collectively, these times are called the
 schedule.</p>
+</div>
+<div class="section" id="adding-student-feedback">
+<span id="quickstart-adding-student-feedback"></span><h2>Adding Student Feedback<a class="headerlink" href="#adding-student-feedback" title="Permalink to this headline">¶</a></h2>
 <p>To begin with the schedule is completely arbitrary.  This is because the model
 doesn’t understand anything about the student yet.  But each time you give it
 student data it adapts its schedule to the student’s behavior, and how they
@@ -115,6 +124,9 @@ learning tracker, by writing the following code:</p>
 </pre></div>
 </div>
 <p>As before, the student reviews the material after they have tested themselves.</p>
+</div>
+<div class="section" id="getting-a-schedule-which-responds-to-the-student-s-feedback">
+<span id="quickstart-getting-a-schedule-which-responds-to-the-student-s-feedback"></span><h2>Getting a Schedule which Responds to the Student’s Feedback<a class="headerlink" href="#getting-a-schedule-which-responds-to-the-student-s-feedback" title="Permalink to this headline">¶</a></h2>
 <p>Now that <code class="docutils literal notranslate"><span class="pre">spaced</span></code> has more data, let’s ask it for its new schedule:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">print</span><span class="p">(</span><span class="s2">&quot;Scheduled as dates&quot;</span><span class="p">)</span>
 <span class="n">pp</span><span class="p">(</span><span class="n">lt</span><span class="o">.</span><span class="n">schedule</span><span class="p">())</span>
@@ -138,6 +150,9 @@ learning tracker, by writing the following code:</p>
         datetime.datetime(2019, 1, 6, 12, 14, 54, 627446)]
 </pre></div>
 </div>
+</div>
+<div class="section" id="understanding-the-reactive-schedule">
+<span id="quickstart-understanding-the-reactive-schedule"></span><h2>Understanding the Reactive Schedule<a class="headerlink" href="#understanding-the-reactive-schedule" title="Permalink to this headline">¶</a></h2>
 <p>It is different than it was when we started.  We can ask the learning tracker
 for a plot so we can see where these datetime values are coming from:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">hdl</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">plot_graphs</span><span class="p">()</span>
@@ -218,6 +233,9 @@ of these plots, since you really have to see the graph from the previous
 feedback event, to understand the current context.  What would be nice would be
 an animation of each training event followed by the next.  You could watch it
 for 10 seconds and get a good idea about their training history.</p>
+</div>
+<div class="section" id="animating-the-reactive-schedule-to-get-an-intuitive-feeling-about-results">
+<span id="quickstart-animating-reactive-schedule-to-get-an-intuitive-feel"></span><h2>Animating the Reactive Schedule to get an Intuitive Feeling about Results<a class="headerlink" href="#animating-the-reactive-schedule-to-get-an-intuitive-feeling-about-results" title="Permalink to this headline">¶</a></h2>
 <p>The <code class="docutils literal notranslate"><span class="pre">spaced</span></code> package can write <code class="docutils literal notranslate"><span class="pre">mp4</span></code> encoded videos using the <code class="docutils literal notranslate"><span class="pre">ffmpeg</span></code>
 animation plugin provided by matplotlib.</p>
 <p>To make a video, using the <code class="docutils literal notranslate"><span class="pre">animate</span></code> api:</p>
@@ -248,18 +266,79 @@ actually forgot things.</p>
 <p>The video plays a training event every second, which means that we are
 accelerating time since the training events become more and more spaced out the
 later they occur.</p>
-<p>It is unlikely that you will be using <code class="docutils literal notranslate"><span class="pre">spaced</span></code> to track just one object.  You
+</div>
+<div class="section" id="predicting-future-results">
+<span id="quickstart-predicting-future-results"></span><h2>Predicting Future Results<a class="headerlink" href="#predicting-future-results" title="Permalink to this headline">¶</a></h2>
+<p>But, it is unlikely that you will be using <code class="docutils literal notranslate"><span class="pre">spaced</span></code> to track just one object.  You
 will probably have thousands of them running, and you will have to select from a
 small subset of these thousands of tracked objects to compile a review session for your
 student.  To do this, you need to know which of your tracked <code class="docutils literal notranslate"><span class="pre">spaced</span></code> objects
 are in the most need of attention.</p>
 <p>For this reason you will need to query a <code class="docutils literal notranslate"><span class="pre">spaced</span></code> object so that it can make a
-prediction about a student’s ability to recall it at some datetime.</p>
-<p>Here is how to this:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>
+prediction about a student’s ability to recall a fact at some datetime.  To predict
+a result, you can use the learning tracker’s <code class="docutils literal notranslate"><span class="pre">predict_result</span></code> api.</p>
+<p>To demonstrate this, I will make a set of predictions and graph them onto the
+plot generated by the learning tracker.</p>
+<p>Here is how to do this:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">repetition</span> <span class="kn">import</span> <span class="n">pp</span>
+<span class="kn">from</span> <span class="nn">repetition</span> <span class="kn">import</span> <span class="n">LearningTracker</span>
+
+<span class="c1"># create a learning tracker</span>
+<span class="n">lt</span> <span class="o">=</span> <span class="n">LearningTracker</span><span class="p">(</span>
+    <span class="n">epoch</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(),</span>
+<span class="p">)</span>
+
+<span class="c1"># give our learning tracker some feedback</span>
+<span class="k">for</span> <span class="n">d</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+    <span class="p">[</span><span class="mi">0</span><span class="p">,</span>    <span class="mf">0.8</span><span class="p">,</span>  <span class="mf">1.75</span><span class="p">,</span> <span class="mf">3.02</span><span class="p">,</span> <span class="mf">4.8</span><span class="p">,</span>  <span class="mf">7.33</span><span class="p">],</span>
+    <span class="p">[</span><span class="mf">0.40</span><span class="p">,</span> <span class="mf">0.44</span><span class="p">,</span> <span class="mf">0.64</span><span class="p">,</span> <span class="mf">0.76</span><span class="p">,</span> <span class="mf">0.83</span><span class="p">,</span> <span class="mf">0.89</span><span class="p">],</span>
+  <span class="p">):</span>
+  <span class="c1"># r: result</span>
+  <span class="c1"># d: days since training epoch</span>
+  <span class="n">lt</span><span class="o">.</span><span class="n">learned</span><span class="p">(</span><span class="n">result</span><span class="o">=</span><span class="n">r</span><span class="p">,</span> <span class="n">when</span><span class="o">=</span><span class="n">d</span><span class="p">)</span>
+
+<span class="c1"># get a set of datetimes</span>
+<span class="n">useful_range_of_datetimes</span> <span class="o">=</span> \
+  <span class="n">lt</span><span class="o">.</span><span class="n">range_for</span><span class="p">(</span><span class="n">curve</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="nb">range</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">day_step_size</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+
+<span class="c1"># make a results query using these datetimes</span>
+<span class="n">results</span> <span class="o">=</span> <span class="p">[</span><span class="n">lt</span><span class="o">.</span><span class="n">predict_result</span><span class="p">(</span><span class="n">moment</span><span class="p">,</span> <span class="n">curve</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="k">for</span>
+            <span class="n">moment</span> <span class="ow">in</span> <span class="n">useful_range_of_datetimes</span><span class="p">]</span>
+<span class="n">hdl</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">plot_graphs</span><span class="p">()</span>
+
+<span class="c1"># get the handle for the last subplot so we can draw on it</span>
+<span class="n">control_plot</span> <span class="o">=</span> <span class="n">hdl</span><span class="o">.</span><span class="n">axarr</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">control_plot</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+  <span class="n">useful_range_of_datetimes</span><span class="p">,</span> <span class="n">results</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;xkcd:azure&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
+<p>Here is the resulting plot:</p>
+<a class="reference external image-reference" href="_static/quickstart_control_after_five_events_and_query.pdf"><div align="center" class="align-center"><img alt="_images/quickstart_control_after_five_events_and_query.svg" src="_images/quickstart_control_after_five_events_and_query.svg" /></div>
+</a>
+<p>You can see when we plot a set of queries for the results of the first learning
+curve over a set of datetimes, that the line representing this information
+extends downward past the plasticity line.  This is because the query assumes
+that no additional training event will occur.</p>
+</div>
+<div class="section" id="building-a-better-initial-student-model">
+<span id="quickstart-building-a-better-initial-student-model"></span><h2>Building a Better Initial Student Model<a class="headerlink" href="#building-a-better-initial-student-model" title="Permalink to this headline">¶</a></h2>
+<p>As the <code class="docutils literal notranslate"><span class="pre">spaced</span></code> algorithm reacts to the student’s feedback, it gets a much
+better idea about how the student forgets information and how they remember
+things over the long term.  It does this by changing the tuning parameters for
+the control-forgetting-curves and the observed-plasticity-curve.</p>
+<p>Now imagine if we used these discovered parameters to create a realistic recommendation
+graph.  We could create a model which is fit to their previous behavior.  If the
+student was having a harder time, the initial scheduling goal would become more aggressive,
+patiently presenting the information over and over until the student gained the foothold
+they needed.</p>
+<p>If the student was very strong, the schedule would become more sparse, avoiding
+the risk of boring the student.</p>
+<p>We can build a better model, even without understanding what the model building
+parameter mean.  We can do by feeding the discovered the discovered parameters
+from one full-training session into the beginning of another.</p>
 <a class="reference internal" href="introduction.html"<span class="std-ref">prev</span></a>, <a class="reference internal" href="index.html#top"><span class="std std-ref">top</span></a>, <a class="reference internal" href="zero_to_one.html"><span class="std std-ref">next</span></a><div class="toctree-wrapper compound">
+</div>
 </div>
 </div>
 
@@ -271,7 +350,22 @@ prediction about a student’s ability to recall it at some datetime.</p>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper"><p class="logo"><a href="index.html">
   <img class="logo_a" src="_static/spaced_1.svg" width="250" alt="Logo" >
-</a></p><div class="relations">
+</a></p>
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Quick Start</a><ul>
+<li><a class="reference internal" href="#getting-an-initial-schedule">Getting an Initial Schedule</a></li>
+<li><a class="reference internal" href="#understanding-where-a-schedule-comes-from">Understanding where a Schedule Comes from</a></li>
+<li><a class="reference internal" href="#adding-student-feedback">Adding Student Feedback</a></li>
+<li><a class="reference internal" href="#getting-a-schedule-which-responds-to-the-student-s-feedback">Getting a Schedule which Responds to the Student’s Feedback</a></li>
+<li><a class="reference internal" href="#understanding-the-reactive-schedule">Understanding the Reactive Schedule</a></li>
+<li><a class="reference internal" href="#animating-the-reactive-schedule-to-get-an-intuitive-feeling-about-results">Animating the Reactive Schedule to get an Intuitive Feeling about Results</a></li>
+<li><a class="reference internal" href="#predicting-future-results">Predicting Future Results</a></li>
+<li><a class="reference internal" href="#building-a-better-initial-student-model">Building a Better Initial Student Model</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>

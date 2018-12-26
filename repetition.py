@@ -653,7 +653,6 @@ class SpaceRepetitionFeedback(SpaceRepetition):
     with np.errstate(all="ignore"):
       result  = np.power(x, 1.0 / pdiv_)
       result /= np.power(x + adder_, 1.0 / pdiv_)
-    #result = np.clip(result, 0, 1)
     return result
 
   def recollection_line_profile(self, x, m, b):
@@ -666,10 +665,7 @@ class SpaceRepetitionFeedback(SpaceRepetition):
     else:
       c_event_x = event_x
 
-    if event_x in self.a_events_x:
-      # duplicate (should we raise?)
-      pass
-    else:
+    if event_x not in self.a_events_x:
       self.a_events_x.append(c_event_x)
       self.a_events_y.append(event_y)
       if c_event_x > self.range:
@@ -1167,6 +1163,9 @@ class SpaceRepetitionController(SpaceRepetition):
   def open_figure(self, filename="spaced.pdf"):
     os.system(filename)
 
+  def predict_result(self, moment, curve=None):
+    return self.recollect_scalar(moment, curve)
+
   def recollect_scalar(self, moment, curve=None):
     '''
     This will return a scalar representing the probability that a student can
@@ -1426,6 +1425,9 @@ class LearningTracker():
 
   def range_for(self, curve=None, range=None, day_step_size=1):
     return self.control.range_for(curve, range, day_step_size)
+
+  def predict_result(self, moment, curve=None):
+    return self.recollect_scalar(moment, curve)
 
   def recollect_scalar(self, moment, curve=None):
     return self.control.recollect_scalar(moment, curve)
