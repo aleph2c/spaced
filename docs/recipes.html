@@ -13,7 +13,6 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="_static/language_data.js"></script>
     <link rel="shortcut icon" href="_static/favicon.ico"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -45,15 +44,271 @@
 </div>
 <div class="section" id="diagrams">
 <span id="recipes-diagrams"></span><h2>Diagrams<a class="headerlink" href="#diagrams" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="generate-learning-tracker-curves">
+<span id="recipes-generate-learning-tracker-curves"></span><h3>Generate Learning Tracker Curves<a class="headerlink" href="#generate-learning-tracker-curves" title="Permalink to this headline">¶</a></h3>
+<p>To generate the learning tracker curves:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">space.repitition</span> <span class="kn">import</span> <span class="n">LearningTracker</span>
+
+<span class="n">days_to_track</span> <span class="o">=</span> <span class="mi">43</span>
+<span class="n">lesson_to_graph</span> <span class="o">=</span> <span class="mi">3</span>
+
+<span class="n">lt</span> <span class="o">=</span> <span class="n">LearningTracker</span><span class="p">(</span>
+  <span class="n">epoch</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">new</span><span class="p">(),</span>
+  <span class="nb">range</span><span class="o">=</span><span class="n">days_to_track</span>
+<span class="p">)</span>
+
+<span class="n">day_offset_from_epoch_and_results</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">[</span><span class="mi">0</span><span class="p">,</span>    <span class="mf">0.81</span><span class="p">,</span> <span class="mf">1.75</span><span class="p">,</span> <span class="mf">3.02</span><span class="p">,</span> <span class="mf">4.8</span><span class="p">,</span>  <span class="mf">8.33</span><span class="p">,</span> <span class="mf">10.93</span><span class="p">,</span> <span class="mf">16.00</span><span class="p">,</span> <span class="mf">23.00</span><span class="p">,</span> <span class="mf">29.00</span><span class="p">],</span>
+    <span class="p">[</span><span class="mf">0.40</span><span class="p">,</span> <span class="mf">0.44</span><span class="p">,</span> <span class="mf">0.64</span><span class="p">,</span> <span class="mf">0.84</span><span class="p">,</span> <span class="mf">0.83</span><span class="p">,</span> <span class="mf">0.89</span><span class="p">,</span>  <span class="mf">1.00</span><span class="p">,</span>  <span class="mf">0.99</span><span class="p">,</span> <span class="mf">0.99</span><span class="p">,</span>   <span class="mf">1.00</span><span class="p">],</span>
+<span class="p">]</span>
+
+<span class="c1"># mimic a full training session</span>
+<span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span> <span class="ow">in</span> \
+  <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">day_offset_from_epoch_and_results</span><span class="p">)):</span>
+  <span class="c1"># r: result</span>
+  <span class="c1"># d: days since training epoch</span>
+  <span class="n">lt</span><span class="o">.</span><span class="n">learned</span><span class="p">(</span><span class="n">result</span><span class="o">=</span><span class="n">r</span><span class="p">,</span> <span class="n">when</span><span class="o">=</span><span class="n">d</span><span class="p">)</span>
+
+  <span class="c1"># plot the lesson we want to graph</span>
+  <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="n">lesson_to_graph</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+
+    <span class="c1"># PLOTTING THE GRAPHS</span>
+    <span class="n">hdl</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">plot_graphs</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>The third set of learning tracker plots would look like this:</p>
+<a class="reference external image-reference" href="_static/quickstart_arbitrary.pdf"><div align="center" class="align-center"><img alt="_images/quickstart_arbitrary.svg" src="_images/quickstart_arbitrary.svg" /></div>
+</a>
+</div>
+<div class="section" id="generate-a-reference-curve">
+<span id="recipes-generate-a-reference-curve"></span><h3>Generate a Reference Curve<a class="headerlink" href="#generate-a-reference-curve" title="Permalink to this headline">¶</a></h3>
+<p>To generate a reference curve:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">repetition</span> <span class="kn">import</span> <span class="n">LearningTracker</span>
+
+<span class="c1"># create a learning tracker</span>
+<span class="n">learning_tracker</span> <span class="o">=</span> <span class="n">LearningTracker</span><span class="p">(</span><span class="n">epoch</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">())</span>
+<span class="n">hdl</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">learning_tracker</span><span class="o">.</span><span class="n">reference</span><span class="o">.</span><span class="n">plot_graph</span><span class="p">()</span>
+
+<span class="c1"># to save this plot (usual api, since I can&#39;t imagine why a</span>
+<span class="c1"># regular user would save the reference, but I have included it</span>
+<span class="c1"># as a recipe since I needed to do this to document this package</span>
+<span class="n">hdl</span><span class="o">.</span><span class="n">ppd</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s2">&quot;quickstart_reference.svg&quot;</span><span class="p">)</span>
+<span class="n">hdl</span><span class="o">.</span><span class="n">ppd</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s2">&quot;quickstart_reference.pdf&quot;</span><span class="p">)</span>
+
+<span class="n">hdl</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+</div>
+<a class="reference external image-reference" href="_static/quickstart_reference.pdf"><div align="center" class="align-center"><img alt="_images/quickstart_reference.svg" src="_images/quickstart_reference.svg" /></div>
+</a>
+</div>
+<div class="section" id="save-a-diagram">
+<span id="recipes-save-a-diagram"></span><h3>Save a Diagram<a class="headerlink" href="#save-a-diagram" title="Permalink to this headline">¶</a></h3>
+<p>To save a diagram:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">space.repitition</span> <span class="kn">import</span> <span class="n">LearningTracker</span>
+<span class="n">lt</span> <span class="o">=</span> <span class="n">LearningTracker</span><span class="p">(</span>
+  <span class="n">epoch</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">new</span><span class="p">(),</span>
+<span class="p">)</span>
+
+<span class="n">hdl</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">plot_graphs</span><span class="p">()</span>
+
+<span class="c1"># SAVE SVG</span>
+<span class="n">lt</span><span class="o">.</span><span class="n">save_figure</span><span class="p">(</span><span class="s2">&quot;replace_with_the_filename_you_want.svg&quot;</span><span class="p">)</span>
+
+<span class="c1"># SAVE PNG</span>
+<span class="n">lt</span><span class="o">.</span><span class="n">save_figure</span><span class="p">(</span><span class="s2">&quot;replace_with_the_filename_you_want.png&quot;</span><span class="p">)</span>
+
+<span class="c1"># SAVE PDF</span>
+<span class="n">lt</span><span class="o">.</span><span class="n">save_figure</span><span class="p">(</span><span class="s2">&quot;replace_with_the_filename_you_want.pdf&quot;</span><span class="p">)</span>
+
+<span class="n">hdl</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="closing-the-graph-handle">
+<span id="recipes-closing-the-graph-handle"></span><h3>Closing the Graph Handle<a class="headerlink" href="#closing-the-graph-handle" title="Permalink to this headline">¶</a></h3>
+<p>Under the hook <code class="docutils literal notranslate"><span class="pre">spaced</span></code> uses <code class="docutils literal notranslate"><span class="pre">matplotlib</span></code>.  The <code class="docutils literal notranslate"><span class="pre">matplotlib</span></code> library
+recommends that graph handles are closed when you are finished looking at the
+graph so as to save system memory:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">space.repitition</span> <span class="kn">import</span> <span class="n">LearningTracker</span>
+<span class="n">lt</span> <span class="o">=</span> <span class="n">LearningTracker</span><span class="p">(</span><span class="n">epoch</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">new</span><span class="p">())</span>
+
+<span class="c1"># plot something</span>
+<span class="n">hdl</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">plot_graphs</span><span class="p">()</span>
+
+<span class="c1"># CLOSE THE GRAPH HANDLE</span>
+<span class="n">hdl</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
 </div>
 <div class="section" id="videos">
 <span id="recipes-videos"></span><h2>Videos<a class="headerlink" href="#videos" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="installing-ffmpeg">
+<span id="recipes-ensure-ffmpeg-is-installed"></span><h3>Installing ffmpeg<a class="headerlink" href="#installing-ffmpeg" title="Permalink to this headline">¶</a></h3>
+<p>In a linux system or WLS running a Debian distribution:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo apt update
+sudo apt-get install ffmpeg
+</pre></div>
+</div>
+</div>
+<div class="section" id="animating-a-learning-tracker">
+<span id="recipes-animating-a-learning-tracker"></span><h3>Animating a Learning Tracker<a class="headerlink" href="#animating-a-learning-tracker" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">repetition</span> <span class="kn">import</span> <span class="n">LearningTracker</span>
+
+<span class="n">day_offset_from_epoch_and_results</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">[</span><span class="mi">0</span><span class="p">,</span>    <span class="mf">0.81</span><span class="p">,</span> <span class="mf">1.75</span><span class="p">,</span> <span class="mf">3.02</span><span class="p">,</span> <span class="mf">4.8</span><span class="p">,</span>  <span class="mf">8.33</span><span class="p">,</span> <span class="mf">10.93</span><span class="p">,</span> <span class="mf">16.00</span><span class="p">,</span> <span class="mf">23.00</span><span class="p">,</span> <span class="mf">29.00</span><span class="p">],</span>
+    <span class="p">[</span><span class="mf">0.40</span><span class="p">,</span> <span class="mf">0.44</span><span class="p">,</span> <span class="mf">0.64</span><span class="p">,</span> <span class="mf">0.84</span><span class="p">,</span> <span class="mf">0.83</span><span class="p">,</span> <span class="mf">0.89</span><span class="p">,</span>  <span class="mf">1.00</span><span class="p">,</span>  <span class="mf">0.99</span><span class="p">,</span> <span class="mf">0.99</span><span class="p">,</span>   <span class="mf">1.00</span><span class="p">],</span>
+<span class="p">]</span>
+
+<span class="c1"># create a learning tracker with arbitrary default parameters</span>
+<span class="n">lt_arbitrary</span> <span class="o">=</span> <span class="n">LearningTracker</span><span class="p">(</span>
+  <span class="n">epoch</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(),</span>
+<span class="p">)</span>
+
+<span class="k">for</span> <span class="n">d</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">day_offset_from_epoch_and_results</span><span class="p">):</span>
+  <span class="c1"># r: result</span>
+  <span class="c1"># d: days since training epoch</span>
+  <span class="n">lt_arbitrary</span><span class="o">.</span><span class="n">learned</span><span class="p">(</span><span class="n">result</span><span class="o">=</span><span class="n">r</span><span class="p">,</span> <span class="n">when</span><span class="o">=</span><span class="n">d</span><span class="p">)</span>
+
+<span class="n">lt</span><span class="o">.</span><span class="n">animate</span><span class="p">(</span>
+  <span class="n">student</span><span class="o">=</span><span class="s2">&quot;Name of Student&quot;</span><span class="p">,</span>
+  <span class="n">name_of_mp4</span><span class="o">=</span><span class="s2">&quot;results/report_card.mp4&quot;</span><span class="p">,</span>
+  <span class="n">time_per_event_in_seconds</span><span class="o">=</span><span class="mf">2.2</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This would generate the following <code class="docutils literal notranslate"><span class="pre">mp4</span></code>:</p>
+<center>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/H8llYuwH5L0" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+</center></div>
 </div>
 <div class="section" id="forgetting-curves">
 <span id="recipes-forgetting-curves"></span><h2>Forgetting Curves<a class="headerlink" href="#forgetting-curves" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="tuning-your-forgetting-curves">
+<span id="recipes-tuning-your-forgetting-curves"></span><h3>Tuning your forgetting curves<a class="headerlink" href="#tuning-your-forgetting-curves" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">fdecay0</span></code> and <code class="docutils literal notranslate"><span class="pre">fdecaytau</span></code> parameters control the forgetting curves:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">repetition</span> <span class="kn">import</span> <span class="n">LearningTracker</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+
+<span class="n">start_time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+
+<span class="c1"># setting up our reference (goals)</span>
+<span class="n">hr</span> <span class="o">=</span> <span class="n">LearningTracker</span><span class="p">(</span><span class="n">fdecaytau</span><span class="o">=</span><span class="mf">1.00</span><span class="p">,</span>  <span class="c1"># ability to improve after a lesson, lower is better</span>
+                     <span class="n">fdecay0</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span>      <span class="c1"># seen it before? then pick lower numbers</span>
+                     <span class="n">epoch</span><span class="o">=</span><span class="n">start_time</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="forgetting-curve-model-discovery">
+<span id="recipes-forgetting-curve-model-discovery"></span><h3>Forgetting curve model discovery<a class="headerlink" href="#forgetting-curve-model-discovery" title="Permalink to this headline">¶</a></h3>
+<p>Use information from one learning tracker session to build a better set of goals
+for another:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">repetition</span> <span class="kn">import</span> <span class="n">LearningTracker</span>
+
+<span class="n">day_offset_from_epoch_and_results</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">[</span><span class="mi">0</span><span class="p">,</span>    <span class="mf">0.81</span><span class="p">,</span> <span class="mf">1.75</span><span class="p">,</span> <span class="mf">3.02</span><span class="p">,</span> <span class="mf">4.8</span><span class="p">,</span>  <span class="mf">8.33</span><span class="p">,</span> <span class="mf">10.93</span><span class="p">,</span> <span class="mf">16.00</span><span class="p">,</span> <span class="mf">23.00</span><span class="p">,</span> <span class="mf">29.00</span><span class="p">],</span>
+    <span class="p">[</span><span class="mf">0.40</span><span class="p">,</span> <span class="mf">0.44</span><span class="p">,</span> <span class="mf">0.64</span><span class="p">,</span> <span class="mf">0.84</span><span class="p">,</span> <span class="mf">0.83</span><span class="p">,</span> <span class="mf">0.89</span><span class="p">,</span>  <span class="mf">1.00</span><span class="p">,</span>  <span class="mf">0.99</span><span class="p">,</span> <span class="mf">0.99</span><span class="p">,</span>   <span class="mf">1.00</span><span class="p">],</span>
+<span class="p">]</span>
+
+<span class="c1"># create a learning tracker with arbitrary default parameters</span>
+<span class="n">lt_arbitrary</span> <span class="o">=</span> <span class="n">LearningTracker</span><span class="p">(</span>
+  <span class="n">epoch</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(),</span>
+<span class="p">)</span>
+
+<span class="c1"># mimic a full training session</span>
+<span class="k">for</span> <span class="n">d</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> \
+  <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">day_offset_from_epoch_and_results</span><span class="p">):</span>
+  <span class="c1"># r: result</span>
+  <span class="c1"># d: days since training epoch</span>
+  <span class="n">lt_arbitrary</span><span class="o">.</span><span class="n">learned</span><span class="p">(</span><span class="n">result</span><span class="o">=</span><span class="n">r</span><span class="p">,</span> <span class="n">when</span><span class="o">=</span><span class="n">d</span><span class="p">)</span>
+
+<span class="c1"># get better initial model parameters based on previous</span>
+<span class="c1"># experience with the student</span>
+
+<span class="c1"># to get the discovered parameter from a previous training session,</span>
+<span class="c1"># pre-pend &#39;discovered&#39; in front of the parameter name,</span>
+<span class="c1"># and call this word like a function</span>
+<span class="n">bf0</span> <span class="o">=</span> <span class="n">lt_arbitrary</span><span class="o">.</span><span class="n">discovered_fdecay0</span><span class="p">()</span>
+<span class="n">bft</span> <span class="o">=</span> <span class="n">lt_arbitrary</span><span class="o">.</span><span class="n">discovered_fdecaytau</span><span class="p">()</span>
+
+<span class="c1"># a better learning tracker</span>
+<span class="n">lt_better_fit</span> <span class="o">=</span> <span class="n">LearningTracker</span><span class="p">(</span>
+  <span class="n">epoch</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(),</span>
+  <span class="n">fdecay0</span><span class="o">=</span><span class="n">bf0</span><span class="p">,</span>
+  <span class="n">fdecaytau</span><span class="o">=</span><span class="n">bft</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
 </div>
 <div class="section" id="plasticity-curves">
 <span id="recipes-plasticity-curves"></span><h2>Plasticity Curves<a class="headerlink" href="#plasticity-curves" title="Permalink to this headline">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">plasticity_root</span></code> and <code class="docutils literal notranslate"><span class="pre">plasticity_denominator_offset</span></code> parameters control the reference plasticity curve:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">repetition</span> <span class="kn">import</span> <span class="n">LearningTracker</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+
+<span class="n">start_time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+
+<span class="c1">#                    x**(1.0/plasticity_root)</span>
+<span class="c1"># r = ---------------------------------------------------------</span>
+<span class="c1">#     (x+plasticity_denominator_offset)**(1.0/plasticity_root)</span>
+
+<span class="c1"># setting up our reference-plasticity</span>
+<span class="c1"># (long term memory formation)</span>
+<span class="n">hr</span> <span class="o">=</span> <span class="n">LearningTracker</span><span class="p">(</span>
+  <span class="n">plasticity_root</span><span class="o">=</span><span class="mf">1.8</span><span class="p">,</span> <span class="c1"># for slower learning pick lower numbers</span>
+  <span class="n">plasticity_denominator_offset</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<div class="section" id="plasticity-curve-model-discovery">
+<span id="recipes-plasticity-curve-model-discovery"></span><h3>Plasticity Curve Model Discovery<a class="headerlink" href="#plasticity-curve-model-discovery" title="Permalink to this headline">¶</a></h3>
+<p>Use information from one learning tracker session to build a better set of goals
+for another:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">repetition</span> <span class="kn">import</span> <span class="n">LearningTracker</span>
+
+<span class="n">day_offset_from_epoch_and_results</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">[</span><span class="mi">0</span><span class="p">,</span>    <span class="mf">0.81</span><span class="p">,</span> <span class="mf">1.75</span><span class="p">,</span> <span class="mf">3.02</span><span class="p">,</span> <span class="mf">4.8</span><span class="p">,</span>  <span class="mf">8.33</span><span class="p">,</span> <span class="mf">10.93</span><span class="p">,</span> <span class="mf">16.00</span><span class="p">,</span> <span class="mf">23.00</span><span class="p">,</span> <span class="mf">29.00</span><span class="p">],</span>
+    <span class="p">[</span><span class="mf">0.40</span><span class="p">,</span> <span class="mf">0.44</span><span class="p">,</span> <span class="mf">0.64</span><span class="p">,</span> <span class="mf">0.84</span><span class="p">,</span> <span class="mf">0.83</span><span class="p">,</span> <span class="mf">0.89</span><span class="p">,</span>  <span class="mf">1.00</span><span class="p">,</span>  <span class="mf">0.99</span><span class="p">,</span> <span class="mf">0.99</span><span class="p">,</span>   <span class="mf">1.00</span><span class="p">],</span>
+<span class="p">]</span>
+
+<span class="c1"># create a learning tracker with arbitrary default parameters</span>
+<span class="n">lt_arbitrary</span> <span class="o">=</span> <span class="n">LearningTracker</span><span class="p">(</span>
+  <span class="n">epoch</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(),</span>
+<span class="p">)</span>
+
+<span class="c1"># mimic a full training session</span>
+<span class="k">for</span> <span class="n">d</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> \
+  <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">day_offset_from_epoch_and_results</span><span class="p">):</span>
+  <span class="c1"># r: result</span>
+  <span class="c1"># d: days since training epoch</span>
+  <span class="n">lt_arbitrary</span><span class="o">.</span><span class="n">learned</span><span class="p">(</span><span class="n">result</span><span class="o">=</span><span class="n">r</span><span class="p">,</span> <span class="n">when</span><span class="o">=</span><span class="n">d</span><span class="p">)</span>
+
+<span class="c1"># get better initial model parameters based on previous</span>
+<span class="c1"># experience with the student</span>
+
+<span class="c1"># to get the discovered parameter from a previous training session,</span>
+<span class="c1"># pre-pend &#39;discovered&#39; in front of the parameter name,</span>
+<span class="c1"># and call this word like a function</span>
+<span class="n">bpr</span> <span class="o">=</span> <span class="n">lt_arbitrary</span><span class="o">.</span><span class="n">discovered_plasticity_root</span><span class="p">()</span>
+<span class="n">bpdo</span> <span class="o">=</span> <span class="n">lt_arbitrary</span><span class="o">.</span><span class="n">discovered_plasticity_denominator_offset</span><span class="p">()</span>
+
+<span class="c1"># a better learning tracker</span>
+<span class="n">lt_better_fit</span> <span class="o">=</span> <span class="n">LearningTracker</span><span class="p">(</span>
+  <span class="n">epoch</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(),</span>
+  <span class="n">plasticity_root</span><span class="o">=</span><span class="n">bpr</span><span class="p">,</span>
+  <span class="n">plasticity_denominator_offset</span><span class="o">=</span><span class="n">bpdo</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
 </div>
 <div class="section" id="feedback">
 <span id="recipes-feedback"></span><h2>Feedback<a class="headerlink" href="#feedback" title="Permalink to this headline">¶</a></h2>
@@ -87,10 +342,27 @@
   <h3><a href="index.html">Table of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Recipes</a><ul>
-<li><a class="reference internal" href="#diagrams">Diagrams</a></li>
-<li><a class="reference internal" href="#videos">Videos</a></li>
-<li><a class="reference internal" href="#forgetting-curves">Forgetting Curves</a></li>
-<li><a class="reference internal" href="#plasticity-curves">Plasticity Curves</a></li>
+<li><a class="reference internal" href="#diagrams">Diagrams</a><ul>
+<li><a class="reference internal" href="#generate-learning-tracker-curves">Generate Learning Tracker Curves</a></li>
+<li><a class="reference internal" href="#generate-a-reference-curve">Generate a Reference Curve</a></li>
+<li><a class="reference internal" href="#save-a-diagram">Save a Diagram</a></li>
+<li><a class="reference internal" href="#closing-the-graph-handle">Closing the Graph Handle</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#videos">Videos</a><ul>
+<li><a class="reference internal" href="#installing-ffmpeg">Installing ffmpeg</a></li>
+<li><a class="reference internal" href="#animating-a-learning-tracker">Animating a Learning Tracker</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#forgetting-curves">Forgetting Curves</a><ul>
+<li><a class="reference internal" href="#tuning-your-forgetting-curves">Tuning your forgetting curves</a></li>
+<li><a class="reference internal" href="#forgetting-curve-model-discovery">Forgetting curve model discovery</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#plasticity-curves">Plasticity Curves</a><ul>
+<li><a class="reference internal" href="#plasticity-curve-model-discovery">Plasticity Curve Model Discovery</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#feedback">Feedback</a></li>
 <li><a class="reference internal" href="#control">Control</a></li>
 <li><a class="reference internal" href="#queries">Queries</a></li>

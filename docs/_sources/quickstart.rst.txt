@@ -155,8 +155,9 @@ In your terminal you will see something like this:
 Understanding the Reactive Schedule
 -----------------------------------
 
-It is different than it was when we started.  We can ask the learning tracker
-for a plot so we can see where these datetime values are coming from:
+The ``spaced`` schedule changes as it reacts to feedback from the student. To
+see why this change has occurred we can look at the plots from which this
+schedule is derived:
 
 .. code-block:: python
 
@@ -166,10 +167,10 @@ for a plot so we can see where these datetime values are coming from:
     :target: _static/quickstart_control_after_two_events.pdf
     :align: center
 
-The diagram above contains four different graphs.  The first graph is called the
-recommendation.  It represents the goal of our training engagement with this
-student for the thing that they are trying to learn.  It is exactly the same as
-the reference graph we plotted above.  
+The learning tracker diagram above contains four different graphs.  The first
+graph is called the recommendation.  It represents the goal of our training
+engagement with this student for the thing that they are trying to learn.  It is
+exactly the same as the reference graph we plotted above.  
 
 The 2nd graph represents the observed data that the student has given us.  At
 time zero they could remember 40 percent of an idea after their initial
@@ -376,23 +377,118 @@ that no additional training event will occur.
 
 Building a Better Initial Student Model
 ---------------------------------------
-As the ``spaced`` algorithm reacts to the student's feedback, it gets a much
-better idea about how the student forgets information and how they remember
-things over the long term.  It does this by changing the tuning parameters for
-the control-forgetting-curves and the observed-plasticity-curve.
+As the ``spaced`` algorithm reacts to student feedback, it gets a much better
+idea about how the student remembers and forgets in their current environment.
+It's control system tunes the forgetting and plasticity parameters as it tries
+to build a better schedule.
 
-Now imagine if we used these discovered parameters to create a realistic recommendation
-graph.  We could create a model which is fit to their previous behavior.  If the
-student was having a harder time, the initial scheduling goal would become more aggressive,
-patiently presenting the information over and over until the student gained the foothold
-they needed.
+Now imagine we let one learning tracker run for a while, then we pulled it's
+discovered parameters to create some initial conditions for another learning
+tracker, one with a more realistic set of goals.  These goals would be based on
+how a student has behaved in the past, instead of some imagined thing.
 
-If the student was very strong, the schedule would become more sparse, avoiding
-the risk of boring the student.
+I'll demonstrate how to do this, by first simulating a full training session (10
+lessons) using the arbitrary default values of the ``spaced`` algorithm.
 
-We can build a better model, even without understanding what the model building
-parameter mean.  We can do by feeding the discovered the discovered parameters
-from one full-training session into the beginning of another.
+.. code-block:: python
+
+  from datetime import datetime
+  from repetition import LearningTracker
+
+  day_offset_from_epoch_and_results = [ 
+      [0,    0.81, 1.75, 3.02, 4.8,  8.33, 10.93, 16.00, 23.00, 29.00],
+      [0.40, 0.44, 0.64, 0.84, 0.83, 0.89,  1.00,  0.99, 0.99,   1.00],
+  ]
+
+  # create a learning tracker with arbitrary default parameters
+  lt_arbitrary = LearningTracker(
+    epoch=datetime.now(),
+  )
+
+  # plot the third lesson so we can take a look at the differences 
+  # between some made up model and a model based
+  # on some previous feedback
+  lesson_to_graph = 3
+
+  # mimic a full training session
+  for index, (d, r) in \
+    enumerate(zip(*day_offset_from_epoch_and_results)):
+    # r: result
+    # d: days since training epoch
+    lt_arbitrary.learned(result=r, when=d)
+
+    # plot the lesson we want to graph
+    if index is lesson_to_graph - 1:
+      hdl, _ = lt_arbitrary.plot_graphs()
+
+.. image:: _static/quickstart_arbitrary.svg
+    :target: _static/quickstart_arbitrary.pdf
+    :align: center
+
+So what can we learn from this?
+
+  1.  Our student forgets things slower than we expected:  The forgetting curves
+  in the recommendation plot are steeper than that seen in the feedback
+  plot.
+
+  2.  Our student is remembering the things slower than we wanted them to learn:  The error
+  signal is positive.
+
+Now lets build another learning tracker using the discovered parameters from
+letting the first learning tracker run for ten lessons:
+
+.. code-block:: python
+
+  # get better initial model parameters based on previous
+  # experience with the student
+    
+  # to get the discovered parameter from a previous training session,
+  # pre-pend 'discovered' in front of the parameter name,
+  # and call this word like a function
+  bpr = lt_arbitrary.discovered_plasticity_root()
+  bpdo = lt_arbitrary.discovered_plasticity_denominator_offset()
+  bf0 = lt_arbitrary.discovered_fdecay0()
+  bft = lt_arbitrary.discovered_fdecaytau()
+
+  lt_better_fit = LearningTracker(
+    epoch=datetime.now(),
+    plasticity_root=bpr,
+    plasticity_denominator_offset=bpdo,
+    fdecay0=bf0,
+    fdecaytau=bft
+  )
+
+  # plot the third lesson so we can take a look at the differences 
+  # between some made up model and a model based
+  # on some previous feedback
+  lesson_to_graph = 3
+
+  for index, (d, r) in \
+    enumerate(zip(*day_offset_from_epoch_and_results)):
+    # r: result
+    # d: days since training epoch
+    lt_better_fit.learned(result=r, when=d)
+
+    # plot the lesson we want to graph
+    if index is lesson_to_graph - 1:
+      lt_better_fit.plot_graphs()
+
+.. image:: _static/quickstart_better_fit.svg
+    :target: _static/quickstart_better_fit.pdf
+    :align: center
+
+Let's try and pretend this plot is from real student feedback and not from a
+conjured example.
+
+We trust our recommendation curve more than we did when it was completely
+arbitrary, what can we learn from this diagram?
+
+Our eyes glance at how the forgetting curves on the recommendation graph and the
+observed plot are falling at around the same rate.  This let's us make a better
+inference about the control plot, we can see that our goals are more realistic
+so the difference between what we want and what we got can be attributed to how
+the student isn't meticulously following our recommended schedule.  This is of
+little consequence, since the schedule is adaptive:  Our student seems on track.
 
 .. raw:: html
 

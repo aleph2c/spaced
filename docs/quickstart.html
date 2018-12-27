@@ -13,7 +13,6 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="_static/language_data.js"></script>
     <link rel="shortcut icon" href="_static/favicon.ico"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -153,16 +152,17 @@ learning tracker, by writing the following code:</p>
 </div>
 <div class="section" id="understanding-the-reactive-schedule">
 <span id="quickstart-understanding-the-reactive-schedule"></span><h2>Understanding the Reactive Schedule<a class="headerlink" href="#understanding-the-reactive-schedule" title="Permalink to this headline">¶</a></h2>
-<p>It is different than it was when we started.  We can ask the learning tracker
-for a plot so we can see where these datetime values are coming from:</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">spaced</span></code> schedule changes as it reacts to feedback from the student. To
+see why this change has occurred we can look at the plots from which this
+schedule is derived:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">hdl</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">plot_graphs</span><span class="p">()</span>
 </pre></div>
 </div>
 <a class="reference external image-reference" href="_static/quickstart_control_after_two_events.pdf"><img alt="_images/quickstart_control_after_two_events.png" class="align-center" src="_images/quickstart_control_after_two_events.png" /></a>
-<p>The diagram above contains four different graphs.  The first graph is called the
-recommendation.  It represents the goal of our training engagement with this
-student for the thing that they are trying to learn.  It is exactly the same as
-the reference graph we plotted above.</p>
+<p>The learning tracker diagram above contains four different graphs.  The first
+graph is called the recommendation.  It represents the goal of our training
+engagement with this student for the thing that they are trying to learn.  It is
+exactly the same as the reference graph we plotted above.</p>
 <p>The 2nd graph represents the observed data that the student has given us.  At
 time zero they could remember 40 percent of an idea after their initial
 training session.  They retrained, then retested themselves 0.8 days later and
@@ -323,20 +323,105 @@ that no additional training event will occur.</p>
 </div>
 <div class="section" id="building-a-better-initial-student-model">
 <span id="quickstart-building-a-better-initial-student-model"></span><h2>Building a Better Initial Student Model<a class="headerlink" href="#building-a-better-initial-student-model" title="Permalink to this headline">¶</a></h2>
-<p>As the <code class="docutils literal notranslate"><span class="pre">spaced</span></code> algorithm reacts to the student’s feedback, it gets a much
-better idea about how the student forgets information and how they remember
-things over the long term.  It does this by changing the tuning parameters for
-the control-forgetting-curves and the observed-plasticity-curve.</p>
-<p>Now imagine if we used these discovered parameters to create a realistic recommendation
-graph.  We could create a model which is fit to their previous behavior.  If the
-student was having a harder time, the initial scheduling goal would become more aggressive,
-patiently presenting the information over and over until the student gained the foothold
-they needed.</p>
-<p>If the student was very strong, the schedule would become more sparse, avoiding
-the risk of boring the student.</p>
-<p>We can build a better model, even without understanding what the model building
-parameter mean.  We can do by feeding the discovered the discovered parameters
-from one full-training session into the beginning of another.</p>
+<p>As the <code class="docutils literal notranslate"><span class="pre">spaced</span></code> algorithm reacts to student feedback, it gets a much better
+idea about how the student remembers and forgets in their current environment.
+It’s control system tunes the forgetting and plasticity parameters as it tries
+to build a better schedule.</p>
+<p>Now imagine we let one learning tracker run for a while, then we pulled it’s
+discovered parameters to create some initial conditions for another learning
+tracker, one with a more realistic set of goals.  These goals would be based on
+how a student has behaved in the past, instead of some imagined thing.</p>
+<p>I’ll demonstrate how to do this, by first simulating a full training session (10
+lessons) using the arbitrary default values of the <code class="docutils literal notranslate"><span class="pre">spaced</span></code> algorithm.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">repetition</span> <span class="kn">import</span> <span class="n">LearningTracker</span>
+
+<span class="n">day_offset_from_epoch_and_results</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">[</span><span class="mi">0</span><span class="p">,</span>    <span class="mf">0.81</span><span class="p">,</span> <span class="mf">1.75</span><span class="p">,</span> <span class="mf">3.02</span><span class="p">,</span> <span class="mf">4.8</span><span class="p">,</span>  <span class="mf">8.33</span><span class="p">,</span> <span class="mf">10.93</span><span class="p">,</span> <span class="mf">16.00</span><span class="p">,</span> <span class="mf">23.00</span><span class="p">,</span> <span class="mf">29.00</span><span class="p">],</span>
+    <span class="p">[</span><span class="mf">0.40</span><span class="p">,</span> <span class="mf">0.44</span><span class="p">,</span> <span class="mf">0.64</span><span class="p">,</span> <span class="mf">0.84</span><span class="p">,</span> <span class="mf">0.83</span><span class="p">,</span> <span class="mf">0.89</span><span class="p">,</span>  <span class="mf">1.00</span><span class="p">,</span>  <span class="mf">0.99</span><span class="p">,</span> <span class="mf">0.99</span><span class="p">,</span>   <span class="mf">1.00</span><span class="p">],</span>
+<span class="p">]</span>
+
+<span class="c1"># create a learning tracker with arbitrary default parameters</span>
+<span class="n">lt_arbitrary</span> <span class="o">=</span> <span class="n">LearningTracker</span><span class="p">(</span>
+  <span class="n">epoch</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(),</span>
+<span class="p">)</span>
+
+<span class="c1"># plot the third lesson so we can take a look at the differences</span>
+<span class="c1"># between some made up model and a model based</span>
+<span class="c1"># on some previous feedback</span>
+<span class="n">lesson_to_graph</span> <span class="o">=</span> <span class="mi">3</span>
+
+<span class="c1"># mimic a full training session</span>
+<span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span> <span class="ow">in</span> \
+  <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">day_offset_from_epoch_and_results</span><span class="p">)):</span>
+  <span class="c1"># r: result</span>
+  <span class="c1"># d: days since training epoch</span>
+  <span class="n">lt_arbitrary</span><span class="o">.</span><span class="n">learned</span><span class="p">(</span><span class="n">result</span><span class="o">=</span><span class="n">r</span><span class="p">,</span> <span class="n">when</span><span class="o">=</span><span class="n">d</span><span class="p">)</span>
+
+  <span class="c1"># plot the lesson we want to graph</span>
+  <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="n">lesson_to_graph</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+    <span class="n">hdl</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">lt_arbitrary</span><span class="o">.</span><span class="n">plot_graphs</span><span class="p">()</span>
+</pre></div>
+</div>
+<a class="reference external image-reference" href="_static/quickstart_arbitrary.pdf"><div align="center" class="align-center"><img alt="_images/quickstart_arbitrary.svg" src="_images/quickstart_arbitrary.svg" /></div>
+</a>
+<p>So what can we learn from this?</p>
+<blockquote>
+<div><p>1.  Our student forgets things slower than we expected:  The forgetting curves
+in the recommendation plot are steeper than that seen in the feedback
+plot.</p>
+<p>2.  Our student is remembering the things slower than we wanted them to learn:  The error
+signal is positive.</p>
+</div></blockquote>
+<p>Now lets build another learning tracker using the discovered parameters from
+letting the first learning tracker run for ten lessons:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># get better initial model parameters based on previous</span>
+<span class="c1"># experience with the student</span>
+
+<span class="c1"># to get the discovered parameter from a previous training session,</span>
+<span class="c1"># pre-pend &#39;discovered&#39; in front of the parameter name,</span>
+<span class="c1"># and call this word like a function</span>
+<span class="n">bpr</span> <span class="o">=</span> <span class="n">lt_arbitrary</span><span class="o">.</span><span class="n">discovered_plasticity_root</span><span class="p">()</span>
+<span class="n">bpdo</span> <span class="o">=</span> <span class="n">lt_arbitrary</span><span class="o">.</span><span class="n">discovered_plasticity_denominator_offset</span><span class="p">()</span>
+<span class="n">bf0</span> <span class="o">=</span> <span class="n">lt_arbitrary</span><span class="o">.</span><span class="n">discovered_fdecay0</span><span class="p">()</span>
+<span class="n">bft</span> <span class="o">=</span> <span class="n">lt_arbitrary</span><span class="o">.</span><span class="n">discovered_fdecaytau</span><span class="p">()</span>
+
+<span class="n">lt_better_fit</span> <span class="o">=</span> <span class="n">LearningTracker</span><span class="p">(</span>
+  <span class="n">epoch</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(),</span>
+  <span class="n">plasticity_root</span><span class="o">=</span><span class="n">bpr</span><span class="p">,</span>
+  <span class="n">plasticity_denominator_offset</span><span class="o">=</span><span class="n">bpdo</span><span class="p">,</span>
+  <span class="n">fdecay0</span><span class="o">=</span><span class="n">bf0</span><span class="p">,</span>
+  <span class="n">fdecaytau</span><span class="o">=</span><span class="n">bft</span>
+<span class="p">)</span>
+
+<span class="c1"># plot the third lesson so we can take a look at the differences</span>
+<span class="c1"># between some made up model and a model based</span>
+<span class="c1"># on some previous feedback</span>
+<span class="n">lesson_to_graph</span> <span class="o">=</span> <span class="mi">3</span>
+
+<span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span> <span class="ow">in</span> \
+  <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">day_offset_from_epoch_and_results</span><span class="p">)):</span>
+  <span class="c1"># r: result</span>
+  <span class="c1"># d: days since training epoch</span>
+  <span class="n">lt_better_fit</span><span class="o">.</span><span class="n">learned</span><span class="p">(</span><span class="n">result</span><span class="o">=</span><span class="n">r</span><span class="p">,</span> <span class="n">when</span><span class="o">=</span><span class="n">d</span><span class="p">)</span>
+
+  <span class="c1"># plot the lesson we want to graph</span>
+  <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="n">lesson_to_graph</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+    <span class="n">lt_better_fit</span><span class="o">.</span><span class="n">plot_graphs</span><span class="p">()</span>
+</pre></div>
+</div>
+<a class="reference external image-reference" href="_static/quickstart_better_fit.pdf"><div align="center" class="align-center"><img alt="_images/quickstart_better_fit.svg" src="_images/quickstart_better_fit.svg" /></div>
+</a>
+<p>Let’s try and pretend this plot is from real student feedback and not from a
+conjured example.</p>
+<p>We trust our recommendation curve more than we did when it was completely
+arbitrary, what can we learn from this diagram?</p>
+<p>Our eyes glance at how the forgetting curves on the recommendation graph and the
+observed plot are falling at around the same rate.  This let’s us make a better
+inference about the control plot, we can see that our goals are more realistic
+so the difference between what we want and what we got can be attributed to how
+the student isn’t meticulously following our recommended schedule.  This is of
+little consequence, since the schedule is adaptive:  Our student seems on track.</p>
 <a class="reference internal" href="introduction.html"<span class="std-ref">prev</span></a>, <a class="reference internal" href="index.html#top"><span class="std std-ref">top</span></a>, <a class="reference internal" href="zero_to_one.html"><span class="std std-ref">next</span></a><div class="toctree-wrapper compound">
 </div>
 </div>
