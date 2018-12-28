@@ -94,9 +94,9 @@ vertical-rise of this red line represents a moment when the student studies.
 There is an assumption that they will review an idea long enough that their
 immediate recollection of that idea will be perfect before they stop thinking
 about it.</p>
-<p>The blue line maps to plasticity, or how fast an idea can be mapped into a mind
-as a function over time.  It can be thought of as representing how memories form
-over the long term.</p>
+<p>The blue line maps to <a class="reference external" href="https://en.wikipedia.org/wiki/Neuroplasticity">plasticity</a>, or how fast an idea can be
+mapped into a mind as a function over time.  It can be thought of as
+representing how memories form over the long term.</p>
 <p>The training events occur where the forgetting curves of the stickleback
 approach the plasticity line. At each intersection of the forgetting curve and
 the plasticity curve, orange lines are projected downward to the x-axis to
@@ -126,7 +126,8 @@ learning tracker, by writing the following code:</p>
 <span class="n">lt</span><span class="o">.</span><span class="n">learned</span><span class="p">(</span><span class="n">result</span><span class="o">=</span><span class="mf">0.44</span><span class="p">,</span> <span class="n">when</span><span class="o">=</span><span class="n">days_since_training_epoch</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>As before, the student reviews the material after they have tested themselves.</p>
+<p>As before, the student reviews the material until they have complete
+understanding, immediately after they have tested themselves.</p>
 </div>
 <div class="section" id="getting-a-schedule-which-responds-to-the-student-s-feedback">
 <span id="quickstart-getting-a-schedule-which-responds-to-the-student-s-feedback"></span><h2>Getting a Schedule which Responds to the Student’s Feedback<a class="headerlink" href="#getting-a-schedule-which-responds-to-the-student-s-feedback" title="Permalink to this headline">¶</a></h2>
@@ -233,10 +234,13 @@ the reference-plasticity curve at this intersection point.</p>
 <p>This last graph really isn’t that useful: the next recommended training date
 isn’t on its control plot.</p>
 <p>In fact, it’s hard to get a clear idea about what is going on by looking at any
-of these plots, since you really have to see the graph from the previous
-feedback event, to understand the current context.  What would be nice would be
-an animation of each training event followed by the next.  You could watch it
-for 10 seconds and get a good idea about their training history.</p>
+of these plots in isolation.  What is better is to flip through them one at a
+time in sequential succession; in this way you can look at a plot while having
+it’s history in your recent visual memory, so as to give it some context.</p>
+<p>What would be nice would be an animation of each training event followed by the
+next.  You could watch it for 10 seconds and get a good idea about their
+training history.  The <code class="docutils literal notranslate"><span class="pre">spaced</span></code> library provides such an animation feature and
+it is described in the next section.</p>
 </div>
 <div class="section" id="animating-the-reactive-schedule-to-get-an-intuitive-feeling-about-results">
 <span id="quickstart-animating-reactive-schedule-to-get-an-intuitive-feel"></span><h2>Animating the Reactive Schedule to get an Intuitive Feeling about Results<a class="headerlink" href="#animating-the-reactive-schedule-to-get-an-intuitive-feeling-about-results" title="Permalink to this headline">¶</a></h2>
@@ -416,16 +420,26 @@ letting the first learning tracker run for ten lessons:</p>
 </div>
 <a class="reference external image-reference" href="_static/quickstart_better_fit.pdf"><div align="center" class="align-center"><img alt="_images/quickstart_better_fit.svg" src="_images/quickstart_better_fit.svg" /></div>
 </a>
-<p>Let’s try and pretend this plot is from real student feedback and not from a
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Try and pretend this plot is from real student feedback and not from a
 conjured example.</p>
+</div>
 <p>We trust our recommendation curve more than we did when it was completely
-arbitrary, what can we learn from this diagram?</p>
+arbitrary, so now what can we learn from this diagram?</p>
 <p>Our eyes glance at how the forgetting curves on the recommendation graph and the
-observed plot are falling at around the same rate.  This let’s us make a better
-inference about the control plot, we can see that our goals are more realistic
-so the difference between what we want and what we got can be attributed to how
-the student isn’t meticulously following our recommended schedule.  This is of
-little consequence, since the schedule is adaptive:  Our student seems on track.</p>
+observed plot are falling at around the same rate.  This means that our model
+seems realistic, letting us make some clearer inferences about the results of
+the control plot.</p>
+<p>The difference between what we want and what we got can be attributed to how the
+student isn’t meticulously following the recommended schedule.  This is the
+expected behavior, since the schedule could place training in the middle of the
+night or at some other inconvenient time for the student.  It doesn’t matter if the
+student religiously follows their schedule, since the schedule is adaptive.
+What we want to see is if they are <em>kind of</em> following that schedule and if the
+observed plasticity curve <em>kind of</em> looks like our reference plasticity curve; it
+does.</p>
+<p>Summary: our student seems to be on track.</p>
 <a class="reference internal" href="introduction.html"<span class="std-ref">prev</span></a>, <a class="reference internal" href="index.html#top"><span class="std std-ref">top</span></a>, <a class="reference internal" href="recipes.html"><span class="std std-ref">next</span></a><div class="toctree-wrapper compound">
 </div>
 </div>

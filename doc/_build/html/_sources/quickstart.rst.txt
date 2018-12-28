@@ -78,9 +78,10 @@ There is an assumption that they will review an idea long enough that their
 immediate recollection of that idea will be perfect before they stop thinking
 about it.
 
-The blue line maps to plasticity, or how fast an idea can be mapped into a mind
-as a function over time.  It can be thought of as representing how memories form
-over the long term.
+The blue line maps to `plasticity
+<https://en.wikipedia.org/wiki/Neuroplasticity>`_, or how fast an idea can be
+mapped into a mind as a function over time.  It can be thought of as
+representing how memories form over the long term.
 
 The training events occur where the forgetting curves of the stickleback
 approach the plasticity line. At each intersection of the forgetting curve and
@@ -120,7 +121,8 @@ learning tracker, by writing the following code:
   days_since_training_epoch = 0.8
   lt.learned(result=0.44, when=days_since_training_epoch)
 
-As before, the student reviews the material after they have tested themselves.
+As before, the student reviews the material until they have complete
+understanding, immediately after they have tested themselves.
 
 .. _quickstart-getting-a-schedule-which-responds-to-the-student's-feedback:
 
@@ -260,10 +262,14 @@ This last graph really isn't that useful: the next recommended training date
 isn't on its control plot.  
 
 In fact, it's hard to get a clear idea about what is going on by looking at any
-of these plots, since you really have to see the graph from the previous
-feedback event, to understand the current context.  What would be nice would be
-an animation of each training event followed by the next.  You could watch it
-for 10 seconds and get a good idea about their training history.
+of these plots in isolation.  What is better is to flip through them one at a
+time in sequential succession; in this way you can look at a plot while having
+it's history in your recent visual memory, so as to give it some context.
+
+What would be nice would be an animation of each training event followed by the
+next.  You could watch it for 10 seconds and get a good idea about their
+training history.  The ``spaced`` library provides such an animation feature and
+it is described in the next section.
 
 .. _quickstart-animating-reactive-schedule-to-get-an-intuitive-feel:
 
@@ -381,6 +387,7 @@ that no additional training event will occur.
 
 Building a Better Initial Student Model
 ---------------------------------------
+
 As the ``spaced`` algorithm reacts to student feedback, it gets a much better
 idea about how the student remembers and forgets in their current environment.
 It's control system tunes the forgetting and plasticity parameters as it tries
@@ -481,18 +488,29 @@ letting the first learning tracker run for ten lessons:
     :target: _static/quickstart_better_fit.pdf
     :align: center
 
-Let's try and pretend this plot is from real student feedback and not from a
-conjured example.
+.. note::
+  
+  Try and pretend this plot is from real student feedback and not from a
+  conjured example.
 
 We trust our recommendation curve more than we did when it was completely
-arbitrary, what can we learn from this diagram?
+arbitrary, so now what can we learn from this diagram?
 
 Our eyes glance at how the forgetting curves on the recommendation graph and the
-observed plot are falling at around the same rate.  This let's us make a better
-inference about the control plot, we can see that our goals are more realistic
-so the difference between what we want and what we got can be attributed to how
-the student isn't meticulously following our recommended schedule.  This is of
-little consequence, since the schedule is adaptive:  Our student seems on track.
+observed plot are falling at around the same rate.  This means that our model
+seems realistic, letting us make some clearer inferences about the results of
+the control plot.
+
+The difference between what we want and what we got can be attributed to how the
+student isn't meticulously following the recommended schedule.  This is the
+expected behavior, since the schedule could place training in the middle of the
+night or at some other inconvenient time for the student.  It doesn't matter if the
+student religiously follows their schedule, since the schedule is adaptive.
+What we want to see is if they are *kind of* following that schedule and if the
+observed plasticity curve *kind of* looks like our reference plasticity curve; it
+does.
+
+Summary: our student seems to be on track.
 
 .. raw:: html
 

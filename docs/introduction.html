@@ -40,13 +40,33 @@
 </div></blockquote>
 <div class="section" id="introduction">
 <span id="introduction-introduction"></span><h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
-<p><code class="docutils literal notranslate"><span class="pre">Spaced</span></code> is a Python library that recommends when a student should study.  It provides cognitive training schedules that over time will adapt to the behaviours of the student.</p>
-<p><code class="docutils literal notranslate"><span class="pre">Spaced</span></code> suggests training dates which gradually become more dispersed from each other over time.  If you train in such a way, you end up remembering more than you would if you put the same amount of attention into your studies over a short duration (say, through intense cramming sessions).</p>
-<p>This <a class="reference external" href="https://en.wikipedia.org/wiki/Spacing_effect">spacing effect</a> was discovered by the German psychologist <a class="reference external" href="https://en.wikipedia.org/wiki/Hermann_Ebbinghaus">Hermann Ebbinghaus</a> in the 1880s.</p>
-<p>The algorithm used by <code class="docutils literal notranslate"><span class="pre">spaced</span></code>, is a mash-up of a spaced-learning-algorithm with a <a class="reference external" href="https://en.wikipedia.org/wiki/PID_controller">simple control system</a> and a lightweight machine learning routine.  It provides training date suggestions, which become less frequent over time while being responsive to what a student actually does.</p>
-<p>You can use the results of one training session to feed in better expectations about how a student remembers and how they forget for their next session.  In this way, the <code class="docutils literal notranslate"><span class="pre">spaced</span></code> schedules are adaptive and will become more useful for the student as they interact with the system.  So, <code class="docutils literal notranslate"><span class="pre">spaced</span></code> helps the student learn, and it learns from the student as they engage with their education.</p>
-<p>The <code class="docutils literal notranslate"><span class="pre">spaced</span></code> package can provide graphs and video feedback to give insights on how a student is responding to their training over time.
-This is useful if you want to get an intuitive feel about the relationship between a student’s attention and how they are responding to their training.  These graphs may provide insights into the quality of the material, how distracted the student is or isn’t, how fast they remember over the longer term and how fast they forget over the short-term.</p>
+<p><code class="docutils literal notranslate"><span class="pre">Spaced</span></code> is a Python library that recommends when a student should study.  It
+provides cognitive training schedules that over time will adapt to the
+behaviours of the student.</p>
+<p><code class="docutils literal notranslate"><span class="pre">Spaced</span></code> suggests training dates which gradually become more dispersed from
+each other over time.  If you train in such a way, you end up remembering more
+than you would if you put the same amount of attention into your studies over a
+short duration (say, through intense cramming sessions).</p>
+<p>This <a class="reference external" href="https://en.wikipedia.org/wiki/Spacing_effect">spacing effect</a> was
+discovered by the German psychologist <a class="reference external" href="https://en.wikipedia.org/wiki/Hermann_Ebbinghaus">Hermann Ebbinghaus</a> in the 1880s.</p>
+<p>The algorithm used by <code class="docutils literal notranslate"><span class="pre">spaced</span></code>, is a mash-up of a spaced-learning-algorithm
+with a <a class="reference external" href="https://en.wikipedia.org/wiki/PID_controller">simple control system</a>
+and a lightweight machine learning routine.  It provides training date
+suggestions, which become less frequent over time while being responsive to what
+a student actually does.</p>
+<p>You can use the results of one training session to feed in better expectations
+about how a student remembers and how they forget for their next session.  In
+this way, the <code class="docutils literal notranslate"><span class="pre">spaced</span></code> schedules are adaptive and will become more useful for
+the student as they interact with the system.  So, <code class="docutils literal notranslate"><span class="pre">spaced</span></code> helps the student
+learn, and it learns from the student as they engage with their education.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">spaced</span></code> package <a class="reference internal" href="recipes.html#recipes-diagrams"><span class="std std-ref">can provide graphs</span></a> and
+<a class="reference internal" href="recipes.html#recipes-animating-a-learning-tracker"><span class="std std-ref">video feedback to give insights</span></a> on
+how a student is responding to their training over time.  This is useful if you
+want to get an intuitive feel about the relationship between a student’s
+attention and how they are responding to their training.  These graphs may
+provide insights into the quality of the material, how distracted the student is
+or isn’t, how fast they remember over the longer term and how fast they forget
+over the short-term.</p>
 <p>However, if you don’t need to drill down to this level of detail, you can used the <code class="docutils literal notranslate"><span class="pre">spaced</span></code> algorithm in a less memory-intensive way.</p>
 <a class="reference internal" href="installation.html"<span class="std-ref">prev</span></a>, <a class="reference internal" href="index.html#top"><span class="std std-ref">top</span></a>, <a class="reference internal" href="quickstart.html"><span class="std std-ref">next</span></a><div class="toctree-wrapper compound">
 </div>

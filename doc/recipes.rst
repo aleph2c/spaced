@@ -380,6 +380,13 @@ Control
 
 What is Being Controlled Anyway?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Here is a control graph taken from the :ref:`quickstart <quick-start>`.  We will
+use it to talk about the different parts of the control system:
+
+.. image:: _static/quickstart_better_fit.svg
+    :target: _static/quickstart_better_fit.pdf
+    :align: center
+
 For a control system to work, we need to know a few things. We need to know what
 we want, this is called the reference, and we need to know what actually
 happened, this is called feedback.
@@ -387,23 +394,34 @@ happened, this is called feedback.
 As previously mentioned, the reference is the dark blue line representing the
 plasticity curve in the first graph.
 
+
 With the spaced algorithm, the feedback data is used to build a second
 plasticity curve, which can be seen in the second and forth boxes as a light
 blue line. This second plasticity curve is the observed plasticity curve. It is
-a model of how the student is actually learning the idea being tracked. While
-spaced is making this curve, it puts extra emphasis on the most recent data
-provided by the student. This is because a student's recent understanding should
-outweigh their previous ignorance. The observed plasticity curve is constructed
-using the curve_fit method of the ``scipy.optimize`` library. The curve_fit method
-finds values of plasticity_root and plasticity_denominator_offset that minimize
-the difference between the observed plasticity curve, and the feedback provided
-by the student.
+a model of how the student is actually learning the idea being tracked. 
+
+The plasticity curves are built using this equation:
+
+.. code-block:: python
+
+  #                     x**(1.0/plasticity_root)
+  # pl = ---------------------------------------------------------
+  #      (x+plasticity_denominator_offset)**(1.0/plasticity_root)
+
+While spaced is making observed plasticity curve, it puts extra emphasis on the
+most recent data provided by the student. This is because a student's recent
+understanding should outweigh their previous ignorance. The observed plasticity
+curve is constructed using the curve_fit method of the ``scipy.optimize``
+library. The curve_fit method finds values of ``plasticity_root`` and
+``plasticity_denominator_offset`` that minimize the difference between the
+observed plasticity curve, and the feedback provided by the student.
 
 After a training session, the spaced algorithm shifts the blue reference line
 such that it intersects with the light blue observed plasticity curve, then
 re-draws the forgetting curves, which causes projections onto the timeline which
-represent the updated schedule (This is a kind of feedforward loop). Well, this
-is very close to what happens, we are missing one little step.
+represent the updated schedule (This is a kind of `feedforward loop
+<https://en.wikipedia.org/wiki/Feed_forward_(control)>`_). Well, this is very
+close to what happens, we are missing one little step.
 
 When we begin to track a student's learning, we make assumptions about how fast
 they forget. But we don't actually know how fast they will forget something, so
