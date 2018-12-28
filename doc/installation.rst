@@ -16,9 +16,12 @@ To install:
   pip install spaced
 
 
-Spaced has been tested on Python 3.5 and is dependent upon pyyaml, numpy, scipy and
-matplotlib.  For testing the package, there are dependencies upon pytest,
-pyreadline and Click.
+Spaced has been tested on Python 3.5 and is dependent upon `pyyaml <https://pyyaml.org/wiki/PyYAMLDocumentation>`_, `numpy <http://www.numpy.org/>`_, `scipy <https://www.scipy.org/>`_ and `matplotlib <https://matplotlib.org/>`_.  
+
+For :ref:`testing <testing-testing>`  the package, there are dependencies upon `pytest
+<https://docs.pytest.org/en/latest/>`_, `pyreadline
+<https://pypi.org/project/pyreadline/>`_ and `Click
+<https://click.palletsprojects.com/en/7.x/>`_.
 
 .. raw:: html
 

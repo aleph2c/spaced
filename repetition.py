@@ -3,7 +3,6 @@ import os
 import json
 import enum
 import pprint
-import pickle
 import warnings
 import functools
 import matplotlib
@@ -15,7 +14,6 @@ from datetime import datetime
 from datetime import timedelta
 import matplotlib.pyplot as plt
 from scipy.optimize import fsolve
-from collections import OrderedDict
 from scipy.optimize import curve_fit
 from graph import SpaceRepetitionPlot
 import matplotlib.animation as animation
@@ -74,13 +72,6 @@ class SpacedKwargInterface():
     if("fdecay0_kd  " in kwargs):
       self.fdecay0_kd = kwargs['fdecay0_kd']
 
-class QueryTimeBeforeCurve(Exception):
-  '''A query time has been made before a forgetting curve has been activated'''
-  def __init__(self, moment, curve, curve_start_datetime):
-    message = "The query to find p at "
-    message += "moment {} for curve {} is too soon, it must occur after {}". \
-                 format(moment, curve, curve_start_datetime)
-    super().__init__(message)
 
 class SpaceRepetitionDataBuilder():
   def __init__(self, *args, **kwargs):
@@ -249,7 +240,7 @@ class SpaceRepetition():
     return_set = [[], []]
 
     solutions = np.array(solutions)
-    solutions_left_shifted = np.array([solution-0.0001 for solution in solutions])
+    solutions_left_shifted = np.array([solution - 0.0001 for solution in solutions])
     x_range   = np.array(np.linspace(0, self.range, self.samples))
     x_data = np.concatenate(
       (
@@ -266,7 +257,7 @@ class SpaceRepetition():
     return_set = [x_data, y[:]]
     for fn in forgetting_functions[1:]:
       y_ = [fn(x) for x in x_data]
-      y = [ 0 if y > 1 else y for y in y_]
+      y = [0 if y > 1 else y for y in y_]
       overlap_set = [x_data, y[:]]
 
       for index in range(len(return_set[0])):
@@ -307,8 +298,10 @@ class SpaceRepetitionReference(SpaceRepetition):
 
   # fdecay0
   Forgetting_Decay_Initial_Value = 1.4
+
   # fdecaytau
   Forgetting_Decay_Tau = 1.2
+
   # plasticity
   PlasticityRoot = 1.8
   PlasticityDenominatorOffset = 1.0
@@ -374,8 +367,7 @@ class SpaceRepetitionReference(SpaceRepetition):
     if curve is None or curve < 1:
       curve = 1
     datetime_of_curve = self.datetime_for(curve=curve)
-    end_date  = self.epoch 
-    #end_date += (timedelta(days=self.range) - (datetime_of_curve - self.epoch))
+    end_date  = self.epoch
     end_date += (timedelta(days=self.range))
     result = list(np.arange(datetime_of_curve, end_date,
       timedelta(days=day_step_size)).astype(datetime))
@@ -420,6 +412,7 @@ class SpaceRepetitionReference(SpaceRepetition):
 
     # make an initial guess to help the solver
     self.solution_x, self.solution_y = 1.0, 0.5
+
     def generate_targets(fn, fn0):
       # Solve fn and rfn with their given tuning parameters
       equation = self.generate_equations(fn0, self.rfn0)
@@ -482,12 +475,6 @@ class SpaceRepetitionReference(SpaceRepetition):
     for target_x, target_y in zip(self.ref_events_x, self.ref_events_y):
       self.vertical_bars.append([target_x, target_x])
       self.vertical_bars.append([0, target_y])
-
-  #def schedule(self):
-  #  schedule = []
-  #  for target_x in self.ref_events_x:
-  #    schedule.append(self.datetime + timedelta(days=target_x))
-  #  return schedule
 
   def plot_graph(self, **kwargs):
     x      = self.x_and_y[0]
@@ -576,11 +563,9 @@ class SpaceRepetitionReference(SpaceRepetition):
       curve = 1
 
     recollection_function = self.recollect_function(curve)
-    index = curve-1
+    index = curve - 1
     time_offset_in_days = self.schedule_as_offset_in_days_from_epoch()[index]
-    curve_start_datetime = self.epoch + timedelta(days=time_offset_in_days)
-
-    y = recollection_function(moment_as_datetime-timedelta(days=time_offset_in_days))
+    y = recollection_function(moment_as_datetime - timedelta(days=time_offset_in_days))
     return y
 
   def recollect_function(self, curve=None):

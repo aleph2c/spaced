@@ -35,14 +35,88 @@
           <div class="body" role="main">
             
   <blockquote id="how-it-works">
-<div><p><em>Simple things should be simple, complex things should be possible.</em></p>
-<p class="attribution">&mdash;Alan Kay</p>
+<div><p><em>Too much of what is called ‘education’ is little more than an expensive
+isolation from reality.</em></p>
+<p class="attribution">&mdash;Thomas Sowell</p>
 </div></blockquote>
 <div class="section" id="id1">
 <h1>How it Works<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
+<a class="reference external image-reference" href="_static/spaced.pdf"><div align="center" class="align-center"><img alt="_images/spaced.svg" src="_images/spaced.svg" /></div>
+</a>
+<div class="section" id="files">
+<span id="how-it-works-files"></span><h2>Files<a class="headerlink" href="#files" title="Permalink to this headline">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">spaced</span></code> algorithm is made up of five different packages/files:</p>
+<ol class="arabic simple">
+<li><code class="docutils literal notranslate"><span class="pre">repetition.py</span></code> - learning tracker features</li>
+<li><code class="docutils literal notranslate"><span class="pre">graph.py</span></code> - provides graphing features</li>
+<li><code class="docutils literal notranslate"><span class="pre">animate.py</span></code> - provides ffmpeg video features</li>
+<li><code class="docutils literal notranslate"><span class="pre">pid.py</span></code> - provides a proportional-integral-differential controller</li>
+<li><code class="docutils literal notranslate"><span class="pre">cli.py</span></code> - wrapper for the pytest package</li>
+</ol>
+<p>The <code class="docutils literal notranslate"><span class="pre">repetition</span></code> package contains the majority of the scheduling code.  It’s
+class structure is primarily broken into the <code class="docutils literal notranslate"><span class="pre">SpaceRepetitionReference</span></code>, the
+<code class="docutils literal notranslate"><span class="pre">SpaceRepetitionFeedback</span></code> and the <code class="docutils literal notranslate"><span class="pre">SpaceRepetitionControl</span></code> classes.</p>
+<p>The common features and interface shared by they classes come from them inheriting from the
+<code class="docutils literal notranslate"><span class="pre">SpaceRepetition</span></code> class.</p>
+</div>
+<div class="section" id="spacerepetitionreference">
+<span id="how-it-works-spacerepetitionreference"></span><h2>SpaceRepetitionReference<a class="headerlink" href="#spacerepetitionreference" title="Permalink to this headline">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">SpaceRepetitionReference</span></code> is used to construct the system goals.  It sets
+up the initial forgetting curves and the reference plasticity curve.  This is
+done using an exponential decay to create a set of less and less aggressive
+exponential decay curves.  The nature of these curves can be tuned using the
+<code class="docutils literal notranslate"><span class="pre">fdecay0</span></code> and <code class="docutils literal notranslate"><span class="pre">fdecaytau</span></code> input parameters.</p>
+<p>The stickleback looking part of the reference graph, which can be seen below, is
+made by restarting an exponential decay at the intersection of the forgetting
+curve and the reference plasticity curve.</p>
+<a class="reference external image-reference" href="_static/quickstart_reference.pdf"><div align="center" class="align-center"><img alt="_images/quickstart_reference.svg" src="_images/quickstart_reference.svg" /></div>
+</a>
+<p>The reference plasticity curve, represented by the dark blue line above, is a
+ratio of two different exponential functions:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1">#                    x**(1.0/plasticity_root)</span>
+<span class="c1"># r = ---------------------------------------------------------</span>
+<span class="c1">#     (x+plasticity_denominator_offset)**(1.0/plasticity_root)</span>
+</pre></div>
+</div>
+<p>The plasticity curve can be tuned using the <code class="docutils literal notranslate"><span class="pre">plasticity_root</span></code> and the
+<code class="docutils literal notranslate"><span class="pre">plasticity_denominator_offset</span></code> parameters.</p>
+</div>
+<div class="section" id="spacerepetitionfeedback">
+<span id="how-it-works-spacerepetitionfeedback"></span><h2>SpaceRepetitionFeedback<a class="headerlink" href="#spacerepetitionfeedback" title="Permalink to this headline">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">SpaceRepetitionFeedback</span></code> class is used for accepting student feedback and
+generating the new observed-plasticity curve.  This curve is built using the
+<code class="docutils literal notranslate"><span class="pre">scipy.optimize</span></code> <code class="docutils literal notranslate"><span class="pre">curve_fit</span></code> api.  It tries to find the <code class="docutils literal notranslate"><span class="pre">plasticity_root</span></code>
+and <code class="docutils literal notranslate"><span class="pre">plasticity_denominator_offset</span></code> parameters that draw a line that has the
+same shape of the reference plasticity curve but fits the feedback data provided
+by the student.  When fitting this curve it places an emphasis on the most
+recently observed data.</p>
+</div>
+<div class="section" id="spacerepetitioncontrol">
+<span id="how-it-works-spacerepetitioncontrol"></span><h2>SpaceRepetitionControl<a class="headerlink" href="#spacerepetitioncontrol" title="Permalink to this headline">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">SpaceRepetitionControl</span></code> class generates an error signal by subtracting
+the reference plasticity curve from the observed plasticity curve.  Then it
+feeds this error signal into two PID controllers to change the reference
+forgetting curve parameters, <code class="docutils literal notranslate"><span class="pre">fdecay0</span></code> and <code class="docutils literal notranslate"><span class="pre">fdecaytau</span></code>, to look more like
+those generated from the student’s feedback.  To read about how to change these
+control parameters look <a class="reference internal" href="recipes.html#recipes-control"><span class="std std-ref">here.</span></a></p>
+<a class="reference external image-reference" href="_static/quickstart_control_after_two_events.pdf"><img alt="_images/quickstart_control_after_two_events.png" class="align-center" src="_images/quickstart_control_after_two_events.png" /></a>
+<p>The <code class="docutils literal notranslate"><span class="pre">SpaceRepetitionControl</span></code> class then finds the intersection between the
+reference plasticity curve and the observed plasticity curve providing a
+starting point to place a new reference plasticity curve and a new set of
+forgetting curves riding on its back.</p>
+</div>
+<div class="section" id="learningtracker">
+<span id="how-it-works-learningtracker"></span><h2>LearningTracker<a class="headerlink" href="#learningtracker" title="Permalink to this headline">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">LearningTracker</span></code> class aggregates the reference, feedback and control
+features into one easy-to-use class.  Any tuning parameter that can be fed into
+any of the other classes can be fed into it, and it will ensure that this
+parameter is passed on properly.</p>
+<p>The majority of the features offered by the <code class="docutils literal notranslate"><span class="pre">LearningTracker</span></code> are described in
+the <a class="reference internal" href="recipes.html#recipes"><span class="std std-ref">recipes</span></a> section.</p>
 <div class="toctree-wrapper compound">
 </div>
 <a class="reference internal" href="recipes.html"<span class="std-ref">prev</span></a>, <a class="reference internal" href="index.html#top"><span class="std std-ref">top</span></a>, <a class="reference internal" href="testing.html"><span class="std std-ref">next</span></a></div>
+</div>
 
 
           </div>
@@ -52,7 +126,19 @@
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper"><p class="logo"><a href="index.html">
   <img class="logo_a" src="_static/spaced_1.svg" width="250" alt="Logo" >
-</a></p><div class="relations">
+</a></p>
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">How it Works</a><ul>
+<li><a class="reference internal" href="#files">Files</a></li>
+<li><a class="reference internal" href="#spacerepetitionreference">SpaceRepetitionReference</a></li>
+<li><a class="reference internal" href="#spacerepetitionfeedback">SpaceRepetitionFeedback</a></li>
+<li><a class="reference internal" href="#spacerepetitioncontrol">SpaceRepetitionControl</a></li>
+<li><a class="reference internal" href="#learningtracker">LearningTracker</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>

@@ -1,6 +1,6 @@
-  *Keep my memory green* 
+  *If you tell the truth, you don't have to remember anything.* 
   
-  -- Charles Dickens
+  -- Mark Twain
 
 .. _introduction-introduction:
 

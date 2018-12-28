@@ -17,7 +17,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="How it Works" href="how_it_works.html" />
-    <link rel="prev" title="Zero to One" href="zero_to_one.html" />
+    <link rel="prev" title="Quick Start" href="quickstart.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -40,6 +40,7 @@
 </div></blockquote>
 <div class="section" id="id1">
 <h1>Recipes<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
+<p>Here are a set of recipes that you can reference to learn by example.</p>
 <div class="toctree-wrapper compound">
 </div>
 <div class="section" id="diagrams">
@@ -102,6 +103,10 @@
 </div>
 <a class="reference external image-reference" href="_static/quickstart_reference.pdf"><div align="center" class="align-center"><img alt="_images/quickstart_reference.svg" src="_images/quickstart_reference.svg" /></div>
 </a>
+</div>
+<div class="section" id="to-plot-a-set-of-queries">
+<span id="recipes-to-plot-a-set-of-queries"></span><h3>To Plot a set of Queries<a class="headerlink" href="#to-plot-a-set-of-queries" title="Permalink to this headline">¶</a></h3>
+<p>To see how to plot a set of predictions about future performance look <a class="reference internal" href="quickstart.html#quickstart-predicting-future-results"><span class="std std-ref">here.</span></a></p>
 </div>
 <div class="section" id="save-a-diagram">
 <span id="recipes-save-a-diagram"></span><h3>Save a Diagram<a class="headerlink" href="#save-a-diagram" title="Permalink to this headline">¶</a></h3>
@@ -246,6 +251,7 @@ for another:</p>
 <span class="p">)</span>
 </pre></div>
 </div>
+<p>You can read more about model learning <a class="reference internal" href="quickstart.html#quickstart-building-a-better-initial-student-model"><span class="std std-ref">here.</span></a></p>
 </div>
 </div>
 <div class="section" id="plasticity-curves">
@@ -309,6 +315,7 @@ for another:</p>
 <span class="p">)</span>
 </pre></div>
 </div>
+<p>You can read more about model learning <a class="reference internal" href="quickstart.html#quickstart-building-a-better-initial-student-model"><span class="std std-ref">here.</span></a></p>
 </div>
 </div>
 <div class="section" id="feedback">
@@ -401,6 +408,32 @@ train…) For now, we will be happy with making mistakes in the right direction.
 </div>
 <div class="section" id="queries">
 <span id="recipes-queries"></span><h2>Queries<a class="headerlink" href="#queries" title="Permalink to this headline">¶</a></h2>
+<p>To make a query about the performance of a student based on their learning
+tracker:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">repetition</span> <span class="kn">import</span> <span class="n">pp</span>
+<span class="kn">from</span> <span class="nn">repetition</span> <span class="kn">import</span> <span class="n">LearningTracker</span>
+
+<span class="n">training_epoch</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+
+<span class="c1"># create a learning tracker</span>
+<span class="n">lt</span> <span class="o">=</span> <span class="n">LearningTracker</span><span class="p">(</span><span class="n">epoch</span><span class="o">=</span><span class="n">training_epoch</span><span class="p">)</span>
+
+<span class="c1"># give our learning tracker some feedback</span>
+<span class="k">for</span> <span class="n">d</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+    <span class="p">[</span><span class="mi">0</span><span class="p">,</span>    <span class="mf">0.8</span><span class="p">,</span>  <span class="mf">1.75</span><span class="p">,</span> <span class="mf">3.02</span><span class="p">,</span> <span class="mf">4.8</span><span class="p">,</span>  <span class="mf">7.33</span><span class="p">],</span>
+    <span class="p">[</span><span class="mf">0.40</span><span class="p">,</span> <span class="mf">0.44</span><span class="p">,</span> <span class="mf">0.64</span><span class="p">,</span> <span class="mf">0.76</span><span class="p">,</span> <span class="mf">0.83</span><span class="p">,</span> <span class="mf">0.89</span><span class="p">],</span>
+  <span class="p">):</span>
+  <span class="c1"># r: result</span>
+  <span class="c1"># d: days since training epoch</span>
+  <span class="n">lt</span><span class="o">.</span><span class="n">learned</span><span class="p">(</span><span class="n">result</span><span class="o">=</span><span class="n">r</span><span class="p">,</span> <span class="n">when</span><span class="o">=</span><span class="n">d</span><span class="p">)</span>
+
+<span class="n">predicted_result_at_day_eight</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">predict_result</span><span class="p">(</span>
+  <span class="n">moment</span><span class="o">=</span><span class="n">training_epoch</span><span class="o">+</span><span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mf">8.00</span><span class="p">),</span>
+  <span class="n">curve</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>To read more about making predictions look <a class="reference internal" href="quickstart.html#quickstart-predicting-future-results"><span class="std std-ref">here.</span></a></p>
 <div class="section" id="get-a-useful-set-of-datetimes">
 <span id="recipes-get-a-useful-set-of-datetimes"></span><h3>Get a useful set of Datetimes<a class="headerlink" href="#get-a-useful-set-of-datetimes" title="Permalink to this headline">¶</a></h3>
 <p>Get a useful range of datetimes from a learning tracker (used for graphing with
@@ -482,7 +515,8 @@ queries).</p>
 </div>
 <div class="section" id="model-learning">
 <span id="recipes-model-learning"></span><h2>Model Learning<a class="headerlink" href="#model-learning" title="Permalink to this headline">¶</a></h2>
-<a class="reference internal" href="zero_to_one.html"<span class="std-ref">prev</span></a>, <a class="reference internal" href="index.html#top"><span class="std std-ref">top</span></a>, <a class="reference internal" href="how_it_works.html"><span class="std std-ref">next</span></a></div>
+<p><a class="reference internal" href="quickstart.html#quickstart-building-a-better-initial-student-model"><span class="std std-ref">read about model learning here</span></a></p>
+<a class="reference internal" href="quickstart.html"<span class="std-ref">prev</span></a>, <a class="reference internal" href="index.html#top"><span class="std std-ref">top</span></a>, <a class="reference internal" href="how_it_works.html"><span class="std std-ref">next</span></a></div>
 </div>
 
 
@@ -500,6 +534,7 @@ queries).</p>
 <li><a class="reference internal" href="#diagrams">Diagrams</a><ul>
 <li><a class="reference internal" href="#generate-learning-tracker-curves">Generate Learning Tracker Curves</a></li>
 <li><a class="reference internal" href="#generate-a-reference-curve">Generate a Reference Curve</a></li>
+<li><a class="reference internal" href="#to-plot-a-set-of-queries">To Plot a set of Queries</a></li>
 <li><a class="reference internal" href="#save-a-diagram">Save a Diagram</a></li>
 <li><a class="reference internal" href="#closing-the-graph-handle">Closing the Graph Handle</a></li>
 </ul>
@@ -541,7 +576,7 @@ queries).</p>
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="zero_to_one.html" title="previous chapter">Zero to One</a></li>
+      <li>Previous: <a href="quickstart.html" title="previous chapter">Quick Start</a></li>
       <li>Next: <a href="how_it_works.html" title="next chapter">How it Works</a></li>
   </ul></li>
 </ul>

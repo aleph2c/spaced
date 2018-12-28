@@ -17,7 +17,6 @@ Repetition in Python
    installation
    introduction
    quickstart
-   zero_to_one
    recipes
    how_it_works
    testing

@@ -6,6 +6,7 @@
 
 Recipes
 =======
+Here are a set of recipes that you can reference to learn by example.
 
 .. toctree::
    :maxdepth: 2
@@ -87,6 +88,12 @@ To generate a reference curve:
 .. image:: _static/quickstart_reference.svg
     :target: _static/quickstart_reference.pdf
     :align: center
+
+.. _recipes-to-plot-a-set-of-queries:
+
+To Plot a set of Queries
+^^^^^^^^^^^^^^^^^^^^^^^^
+To see how to plot a set of predictions about future performance look :ref:`here.<quickstart-predicting-future-results>` 
 
 .. _recipes-save-a-diagram:
 
@@ -261,6 +268,9 @@ for another:
     fdecaytau=bft
   )
 
+
+You can read more about model learning :ref:`here.<quickstart-building-a-better-initial-student-model>`
+
 .. _recipes-plasticity-curves:
 
 Plasticity Curves
@@ -331,6 +341,8 @@ for another:
     plasticity_root=bpr,
     plasticity_denominator_offset=bpdo,
   )
+
+You can read more about model learning :ref:`here.<quickstart-building-a-better-initial-student-model>`
 
 .. _recipes-feedback:
 
@@ -442,6 +454,35 @@ To change the control system parameters:
 Queries
 -------
 
+To make a query about the performance of a student based on their learning
+tracker:
+
+.. code-block:: python
+
+  from datetime import datetime
+  from repetition import pp
+  from repetition import LearningTracker
+
+  training_epoch = datetime.now()
+
+  # create a learning tracker
+  lt = LearningTracker(epoch=training_epoch)
+
+  # give our learning tracker some feedback
+  for d, r in zip( 
+      [0,    0.8,  1.75, 3.02, 4.8,  7.33],
+      [0.40, 0.44, 0.64, 0.76, 0.83, 0.89],
+    ):
+    # r: result
+    # d: days since training epoch
+    lt.learned(result=r, when=d)
+
+  predicted_result_at_day_eight = lt.predict_result(
+    moment=training_epoch+timedelta(days=8.00),
+    curve=1)
+
+To read more about making predictions look :ref:`here.<quickstart-predicting-future-results>`
+
 .. _recipes-get-a-useful-set-of-datetimes:
 
 Get a useful set of Datetimes
@@ -537,10 +578,11 @@ To pickle a learning tracker to a file:
 
 Model Learning
 --------------
+:ref:`read about model learning here<quickstart-building-a-better-initial-student-model>`
 
 .. raw:: html
 
-  <a class="reference internal" href="zero_to_one.html"<span class="std-ref">prev</span></a>, <a class="reference internal" href="index.html#top"><span class="std std-ref">top</span></a>, <a class="reference internal" href="how_it_works.html"><span class="std std-ref">next</span></a>
+  <a class="reference internal" href="quickstart.html"<span class="std-ref">prev</span></a>, <a class="reference internal" href="index.html#top"><span class="std std-ref">top</span></a>, <a class="reference internal" href="how_it_works.html"><span class="std std-ref">next</span></a>
 
 .. _umlet: http://www.umlet.com/
 .. _umletino: http://www.umlet.com/umletino/umletino.html

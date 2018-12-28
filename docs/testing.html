@@ -34,11 +34,31 @@
           <div class="body" role="main">
             
   <blockquote>
-<div><p><em>The first principle is that you must not fool yourself — and you are the easiest person to fool.</em></p>
-<p class="attribution">&mdash;Richard Feynman</p>
+<div><p><em>Vox populi, vox humbug.</em></p>
+<p class="attribution">&mdash;William Tecumseh Sherman</p>
 </div></blockquote>
 <div class="section" id="testing">
 <span id="testing-testing"></span><h1>Testing<a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h1>
+<p>To run the test code, create a virtual environment in the <code class="docutils literal notranslate"><span class="pre">spaced</span></code> directory:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python -m venv venv
+. ./venv/bin/activate
+</pre></div>
+</div>
+<p>Then install the package within this same directory as an editable package:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install --editable .
+</pre></div>
+</div>
+<p>This will add an <code class="docutils literal notranslate"><span class="pre">entry_point</span></code> command line tool which is based upon the
+<code class="docutils literal notranslate"><span class="pre">Click</span></code> python library.  You can use this command from your terminal while in the
+<code class="docutils literal notranslate"><span class="pre">spaced</span></code> directory.</p>
+<p>To test the package, type:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>space <span class="nb">test</span>  <span class="c1"># wrapper for pytest</span>
+</pre></div>
+</div>
+<p>A lot of the testing involves looking at graphs and videos to see if the package
+is behaving as expected, you can find these graphs as <code class="docutils literal notranslate"><span class="pre">pdf</span></code> files in the
+<code class="docutils literal notranslate"><span class="pre">results</span></code> directory.  Likewise, the test videos have an <code class="docutils literal notranslate"><span class="pre">mp4</span></code> extension and
+can be found in the same <code class="docutils literal notranslate"><span class="pre">results</span></code> directory.</p>
 <a class="reference internal" href="how_it_works.html"<span class="std-ref">prev</span></a>, <a class="reference internal" href="index.html#top"><span class="std std-ref">top</span></a>, <span class="inactive-link">next</span><div class="toctree-wrapper compound">
 </div>
 </div>
