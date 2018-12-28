@@ -12,7 +12,6 @@ Here are a set of recipes that you can reference to learn by example.
    :maxdepth: 2
    :caption: Contents:
 
-
 .. _recipes-diagrams:
 
 Diagrams

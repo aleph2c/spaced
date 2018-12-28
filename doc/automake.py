@@ -32,7 +32,7 @@ class Handler(watchdog.events.PatternMatchingEventHandler):
       print(output)
 
       # generate the api docs
-      cmd = 'sphinx-apidoc -f -o ./../spaced .'
+      cmd = 'sphinx-apidoc -f -o . ./../'
       p = subprocess.Popen(cmd,
                       stdout=subprocess.PIPE,
                       stdin=subprocess.PIPE,
