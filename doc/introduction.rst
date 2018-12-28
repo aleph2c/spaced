@@ -20,7 +20,7 @@ You can use the results of one training session to feed in better expectations a
 The ``spaced`` package can provide graphs and video feedback to give insights on how a student is responding to their training over time.  
 This is useful if you want to get an intuitive feel about the relationship between a student's attention and how they are responding to their training.  These graphs may provide insights into the quality of the material, how distracted the student is or isn't, how fast they remember over the longer term and how fast they forget over the short-term.
 
-However, if these features are not needed, ``spaced`` can be used in a less memory intensive way.  It can operate with a very memory-light footprint so that it can be used as a part of a more extensive system.
+However, if you don't need to drill down to this level of detail, you can used the ``spaced`` algorithm in a less memory-intensive way.  
 
 .. raw:: html
 
