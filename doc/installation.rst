@@ -11,7 +11,7 @@ To install:
 
 .. code-block:: bash
 
-  python3 -m venv
+  python3 -m venv venv
   . ./venv/bin/activate
   pip install spaced
 
