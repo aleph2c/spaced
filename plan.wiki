@@ -2,28 +2,10 @@
 = Observe =
   
   *What defines Success?*
-    * [X] The range in the plots is exactly what is asked for.
-    * [X] The stickleback plots were fixed to match the accurate prediction plots.
-    * [X] The stickleback plots schedule drops are now all populated.
-    * [X] The code is much much faster than it was.
-    * [X] Find out what we are controlling anyway, write it up.
-    * [X] Reduce the number of samples, and increase it's speed of execution.
-    * [X] That plasticity function is learned over time so that it can be transported
-          to the next training item.
-    * [X] There is a single interface, instead of 3-4 interfaces as there was before.
-    * [X] Model learning
-    * [X] Get the epoch parameters
-    * [X] Get the feedback as reflection
-    * [X] Get the curve parameters as reflection
-    * [X] Get the discovered curve parameters as reflection
-    * [X] Get the control system parameters as reflection
-    * [X] Make a simple way to pickle a learning tracker at a particular state
-          of learning
-    * [X] Spaced was turned into a python package and shipped.
+    * [ ] Add long-term tests, adjust design to manage long term potentiating
+          that goes down over the long term
     
   *What is the problem?*
-    If you look at the spaced_predict.pdf file, you see that the last orange
-    line does not drop.
     
   *Evidence that contradicts Assumptions:*
   
@@ -32,19 +14,18 @@
   quick description of symptoms that lead your belief
   
   *Questions for Space Repetition Algorithm:*
-    Can you simplify your test?
-    Do you have enough information?
-    What recently changed?
 
   *Assumptions:*
 
 = Decide =
   *Idea/Hypotheses for Space Repetition Algorithm: >=5*
-  * [ ] 
-  * [ ] 
-  * [ ] 
-  * [ ] 
-  * [ ] 
+  * [ ] Create a longer term data set
+  * [ ] Add a test to the test file
+  * [ ] Feed the data into the long term tracker
+  * [ ] Set the range so 365 days
+  * [ ] Try to graph it, to see if it makes sense
+  * [ ] Iterate the design to accommodate shortcomings discerned from this
+        testing
   *Chosen Idea/Hypothesis*
     
 
