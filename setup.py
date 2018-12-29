@@ -4,7 +4,7 @@ setuptools.setup(
   setup_requires=['pytest-runner'],
   tests_require=['pytest'],
   name='spaced',
-  version=0.1,
+  version=0.2,
   py_modules=['spaced'],
   install_requires=[
     'Click',

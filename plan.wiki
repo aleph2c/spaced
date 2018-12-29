@@ -12,15 +12,14 @@
           to the next training item.
     * [X] There is a single interface, instead of 3-4 interfaces as there was before.
     * [X] Model learning
-    * [ ] Get the epoch parameters
-    * [ ] Get the feedback as reflection
-    * [ ] Get the curve parameters as reflection
-    * [ ] Get the discovered curve parameters as reflection
-    * [ ] Get the control system parameters as reflection
-    * [ ] Make a simple way to pickle a learning tracker at a particular state
+    * [X] Get the epoch parameters
+    * [X] Get the feedback as reflection
+    * [X] Get the curve parameters as reflection
+    * [X] Get the discovered curve parameters as reflection
+    * [X] Get the control system parameters as reflection
+    * [X] Make a simple way to pickle a learning tracker at a particular state
           of learning
-    * [ ] 
-    * [ ] Spaced was turned into a python package and shipped.
+    * [X] Spaced was turned into a python package and shipped.
     
   *What is the problem?*
     If you look at the spaced_predict.pdf file, you see that the last orange

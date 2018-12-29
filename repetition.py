@@ -590,7 +590,7 @@ class SpaceRepetitionReference(SpaceRepetition):
         forgetting_function=forgetting_function,
         offset=curves_start_since_epoch,
         epoch=self.epoch,
-        control_x=self.control_x+previous_offset)
+        control_x=self.control_x + previous_offset)
 
     return recollection_function
 
@@ -622,7 +622,6 @@ class SpaceRepetitionFeedback(SpaceRepetition):
         self.add_event(conditioned_x, event_y)
 
     SpacedKwargInterface.__init__(self, *args, **kwargs)
-
 
     if("range" in kwargs):
       self.range = kwargs['range']
@@ -680,12 +679,6 @@ class SpaceRepetitionFeedback(SpaceRepetition):
         weights[-1] = 0.1
 
     rparams, rcov = self.fitting_parameters(self.recollection_curve_profile, rx, ry, weights)
-
-    # if we can't fit the parameters
-    if not np.isinf(rcov[0][0]):
-      # rparams[0] = self.plasticity_denominator_offset
-      # rparams[1] = self.plasticity_root
-      pass
 
     def fn(x):
       return self.recollection_curve_profile(x, *rparams)
