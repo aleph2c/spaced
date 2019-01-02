@@ -2,31 +2,57 @@
 = Observe =
   
   *What defines Success?*
-  The spaced library can be used over the long term.  An idea will be presented
-  even if it is perfectly understood.
-    
+  
+  The schedule generation is done using a Python generator.  The range uses the
+  generator to create a limited schedule which can be graphed.
+  
   *What is the problem?*
+  
+  The schedule really needs to run forever, not just over the range provided by
+  the user.  The range will cause the tracker to stop when it shouldn't stop,
+  since the maintenance pulses need to go on and on and on.
+  
+  The range argument given to a learning tracker came from the need to draw a
+  graph, so that I could see if the algorithm was working.
+  
+  The range can still be an argument, but the schedule should go on forever.
+  
+  Python has a language feature for these kinds of problems, it is called a
+  generator.  The range needs to use a generator, and the graphs should look the
+  same, but the learning tracker and it's inner parts should be able to
+  provide infinite schedules.
+  
     
   *Evidence that contradicts Assumptions:*
   
 = Orient =
   *Symptoms:*
-  quick description of symptoms that lead your belief
   
   *Questions for Space Repetition Algorithm:*
+  * Is there another way to do this?
+  * Maybe a schedule doesn't need to run forever, maybe it would be a good thing
+    for a learning tracker to delete itself from the system
+  * Could you create an 'ignored' or 'hold' state for the learning tracker, so
+    it does not end up clogging the system?
 
   *Assumptions:*
 
 = Decide =
   *Idea/Hypotheses for Space Repetition Algorithm: >=5*
-  * [ ] Create a longer term data set
-  * [ ] Add a test to the test file
-  * [ ] Feed the data into the long term tracker
-  * [ ] Use the learning tracker to provide realistic dates
-  * [ ] Set the range so 365 days
-  * [ ] Try to graph it, to see if it makes sense
-  * [ ] Iterate the design to accommodate shortcomings discerned from this
-        testing
+  * [ ] The client can determine if the tracker goes on forever or it stops.
+  * [ ] The learning tracker should be run for a pre-set number of times, then
+        die.  It should report if the learning intervention worked or not up to
+        the client.
+  * [ ] The learning tracker should run forever, it's maintenance pulse going on
+        and on.  This way someone can keep their education fresh over the long
+        term.
+  * [ ] The tracker can go into status if the idea being uses is integrating
+        into another idea being tracked
+  * [ ] Keep the interface simple, the client will add complexity if it needs
+        to.  Have the schedule run forever using a generator, then use the range
+        argument for graphing.  In doing so move the range argument out of main
+        constructor and into the graph plotting methods.
+        
   *Chosen Idea/Hypothesis*
     
 
