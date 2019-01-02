@@ -29,6 +29,7 @@
   *Symptoms:*
   
   *Questions for Space Repetition Algorithm:*
+  
   * Is there another way to do this?
   * Maybe a schedule doesn't need to run forever, maybe it would be a good thing
     for a learning tracker to delete itself from the system
@@ -39,24 +40,56 @@
 
 = Decide =
   *Idea/Hypotheses for Space Repetition Algorithm: >=5*
-  * [ ] The client can determine if the tracker goes on forever or it stops.
-  * [ ] The learning tracker should be run for a pre-set number of times, then
-        die.  It should report if the learning intervention worked or not up to
-        the client.
-  * [ ] The learning tracker should run forever, it's maintenance pulse going on
-        and on.  This way someone can keep their education fresh over the long
-        term.
-  * [ ] The tracker can go into status if the idea being uses is integrating
-        into another idea being tracked
   * [ ] Keep the interface simple, the client will add complexity if it needs
         to.  Have the schedule run forever using a generator, then use the range
         argument for graphing.  In doing so move the range argument out of main
         constructor and into the graph plotting methods.
+  * [ ] The learning tracker should be run for a pre-set number of times, then
+        die.  It should report if the learning intervention worked or not up to
+        its client.
+  * [ ] The tracker can go into stasis if the idea being uses is integrating
+        into another idea being tracked
+  * [ ] The tracker can delete itself if the idea being uses is integrating
+        into another idea being tracked
+  * [ ] Keeping a learning tracker in memory, when it is subsumed by another
+        learning tracker is wasteful.  So, we will have the option of running
+        forever (say for chinese character learning), but also have the option
+        to put it on ice (mathematical concept that is foundational).
+  * [ ] The learning trackers can know about one another, so that they can build
+        a Dag or statechart.
+  
         
   *Chosen Idea/Hypothesis*
     
+    Keep the interface simple, the client will add complexity if it is needed.
+    Have the schedule run forever using a generator, then use the range argument
+    for graphing.  In doing so, move the range argument out of the main
+    constructor and into the graphing plot methods.
+    
+    Provide an option to put the learning tracker on ice, in the case its idea
+    is being subsumed by another more complicated idea that is being tracked by
+    a different learning tracker.
 
   *Plan to Expand-on-Idea/Disprove-Hypothesis*
+  * [ ] Read up on generators, write some practice code.
+  * [ ] Get your tests in a state where you can see if you have broken the
+        functionality of the system.
+  * [ ] Update your Jupyter notebooks so you can see if the queries are working
+        visually.
+  * [ ] Check in the tests and the plan
+  * [ ] Branch the code so it is easy to do diffs in the case that you break
+        things.
+  * [ ] Analyze the existing code.  I think most of this work can happen in the
+        reference class, or at least this is where things are hard.
+  * [ ] Perform the surgery
+  * [ ] Re-run tests
+  * [ ] Run Jupyter notebooks to see what has changed
+  * [ ] Iterate on this OODA loop if required
+  * [ ] Write new tests if it makes sense to.
+  * [ ] Update the docs with the API changes.
+  * [ ] merge with master
+  * [ ] push to github
+  * [ ] release pip package
 
 = Act =
 
