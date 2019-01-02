@@ -2,8 +2,8 @@
 = Observe =
   
   *What defines Success?*
-    * [ ] Add long-term tests, adjust design to manage long term potentiating
-          that goes down over the long term
+  The spaced library can be used over the long term.  An idea will be presented
+  even if it is perfectly understood.
     
   *What is the problem?*
     
@@ -22,6 +22,7 @@
   * [ ] Create a longer term data set
   * [ ] Add a test to the test file
   * [ ] Feed the data into the long term tracker
+  * [ ] Use the learning tracker to provide realistic dates
   * [ ] Set the range so 365 days
   * [ ] Try to graph it, to see if it makes sense
   * [ ] Iterate the design to accommodate shortcomings discerned from this

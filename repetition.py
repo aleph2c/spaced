@@ -41,6 +41,8 @@ class SpacedKwargInterface():
       self.plasticity_root = kwargs['plasticity_root']
     if("plasticity_denominator_offset" in kwargs):
       self.plasticity_denominator_offset = kwargs['plasticity_denominator_offset']
+    if("long_term_clamp" in kwargs):
+      self.long_term_clamp = kwargs['long_term_clamp']
 
     # forgetting decay tau
     if("fdecaytau" in kwargs):
@@ -138,6 +140,8 @@ class SpaceRepetition():
     self.fdecay0_ki   = SpaceRepetitionController.DECAY_INITIAL_VALUE_KI
     self.fdecay0_kd   = SpaceRepetitionController.DECAY_INITIAL_VALUE_KD
 
+    self.long_term_clamp = SpaceRepetitionController.LONG_TERM_CLAMP
+
     SpacedKwargInterface.__init__(self, *args, **kwargs)
 
   def plot_graph(self, **kwargs):
@@ -180,8 +184,8 @@ class SpaceRepetition():
     if isinstance(days, datetime):
       raise TypeError("datetime objects not supported")
     else:
-      time              = self.epoch
-      time             += timedelta(seconds=(days * 86400))
+      time = self.epoch
+      time += timedelta(seconds=(days * 86400))
     return time
 
   def longterm_potentiation_curve(self, denominator_offset, root):
@@ -223,7 +227,8 @@ class SpaceRepetition():
   def forgetting_decay_curve(self, initial, tau):
     """
     This is the forgetting curve function in a regular and
-    zero'd form """
+    zero'd form
+    """
 
     def fn(x):
       exponential  = -1
@@ -231,6 +236,9 @@ class SpaceRepetition():
       exponential /= tau
       result  = initial
       result *= np.exp(exponential)
+      # force review roughly every 30 days
+      if result < self.long_term_clamp:
+        result = self.long_term_clamp
       result *= -1
       return result
 
@@ -813,7 +821,10 @@ class SpaceRepetitionController(SpaceRepetition):
   DECAY_INITIAL_VALUE_KI = 0.1
   DECAY_INITIAL_VALUE_KD = 0.03
 
+  LONG_TERM_CLAMP = 0.00005
+
   def __init__(self, *args, **kwargs):
+
     # Run our super class
     SpaceRepetition.__init__(self, *args, **kwargs)
     self.vertical_bars = []
@@ -1006,12 +1017,14 @@ class SpaceRepetitionController(SpaceRepetition):
     self.fdecaytau = fdecaytau
 
     self.updated_reference = SpaceRepetitionReference(
+        range=self.range,
         ifo=x_reference_feedback_overlap,
         fdecay0=fdecay0,
         fdecaytau=fdecaytau,
         plasticity_denominator_offset=self.plasticity_denominator_offset,
         plasticity_root=self.plasticity_root,
-        )
+        long_term_clamp=self.long_term_clamp,
+    )
 
     x_reference_feedback_overlap = self.updated_reference.invfn(y_input)
 
@@ -1252,37 +1265,43 @@ class LearningTracker():
     SpacedKwargInterface.__init__(self, *args, **kwargs)
 
     self.reference = SpaceRepetitionReference(
-          plot=False,
-          epoch=self.epoch,
-          plasticity_denominator_offset=self.plasticity_denominator_offset,
-          plasticity_root=self.plasticity_root,
-          fdecay0=self.fdecay0,
-          fdecaytau=self.fdecaytau,
-          ifo=self.ifo,
+      plot=False,
+      epoch=self.epoch,
+      range=self.range,
+      plasticity_denominator_offset=self.plasticity_denominator_offset,
+      plasticity_root=self.plasticity_root,
+      fdecay0=self.fdecay0,
+      fdecaytau=self.fdecaytau,
+      ifo=self.ifo,
+      long_term_clamp=self.long_term_clamp,
     )
 
     self._feedback = SpaceRepetitionFeedback(
-          [],
-          [],
-          epoch=self.start_time,
-          plasticity_denominator_offset=self.plasticity_denominator_offset,
-          plasticity_root=self.plasticity_root,
+      [],
+      [],
+      range=self.range,
+      epoch=self.start_time,
+      plasticity_denominator_offset=self.plasticity_denominator_offset,
+      plasticity_root=self.plasticity_root,
+      long_term_clamp=self.long_term_clamp,
     )
 
     self.control = SpaceRepetitionController(
-          reference=self.reference,
-          feedback=self._feedback,
-          epoch=self.start_time,
-          plasticity_root=self.plasticity_root,
-          fdecay0=self.fdecay0,
-          fdecaytau=self.fdecaytau,
-          ifo=self.ifo,
-          fdecaytau_kp=self.fdecaytau_kp,
-          fdecaytau_ki=self.fdecaytau_ki,
-          fdecaytau_kd=self.fdecaytau_kd,
-          fdecay0_kp=self.fdecay0_kp,
-          fdecay0_ki=self.fdecay0_ki,
-          fdecay0_kd=self.fdecay0_kd,
+      reference=self.reference,
+      feedback=self._feedback,
+      range=self.range,
+      epoch=self.start_time,
+      plasticity_root=self.plasticity_root,
+      fdecay0=self.fdecay0,
+      fdecaytau=self.fdecaytau,
+      ifo=self.ifo,
+      fdecaytau_kp=self.fdecaytau_kp,
+      fdecaytau_ki=self.fdecaytau_ki,
+      fdecaytau_kd=self.fdecaytau_kd,
+      fdecay0_kp=self.fdecay0_kp,
+      fdecay0_ki=self.fdecay0_ki,
+      fdecay0_kd=self.fdecay0_kd,
+      long_term_clamp=self.long_term_clamp,
     )
 
     if "feedback_data" in kwargs:
@@ -1427,6 +1446,9 @@ class LearningTracker():
 
   def discovered_fdecay0(self):
     return self.control.fdecay0
+
+  def days_from_epoch(self, time):
+    return self.control.days_from_epoch(time)
 
   def discovered_plasticity_root(self):
     return self.control.discovered_plasticity_root

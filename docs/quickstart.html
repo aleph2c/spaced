@@ -440,6 +440,119 @@ What we want to see is if they are <em>kind of</em> following that schedule and 
 observed plasticity curve <em>kind of</em> looks like our reference plasticity curve; it
 does.</p>
 <p>Summary: our student seems to be on track.</p>
+</div>
+<div class="section" id="dealing-with-forgetting-over-the-long-term">
+<span id="quickstart-dealing-with-forgetting-over-the-long-term"></span><h2>Dealing with Forgetting Over the Long Term<a class="headerlink" href="#dealing-with-forgetting-over-the-long-term" title="Permalink to this headline">¶</a></h2>
+<p>What happens to a schedule after an idea has been mastered?  To answer this we
+must first ask a different question, what happens to a memory after it has been
+mastered over the first couple of months?</p>
+<p>Your memories manifest themselves as physical three dimensional
+chemical-electrical circuits in your brain.  These circuits are built up as a
+pattern of neuron and glial cells.  The neurons connect in such a way that their
+pattern will offer up the memory when it is stimulated by an electrical impulse –
+this impulse being a kind of query from another part of your mind.  The
+electrical wave front propagating out from your memory’s neural cluster
+offers-up what feels like knowledge, and recollection in your conscious
+awareness.</p>
+<p>The transmission of these memory wave fronts through the brain make memories
+holonomic:  A memory exists in all parts of the brain all at once.  This is
+because a network can have multiple patterns imprinted on them at the same time,
+and a pattern is imprinted when a network experiences a wave front.</p>
+<p>Think about how sand organizes itself on a beach in reaction to a wave.  It, and
+its adjacent particles flow with the wave front, only to re-settle into a stable
+state once the watery part of the wave subsides back into the ocean.  Every wave
+will move the sand, but the sand mostly stays in the same location over time.</p>
+<p>We have large craniums, but they are not infinite, the real-estate in the brain
+is limited, and if a specific network pattern is not being used it could be
+pruned back; its volume, resources and cells commandeered to map another
+thought, memory or behavior.  Your brain organizes its neurons using adversarial
+competition, so if a memory network doesn’t have a signature that expresses
+utility, it could very well be cannibalized to map another set of ideas.  At
+least it looks this way from the outside.  Maybe all that is happening is that
+the sand on that part of the beach has been re-organized by many many different
+thoughts, many different wave-fronts impressing their patterns onto the sand.</p>
+<p>This process is largely passive, mysterious and outside of our conscious
+control.  The brain’s pruning and plasticity mechanism can’t determine what you
+think of as being consciously important; they use an emergent recipe brought to
+us by evolution, it optimizes for your survival; based on emotional queues, when
+the network was fired last, where a network is situated in the brain, not to
+mention many other factors.</p>
+<p>To save a trained skill, and its neural pattern from oblivion, we need to
+activate it from time to time.  This will not guarantee that you won’t lose your
+hard-fought memory, but it will reduce the probability of its destruction.</p>
+<p>So, this is just a really complicated way of saying that we have to think about
+the thing we understand to hold off the brain’s garbage collector.</p>
+<p>We have to activate a network even after it has been mastered.  This can happen
+very infrequently, and it can be thought of as a kind of maintenance pulse.</p>
+<p>To see how this works with the <code class="docutils literal notranslate"><span class="pre">spaced</span></code> library consider the following
+example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">start_time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+
+<span class="c1"># track for 2 years</span>
+<span class="n">range_in_days</span> <span class="o">=</span> <span class="mi">365</span><span class="o">*</span><span class="mi">2</span>
+
+<span class="n">lt</span> <span class="o">=</span> <span class="n">LearningTracker</span><span class="p">(</span>
+  <span class="n">epoch</span><span class="o">=</span><span class="n">start_time</span><span class="p">,</span>
+  <span class="nb">range</span><span class="o">=</span><span class="n">range_in_days</span><span class="p">,</span>
+  <span class="n">long_term_clamp</span><span class="o">=</span><span class="mf">0.00005</span><span class="p">,</span>  <span class="c1"># default</span>
+<span class="p">)</span>
+
+<span class="c1"># the idea is mastered over two months</span>
+<span class="n">day_offset_from_epoch_and_results</span> <span class="o">=</span> <span class="p">[</span>
+  <span class="p">[</span><span class="mi">0</span><span class="p">,</span>    <span class="mf">0.81</span><span class="p">,</span> <span class="mf">1.75</span><span class="p">,</span> <span class="mf">3.02</span><span class="p">,</span> <span class="mf">4.8</span><span class="p">,</span>  <span class="mf">8.33</span><span class="p">,</span> <span class="mf">16.00</span><span class="p">,</span> <span class="mf">23.00</span><span class="p">,</span> <span class="mf">29.00</span><span class="p">,</span> <span class="mi">60</span><span class="p">],</span>
+  <span class="p">[</span><span class="mf">0.40</span><span class="p">,</span> <span class="mf">0.44</span><span class="p">,</span> <span class="mf">0.64</span><span class="p">,</span> <span class="mf">0.84</span><span class="p">,</span> <span class="mf">0.83</span><span class="p">,</span> <span class="mf">0.89</span><span class="p">,</span>  <span class="mf">0.99</span><span class="p">,</span> <span class="mf">0.99</span><span class="p">,</span>   <span class="mf">0.90</span><span class="p">,</span> <span class="mf">0.99</span><span class="p">],</span>
+<span class="p">]</span>
+
+<span class="k">for</span> <span class="n">d</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">day_offset_from_epoch_and_results</span><span class="p">)</span>
+  <span class="c1"># r: result</span>
+  <span class="c1"># d: days since training epoch</span>
+  <span class="n">lt</span><span class="o">.</span><span class="n">learned</span><span class="p">(</span><span class="n">result</span><span class="o">=</span><span class="n">r</span><span class="p">,</span> <span class="n">when</span><span class="o">=</span><span class="n">d</span><span class="p">)</span>
+
+<span class="c1"># look at the schedule over two years</span>
+<span class="n">hdl</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">plot_graphs</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>We create feedback for 60 days and look at the schedule recommendations provided
+by <code class="docutils literal notranslate"><span class="pre">spaced</span></code> for two years:</p>
+<a class="reference external image-reference" href="_static/quickstart_long_term.pdf"><img alt="_images/quickstart_long_term.svg" src="_images/quickstart_long_term.svg" /></a>
+<p>You can see the maintenance pulses are just schedule suggestions over the longer
+term. The schedule is sparse immediately after mastery then it tightens up more
+and more into the future.</p>
+<p>Doesn’t this mean that as time progresses, spaced will annoy the student with
+maintenance reviews?</p>
+<p>To answer this question, I will first have to provide more context. There will
+be a lot of spaced learning trackers for each student in a system. As a student
+adds more items to their education, in aggregate, their learning tracker’s
+schedule suggestions will cause a kind of attention-jam. The student can only
+look at so much per review without being exhausted. So the system will have to
+ignore some schedule suggestions, or the system will stop working as it scales.</p>
+<p>The client code using spaced will query each of the objects and select a subset
+of them which are in most need of maintenance, then it will use these items for
+the review. Well, this is almost true.</p>
+<p>The client code will run a kind of lottery, where each of the learning trackers
+will get one or more lottery tickets. The number of lottery tickets given to
+each tracker will be proportional to how bad their student’s memory will be at
+the moment of the review. In this way, young, weaker memories, will get more
+tickets. After the tickets are assigned, the client runs a lottery. The number
+of draws in each lottery will be proportional to how much attention a student
+can put into their review. The learning trackers with the winning tickets will
+win the student’s attention.</p>
+<p>Or, in more technical language, the client code will have a sampler who’s
+probability distribution is distorted by the query results, such that it will
+have a bias to select things that are about to be forgotten.</p>
+<p>After a student has mastered an idea being tracked with a learning tracker, its
+forgetting curves remain mostly flat, so a query made against it in the
+maintenance pulse part of its schedule, will return a value very close to one.
+A learning tracker’s in their maintenance phase won’t be given very many lottery
+tickets.</p>
+<p>So when you look at the above curve, and it’s schedule, you can think of these
+times as moments a geriatric memory is given a single lottery ticket, in a
+lottery that is rigged for youthful memories.</p>
+<p>What happens if a geriatric memory wins a lottery and gets into a review? Well,
+it will stop trying to get tickets for a while, you can see this in on the above graph
+at 2019-04. The time between review suggestions swells a bit.  Then a pressure
+will build again and it will try to get into more and more lotteries (but the
+client will only give it one ticket).</p>
 <a class="reference internal" href="introduction.html"<span class="std-ref">prev</span></a>, <a class="reference internal" href="index.html#top"><span class="std std-ref">top</span></a>, <a class="reference internal" href="recipes.html"><span class="std std-ref">next</span></a><div class="toctree-wrapper compound">
 </div>
 </div>
@@ -465,6 +578,7 @@ does.</p>
 <li><a class="reference internal" href="#animating-the-reactive-schedule-to-get-an-intuitive-feeling-about-results">Animating the Reactive Schedule to get an Intuitive Feeling about Results</a></li>
 <li><a class="reference internal" href="#predicting-future-results">Predicting Future Results</a></li>
 <li><a class="reference internal" href="#building-a-better-initial-student-model">Building a Better Initial Student Model</a></li>
+<li><a class="reference internal" href="#dealing-with-forgetting-over-the-long-term">Dealing with Forgetting Over the Long Term</a></li>
 </ul>
 </li>
 </ul>
@@ -501,7 +615,7 @@ does.</p>
       <div class="clearer"></div>
     </div>
     <div class="footer">
-      &copy;2018, Scott Volk.
+      &copy;2019, Scott Volk.
       
       |
       <a href="_sources/quickstart.rst.txt"

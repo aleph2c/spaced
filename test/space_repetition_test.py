@@ -70,6 +70,34 @@ def get_feedback2():
           ]
   return [x_v,y_v]
 
+def longterm_feedback():
+  x_v = [
+          0,
+          0.80640320160080037,
+          1.7523761880940469,
+          3.0240120060030016,
+          4.8074037018509257,
+          7.3351675837918959,
+          10.932966483241621,
+          16.004002001000501,
+          23.029014507253628,
+          30.0,
+          60,
+        ]
+  y_v = [1,
+          0.44646101201172317,
+          0.64510969552772512,
+          0.76106659335521121,
+          0.93741905134093808,
+          0.99000147547559727,
+          0.99902389355455017,
+          1.00000000000000000,
+          0.90000000000000000,
+          0.7,
+          0.90000000000000000,
+          ]
+  return [x_v, y_v]
+
 def get_feedback3():
   x_v = [
           0,
@@ -437,4 +465,26 @@ def test_serialization_epoch():
   unpickled_learning_tracker.save_figure("results/post_pickle.pdf")
   hdl.close()
 
+@pytest.mark.longterm
+def test_longterm_response():
+  start_time = datetime.now()
+
+  lt = LearningTracker(
+    epoch=start_time,
+    range=500,
+    long_term_clamp=0.00005
+  )
+
+  offsets = [lt.days_from_epoch(dt) for dt in lt.schedule()]
+
+  moments, results = longterm_feedback()
+  for moment, result in zip(moments, results):
+    lt.learned(when=moment, result=result)
+
+  hdl, _ = lt.plot_graphs()
+  lt.save_figure("results/longterm.pdf")
+  hdl.close()
+  print(offsets)
+
+  
 
