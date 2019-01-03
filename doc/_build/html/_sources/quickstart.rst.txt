@@ -520,14 +520,13 @@ What happens to a schedule after an idea has been mastered?  To answer this we
 must first ask a different question, what happens to a memory after it has been
 mastered over the first couple of months?
 
-Your memories manifest themselves as physical three dimensional
-chemical-electrical circuits in your brain.  These circuits are built up as a
-pattern of neuron and glial cells.  The neurons connect in such a way that their
-pattern will offer up the memory when it is stimulated by an electrical impulse --
-this impulse being a kind of query from another part of your mind.  The
-electrical wave front propagating out from your memory's neural cluster
-offers-up what feels like knowledge, and recollection in your conscious
-awareness.
+Your memories are reliant on physical three dimensional chemical-electrical
+circuits in your brain tissue.  These circuits are built up as a pattern of
+neuron and glial cells.  The neurons connect in such a way that their pattern
+will offer up the memory when it is stimulated by an electrical impulse -- this
+impulse being a kind of query from another part of your mind.  The electrical
+wave front propagating out from your memory's neural cluster offers-up what
+feels like knowledge, and recollection in your conscious awareness.
 
 The transmission of these memory wave fronts through the brain make memories
 holonomic:  A memory exists in all parts of the brain all at once.  This is
@@ -541,20 +540,20 @@ will move the sand, but the sand mostly stays in the same location over time.
 
 We have large craniums, but they are not infinite, the real-estate in the brain
 is limited, and if a specific network pattern is not being used it could be
-pruned back; its volume, resources and cells commandeered to map another
-thought, memory or behavior.  Your brain organizes its neurons using adversarial
-competition, so if a memory network doesn't have a signature that expresses
-utility, it could very well be cannibalized to map another set of ideas.  At
-least it looks this way from the outside.  Maybe all that is happening is that
-the sand on that part of the beach has been re-organized by many many different
-thoughts, many different wave-fronts impressing their patterns onto the sand.
+pruned back; its volume, resources and cells commandeered to map another memory.
+Your brain organizes its neurons using adversarial competition, so if a memory
+network doesn't have a signature that expresses utility, it could very well be
+cannibalized to map another set of ideas.  At least it looks this way from the
+outside.  Maybe all that is happening is that the sand on that part of the beach
+has been re-organized by many many different thoughts, many different
+wave-fronts impressing their patterns onto that patch of sand.
 
 This process is largely passive, mysterious and outside of our conscious
 control.  The brain's pruning and plasticity mechanism can't determine what you
 think of as being consciously important; they use an emergent recipe brought to
-us by evolution, it optimizes for your survival; based on emotional queues, when
-the network was fired last, where a network is situated in the brain, not to
-mention many other factors.
+us by evolution, it optimizes for your survival; it is based on emotional
+queues, when the network was fired last, where a network is situated in the
+brain, not to mention many other factors.
 
 To save a trained skill, and its neural pattern from oblivion, we need to
 activate it from time to time.  This will not guarantee that you won't lose your
