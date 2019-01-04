@@ -484,7 +484,7 @@ def test_longterm_response():
   hdl, _ = lt.plot_graphs()
   lt.save_figure("results/longterm.pdf")
   hdl.close()
-  print(offsets)
+  #print(offsets)
 
   
 

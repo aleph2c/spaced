@@ -1,4 +1,5 @@
 *Space Repetition Algorithm*
+
 = Observe =
   
   *What defines Success?*
@@ -71,13 +72,13 @@
     a different learning tracker.
 
   *Plan to Expand-on-Idea/Disprove-Hypothesis*
-  * [ ] Read up on generators, write some practice code.
+  * [X] Read up on generators, write some practice code.
   * [ ] Get your tests in a state where you can see if you have broken the
         functionality of the system.
-  * [ ] Update your Jupyter notebooks so you can see if the queries are working
+  * [X] Update your Jupyter notebooks so you can see if the queries are working
         visually.
-  * [ ] Check in the tests and the plan
-  * [ ] Branch the code so it is easy to do diffs in the case that you break
+  * [X] Check in the tests and the plan
+  * [X] Branch the code so it is easy to do diffs in the case that you break
         things.
   * [ ] Analyze the existing code.  I think most of this work can happen in the
         reference class, or at least this is where things are hard.
