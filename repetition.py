@@ -147,25 +147,125 @@ class SpaceRepetition():
   def plot_graph(self, **kwargs):
     pass
 
-  def forgetting_curves(self, scale, offset):
-    def fn(x):
-      """
-      This is the falling exponential forgetting curve
-      given a x value, you return a y value """
+  def decay_of_decay(self, initial, tau):
+    """
+    This function returns the ``scale`` values needed to generate the forgetting
+    curves.  It returns a function with the values of ``initial`` and ``tau``
+    enclosed within it:
 
+    - fn(x): a curve which reaches an asymptote of 0, but is clamped to
+      ``-1*self.long_term_clamp`` before it gets there.
+
+    Where ``fn(x)`` is:
+
+    .. code-block:: python
+
+      -1 * initial * e^(-x/tau) clamped to -1*self.long_term_clamp
+
+    ``initial`` determines where to start the curve.  It is negated by the
+    function, its value determines at what negative y value to start.
+
+    ``tau`` determines how fast the forgetting curves should transition from a
+    fast state of forgetting to a slower state of forgetting.
+
+    .. code-block:: python
+
+
+              |
+              | ---------------------------- self.long_term_clamp -
+      -0.0003 |                     ...............................
+              |                .....                               
+              |             ...                                    
+              |           ..                                       
+              |          /                                         
+              |         /                                          
+              |        /                                           
+              |       /                                            
+      -0.7001 | -----/---------------------------------------------
+              |     .                                              
+              |                                                    
+              |    .                                               
+              |                                                    
+              |   .                                                
+              |                                                    
+              |  .                                                 
+              |                                                    
+         -1.4 | .   
+                0                      5                        10
+
+    """
+
+    def fn(x):
+      exponential  = -1
+      exponential *= x
+      exponential /= tau
+      result  = initial
+      result *= np.exp(exponential)
+
+      # force review roughly every 30 days
+      if result < self.long_term_clamp:
+        result = self.long_term_clamp
+      result *= -1
+      return result
+    return fn
+
+  def forgetting_curves(self, scale, offset):
+    """
+    This function returns two other functions which have the values of ``scale``
+    and ``offset`` enclosed within them:
+
+    - fn(x):  the falling-exponential forgetting curve profile
+    - fn0(x, y): ``y - fn(x)``
+
+    Where ``fn(x)`` is:
+
+    .. code-block:: python
+
+      e^(scale*(x-offset))
+
+    ``scale`` determines how fast the forgetting curve falls
+
+    ``offset`` determines how far to shift the curve to the right
+
+    .. code-block:: python
+
+        scale = -0.7
+        offset = 10
+
+
+        1096 |                                                        
+             |                                                        
+             |  .                                                     
+             |                                                        
+             |   .                                                    
+             |    .                                                   
+             |                                                        
+             |     .                                                  
+         548 | -----\-------------------------------------------------
+             |       \                                                
+             |        \                                               
+             |         \                                              
+             |          ..                                            
+             |            \                                           
+             |             ...                                        
+             |                ...                                     
+             |                   .....                                
+        1.13 |                        ................................
+                  0                      5                          10
+    
+    """
+
+    def fn(x):
       return np.exp(scale * (x - offset))
 
     def fn0(x, y):
-      return y - np.exp(scale * (x - offset))
+      """
+      result = y - e^(scale*(x-offset))
+      
+      """
+      return y - fn(x) 
 
     return [fn, fn0]
-
-  def generate_equations(self, ffn0, fn0_2):
-    def equations(xy):
-      x, y = xy
-      return(ffn0(x, y), fn0_2(x, y))
-
-    return equations
 
   def days_from_epoch(self, time):
 
@@ -188,13 +288,92 @@ class SpaceRepetition():
       time += timedelta(seconds=(days * 86400))
     return time
 
-  def longterm_potentiation_curve(self, denominator_offset, root):
+  def plasticity_functions(self, denominator_offset, root):
+    """
+    This function returns three other functions which have the values of
+    ``denominator_offset`` and ``root`` enclosed within them:
+
+    - fn(x): the plasticity curve for the student
+    - fn0(x, y): ``y - fn(x)``
+    - invfn(y): returns the x value which provides y from ``fn(x)``
+
+
+    Where ``fn(x)`` is:
+
+    .. code-block:: python
+
+                   x^(1/root)
+      ------------------------------------ for x > shift
+       (x + denominator_offset)^(1/root)
+
+      0 for x <= shift
+
+      example:
+        root = 1.8
+        denominator_offset = 1.0
+
+
+        0.94754 |                          ...........................
+                |                 .........                           
+                |            .....                                    
+                |         ...                                         
+                |       ..                                            
+                |      /                                              
+                |     /                                               
+                |    /                                                
+        0.47377 | --.-------------------------------------------------
+                |                                                     
+                |                                                     
+                |  .                                                  
+                |                                                     
+                |                                                     
+                |                                                     
+                |                                                     
+                |                                                     
+              0 | .                                                   
+                  0                      5                          10
+
+    Where ``fn0(x,y)`` is:
+
+    .. code-block:: python
+      
+      y - fn(x)
+
+    Where ``invfn(y)`` is:
+
+    .. code-block:: python
+
+                                   y^(root)
+      -1 *denominator_offset * --------------- for 0 <= y <= 1
+                                  y^(root) - 1
+ 
+      example
+        root = 1.8
+        denominator_offset = 1.0
+
+        6.89791 |                                                    
+                |                                                    
+                |                                                    
+                |                                                    
+                |                                                    
+                |        .                                           
+                |                                                    
+                |         ...                                        
+        0.77734 | -----------........................................
+                |                                                    
+                | ....                                               
+                |                                                    
+                |     .                                              
+                |                                                    
+                |                                                    
+                |                                                    
+                |                                                    
+        -5.3432 |      .                                             
+                  0                      5                          10
+    """
     def is_array(var):
       return isinstance(var, (np.ndarray))
 
-    """
-    This is the slow improvement, recollection curve function in a regular and
-    zero'd form """
     def fn(x, shift=0):
       with np.errstate(all="ignore"):
         result = np.power(x, 1.0 / root)
@@ -212,6 +391,9 @@ class SpaceRepetition():
 
       return result
 
+    def fn0(x, y):
+      return y - fn(x)
+
     def invfn(y):
       assert 0 <= y <= 1, "only 0 <= y <=1 supported by this function"
       result = -1 * denominator_offset
@@ -219,32 +401,9 @@ class SpaceRepetition():
       result /= (np.power(y, root) - 1)
       return result
 
-    def fn0(x, y):
-      return y - np.power(x, 1.0 / root) / (np.power(x + denominator_offset, 1.0 / root))
-
     return [fn, fn0, invfn]
 
-  def forgetting_decay_curve(self, initial, tau):
-    """
-    This is the forgetting curve function in a regular and
-    zero'd form
-    """
-
-    def fn(x):
-      exponential  = -1
-      exponential *= x
-      exponential /= tau
-      result  = initial
-      result *= np.exp(exponential)
-      # force review roughly every 30 days
-      if result < self.long_term_clamp:
-        result = self.long_term_clamp
-      result *= -1
-      return result
-
-    return fn
-
-  def make_data(self, forgetting_functions, solutions):
+  def make_stickleback_data_for_plot(self, forgetting_functions, solutions):
     return_set = [[], []]
 
     solutions = np.array(solutions)
@@ -317,7 +476,7 @@ class SpaceRepetitionReference(SpaceRepetition):
   # initial forgetting offset
   Initial_Forgetting_Offset = 0.0
 
-  def __init__(self, *args, **kwargs):
+  def __init__(self, plot=None, *args, **kwargs):
 
     # Run our super initializations
     SpaceRepetition.__init__(self, *args, **kwargs)
@@ -338,17 +497,23 @@ class SpaceRepetitionReference(SpaceRepetition):
 
     SpacedKwargInterface.__init__(self, *args, **kwargs)
 
-    self.rfn, self.rfn0, self.invfn = self.longterm_potentiation_curve(
+    # pc:  plasticity curve
+    # pc0:  plasticity curve set to 0
+    # ipc: inverse plasticity curve
+    self.pc, self.pc0, self.ipc = self.plasticity_functions(
       self.plasticity_denominator_offset,
       self.plasticity_root
     )
+
+    # create the forgetting curves that will ride on
+    # top of the plasticity curve, it looks like a stickleback
     self.stickleback(
       fdecaytau=self.fdecaytau,
       fdecay0=self.fdecay0,
       ifo=self.ifo
     )
 
-    if("plot" in kwargs and kwargs["plot"] is True):
+    if plot is not None and plot is True:
       self.plot_graph()
 
   def schedule(self):
@@ -388,59 +553,52 @@ class SpaceRepetitionReference(SpaceRepetition):
       idx = (np.abs(array - value)).argmin()
       return array[idx], idx
 
-  def stickleback(self, **kwargs):
+  # generator needs to be put in here
+  def stickleback(self, fdecaytau, fdecay0, ifo=None):
 
-    fdecaytau = kwargs['fdecaytau']
-    fdecay0 = kwargs['fdecay0']
-
-    if("ifo" in kwargs):
-      ifo = kwargs['ifo']
-    else:
+    # ifo: initial forgetting offset
+    if ifo is None:
       ifo = 0.0
 
-    # salt away our results
-    self.forgetting_properties["fdecaytau"][ifo] = fdecaytau
-    self.forgetting_properties["fdecay"][ifo]    = fdecay0
-
+    # dod: decay of decay
     # describes how the student gets worse at forgetting after a refresh
-    fdfn = self.forgetting_decay_curve(fdecay0, fdecaytau)
-    self.fdfn = fdfn
+    self.dod = self.decay_of_decay(fdecay0, fdecaytau)
 
     # construct our first forgetting curve, they haven't see this information before.
-    ffn, ffn0 = self.forgetting_curves(fdfn(ifo), ifo)
+    ffn, ffn0 = self.forgetting_curves(self.dod(ifo), ifo)
 
     # Our first training schedule is set at time self.ifo
     self.ref_events_x.append(ifo)
     self.forgetting_functions.append(ffn)
     self.ref_events_y.append(1)
 
-    # The function used to generate the next set of forgetting curves at their
-    # prescribed locations in time
-    self.recollection_x = np.linspace(0, self.range, self.samples)
-
     # make an initial guess to help the solver
     self.solution_x, self.solution_y = 1.0, 0.5
 
     def generate_targets(fn, fn0):
-      # Solve fn and rfn with their given tuning parameters
-      equation = self.generate_equations(fn0, self.rfn0)
-      with warnings.catch_warnings():
-        warnings.simplefilter("ignore")
-        # use the previous answers as our first guess to find the solutions for our next
-        # problem
-        solution_x, solution_y = fsolve(equation, (self.solution_x, self.solution_y))
-      self.solution_x = solution_x
-      self.solution_y = solution_y
 
-      # we an intersection between our rfn curve and our latest forgetting
-      # curve.
-      if(solution_x <= self.range):
-        # get an x value in our data close to solution_x
-        target_x, nearest_index = self.find_nearest(self.recollection_x, solution_x)
-        self.recollection_x[nearest_index] = solution_x
+      while True:
+        # Solve fn and pc with their given tuning parameters
+        def generate_equations(ffn0, fn0_2):
+          def equations(xy):
+            x, y = xy
+            return(ffn0(x, y), fn0_2(x, y))
+          return equations
+        # link the zero'd form of the forgetting function and the zero'd form of
+        # the plasticity curve, this is needed by fsolve to find where these
+        # functions intersect 
+        equations = generate_equations(fn0, self.pc0)
+        with warnings.catch_warnings():
+          warnings.simplefilter("ignore")
+          # fsolve needs a guess at the answer, use the previous answers as our
+          # first guess to find the solutions for our next problem
+          solution_x, solution_y = fsolve(equations, (self.solution_x, self.solution_y))
+
+        self.solution_x = solution_x
+        self.solution_y = solution_y
 
         # generate our next forgetting curve
-        fn_next, ffn0_next = self.forgetting_curves(self.fdfn(solution_x), solution_x)
+        fn_next, ffn0_next = self.forgetting_curves(self.dod(solution_x), solution_x)
 
         self.ref_events_x.append(solution_x)
         self.ref_events_y.append(solution_y)
@@ -449,32 +607,16 @@ class SpaceRepetitionReference(SpaceRepetition):
         # will be needed to make predictions about a student's ability to
         # recollect something at a given time in the future
         self.forgetting_functions.append(fn_next)
-
-      else:
-        # if we didn't find a solution our search is complete
-        fn_next, ffn0_next = [None, None]
-      return [fn_next, ffn0_next]
-
+        return [solution_x, fn_next, ffn0_next]
 
     # get ready to generate the second forgetting curve
     ffn_next, ffn0_next = [ffn, ffn0]
 
     # generate as many forgetting curves that we need for the time over which we
     # are looking
-    while(ffn_next is not None):
-      ffn_next, ffn0_next = generate_targets(ffn_next, ffn0_next)
+    while(self.solution_x <= self.range):
+      self.solution_x, ffn_next, ffn0_next = generate_targets(ffn_next, ffn0_next)
 
-    # create the stickleback x and y data that can be plotted
-    self.x_and_y = self.make_data(
-      forgetting_functions = self.forgetting_functions,
-      solutions=self.ref_events_x
-    )
-
-    # Draw our first forgetting curve across our schedule
-    self.recollection_y = [self.rfn(x) for x in self.recollection_x]
-
-    # parse our ref_events into vertical bar information for graphing
-    self.vertical_bar_information()
 
   def vertical_bar_information(self):
     self.ref_events_x = self.ref_events_x[:]
@@ -484,28 +626,40 @@ class SpaceRepetitionReference(SpaceRepetition):
       self.vertical_bars.append([target_x, target_x])
       self.vertical_bars.append([0, target_y])
 
-  def plot_graph(self, **kwargs):
-    x      = self.x_and_y[0]
-    y      = self.x_and_y[1]
-    rx     = self.recollection_x
-    ry     = self.recollection_y
-    if("epoch" in kwargs):
-      epoch = kwargs['epoch']
-    else:
+  def make_data_for_plot(self):
+    self.recollection_x = np.linspace(0, self.range, self.samples)
+
+    for solution_x, solution_y in zip(self.ref_events_x, self.ref_events_y):
+      target_x, nearest_index = self.find_nearest(self.recollection_x, solution_x)
+      self.recollection_x[nearest_index] = solution_x
+
+    # Draw our first forgetting curve across our schedule
+    self.recollection_y = [self.pc(x) for x in self.recollection_x]
+
+    # create the stickleback x and y data that can be plotted
+    self.x_and_y = self.make_stickleback_data_for_plot(
+      forgetting_functions = self.forgetting_functions,
+      solutions=self.ref_events_x
+    )
+
+    # parse our ref_events into vertical bar information for graphing
+    self.vertical_bar_information()
+
+
+  def plot_graph(self, epoch=None, plot_pane_data=None, panes=None):
+
+    if epoch is None:
       if self.epoch is None:
         epoch = None
       else:
         epoch = self.epoch
 
-    if("plot_pane_data" in kwargs):
-      plot_pane_data = kwargs['plot_pane_data']
-    else:
-      plot_pane_data = None
+    self.make_data_for_plot()
 
-    if("panes" in kwargs):
-      panes = kwargs['panes']
-    else:
-      panes = None
+    x  = self.x_and_y[0]
+    y  = self.x_and_y[1]
+    rx = self.recollection_x
+    ry = self.recollection_y
 
     data_dict = {}
     add_x_y = SpaceRepetitionDataBuilder().create_add_x_y_fn_for(data_dict, "recommendation")
@@ -637,7 +791,7 @@ class SpaceRepetitionFeedback(SpaceRepetition):
       self.range = 10
 
     self.domain = 1.01
-    self.rfn, dpo, dpr = self.longterm_potentiation_curve()
+    self.pc, dpo, dpr = self.plasticity_functions()
     self.discovered_plasticity_root = dpr
     self.discovered_plasticity_denominator_offset = dpo
 
@@ -663,10 +817,10 @@ class SpaceRepetitionFeedback(SpaceRepetition):
       if c_event_x > self.range:
         self.range = c_event_x
 
-    self.rfn, dpo, dpr = self.longterm_potentiation_curve()
+    self.pc, dpo, dpr = self.plasticity_functions()
     self.discovered_plasticity_denominator_offset = dpo
     self.discovered_plasticity_root = dpr
-    return [self.rfn, dpo, dpr]
+    return [self.pc, dpo, dpr]
 
   def fitting_parameters(self, fn, xdata, ydata, weights):
     with warnings.catch_warnings():
@@ -675,7 +829,7 @@ class SpaceRepetitionFeedback(SpaceRepetition):
           bounds=(0, [2.0, 2.0]))
     return [popt, pcov]
 
-  def longterm_potentiation_curve(self):
+  def plasticity_functions(self):
     rx = self.a_events_x
     ry = self.a_events_y
     weights = np.flip(np.linspace(0.1, 1.0, len(rx)))
@@ -696,11 +850,11 @@ class SpaceRepetitionFeedback(SpaceRepetition):
   def plot_graph(self, **kwargs):
     observed_events = [[], []]
 
-    rfn   = self.rfn
+    pc   = self.pc
     x     = self.a_events_x
     fillx = np.linspace(0, self.range, 50)
     rx    = np.union1d(fillx, x)
-    ry    = rfn(rx)
+    ry    = pc(rx)
 
     if("epoch" in kwargs):
       epoch = kwargs['epoch']
@@ -764,8 +918,8 @@ class ControlData():
     self._long_term_potentiation = None
     self._obj = object_handle
 
-    if("rfn" in kwargs):
-      self._long_term_potentiation_graph = kwargs["rfn"]
+    if("pc" in kwargs):
+      self._long_term_potentiation_graph = kwargs["pc"]
 
   @property
   def long_term_potentiation_graph(self):
@@ -830,15 +984,15 @@ class SpaceRepetitionController(SpaceRepetition):
     self.vertical_bars = []
 
     self.reference        = ControlData(kwargs['reference'])
-    self.reference.fn     = self.reference.o.rfn
-    self.reference.invfn  = self.reference.o.invfn
+    self.reference.fn     = self.reference.o.pc
+    self.reference.ipc  = self.reference.o.ipc
     self.reference.range  = self.reference.o.range
     self.reference.domain = self.reference.o.domain
     self.plasticity_root  = self.reference.o.plasticity_root
     self.plasticity_denominator_offset = self.reference.o.plasticity_denominator_offset
 
     self.feedback         = ControlData(kwargs['feedback'])
-    self.feedback.fn      = self.feedback.o.rfn
+    self.feedback.fn      = self.feedback.o.pc
     self.feedback.range   = self.feedback.o.range
     self.feedback.domain  = self.feedback.o.domain
     self.range            = self.feedback.range
@@ -878,7 +1032,7 @@ class SpaceRepetitionController(SpaceRepetition):
 
   def initialize_feedback(self, feedback, *args, **kwargs):
     self.feedback         = ControlData(feedback)
-    self.feedback.fn      = self.feedback.o.rfn
+    self.feedback.fn      = self.feedback.o.pc
     self.feedback.range   = self.feedback.o.range
     self.feedback.domain  = self.feedback.o.domain
     self.range            = self.feedback.range
@@ -972,14 +1126,14 @@ class SpaceRepetitionController(SpaceRepetition):
     # location
     #
     # We take the x_input location, determine the corresponding y_input
-    # then find the corresponding x location on the reference rfn function.
+    # then find the corresponding x location on the reference pc function.
     #
-    # We shift the rfn function on the x axis so that it will intersect where
-    # the feedback rfn function was at the x_input, then redraw our reference
+    # We shift the pc function on the x axis so that it will intersect where
+    # the feedback pc function was at the x_input, then redraw our reference
     # graph at that location, to generate new recommendation times.
     x_reference_feedback_overlap = 0
     y_input                      = self.feedback.fn(control_x)
-    x_reference_feedback_overlap = self.reference.invfn(y_input)
+    x_reference_feedback_overlap = self.reference.ipc(y_input)
     self.x_reference_feedback_overlap = x_reference_feedback_overlap
     x_reference_shift            = control_x - x_reference_feedback_overlap
     self.x_reference_shift       = x_reference_shift
@@ -1025,8 +1179,7 @@ class SpaceRepetitionController(SpaceRepetition):
         plasticity_root=self.plasticity_root,
         long_term_clamp=self.long_term_clamp,
     )
-
-    x_reference_feedback_overlap = self.updated_reference.invfn(y_input)
+    x_reference_feedback_overlap = self.updated_reference.ipc(y_input)
 
     # the reference must be shift to the left for positive overlap
     self.x_reference_shift = self.control_x - x_reference_feedback_overlap
@@ -1137,6 +1290,7 @@ class SpaceRepetitionController(SpaceRepetition):
     h, data_dict = self.plot_error(epoch=self.epoch, plot_pane_data=hdl.ppd)
     db.append_to_base(base, data_dict)
 
+    self.updated_reference.make_data_for_plot()
     h, data_dict = self.plot_control(epoch=self.epoch, plot_pane_data=hdl.ppd)
     db.append_to_base(base, data_dict)
     graph_handle = h.ppd
