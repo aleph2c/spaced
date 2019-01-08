@@ -80,8 +80,17 @@
   * [X] Check in the tests and the plan
   * [X] Branch the code so it is easy to do diffs in the case that you break
         things.
-  * [ ] Analyze the existing code.  I think most of this work can happen in the
+  * [X] Analyze the existing code.  I think most of this work can happen in the
         reference class, or at least this is where things are hard.
+        * write ideas as comments in the code
+        * use Gvdiff to view your notes
+        * write a general strategy (what)
+        * write a set of tactics (how)
+        * investigate sympy?
+  * [ ] Simplify and document the code internally, change the structure so it
+        will be easier to apply a generator
+  * [ ] Create a simplified example of what you want to do in the experiment
+        folder.
   * [ ] Perform the surgery
   * [ ] Re-run tests
   * [ ] Run Jupyter notebooks to see what has changed
