@@ -87,7 +87,7 @@
         * write a general strategy (what)
         * write a set of tactics (how)
         * investigate sympy?
-  * [ ] Simplify and document the code internally, change the structure so it
+  * [X] Simplify and document the code internally, change the structure so it
         will be easier to apply a generator
   * [ ] Create a simplified example of what you want to do in the experiment
         folder.

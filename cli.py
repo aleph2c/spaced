@@ -23,3 +23,4 @@ def test(cli_config, pdb):
   else:
     rv = "python3 -m pytest test/ --ignore=cli -s -v"
   os.system(rv)
+
