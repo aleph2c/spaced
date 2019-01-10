@@ -218,26 +218,89 @@ difference between that datetime and when epoch</p>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="repetition.SpaceRepetition.forgetting_curves">
-<code class="descname">forgetting_curves</code><span class="sig-paren">(</span><em>scale</em>, <em>offset</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetition.forgetting_curves" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="repetition.SpaceRepetition.forgetting_decay_curve">
-<code class="descname">forgetting_decay_curve</code><span class="sig-paren">(</span><em>initial</em>, <em>tau</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetition.forgetting_decay_curve" title="Permalink to this definition">¶</a></dt>
-<dd><p>This is the forgetting curve function in a regular and
-zero’d form</p>
+<dt id="repetition.SpaceRepetition.decay_of_decay">
+<code class="descname">decay_of_decay</code><span class="sig-paren">(</span><em>initial</em>, <em>tau</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetition.decay_of_decay" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function returns the <code class="docutils literal notranslate"><span class="pre">scale</span></code> values needed to generate the forgetting
+curves.  It returns a function with the values of <code class="docutils literal notranslate"><span class="pre">initial</span></code> and <code class="docutils literal notranslate"><span class="pre">tau</span></code>
+enclosed within it:</p>
+<ul class="simple">
+<li>fn(x): a curve which reaches an asymptote of 0, but is clamped to
+<code class="docutils literal notranslate"><span class="pre">-1*self.long_term_clamp</span></code> before it gets there.</li>
+</ul>
+<p>Where <code class="docutils literal notranslate"><span class="pre">fn(x)</span></code> is:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">-</span><span class="mi">1</span> <span class="o">*</span> <span class="n">initial</span> <span class="o">*</span> <span class="n">e</span><span class="o">^</span><span class="p">(</span><span class="o">-</span><span class="n">x</span><span class="o">/</span><span class="n">tau</span><span class="p">)</span> <span class="n">clamped</span> <span class="n">to</span> <span class="o">-</span><span class="mi">1</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">long_term_clamp</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">initial</span></code> determines where to start the curve.  It is negated by the
+function, its value determines at what negative y value to start.</p>
+<p><code class="docutils literal notranslate"><span class="pre">tau</span></code> determines how fast the forgetting curves should transition from a
+fast state of forgetting to a slower state of forgetting.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>        <span class="o">|</span>
+        <span class="o">|</span> <span class="o">----------------------------</span> <span class="bp">self</span><span class="o">.</span><span class="n">long_term_clamp</span> <span class="o">-</span>
+<span class="o">-</span><span class="mf">0.0003</span> <span class="o">|</span>                     <span class="o">...............................</span>
+        <span class="o">|</span>                <span class="o">.....</span>                               
+        <span class="o">|</span>             <span class="o">...</span>                                    
+        <span class="o">|</span>           <span class="o">..</span>                                       
+        <span class="o">|</span>          <span class="o">/</span>                                         
+        <span class="o">|</span>         <span class="o">/</span>                                          
+        <span class="o">|</span>        <span class="o">/</span>                                           
+        <span class="o">|</span>       <span class="o">/</span>                                            
+<span class="o">-</span><span class="mf">0.7001</span> <span class="o">|</span> <span class="o">-----/---------------------------------------------</span>
+        <span class="o">|</span>     <span class="o">.</span>                                              
+        <span class="o">|</span>                                                    
+        <span class="o">|</span>    <span class="o">.</span>                                               
+        <span class="o">|</span>                                                    
+        <span class="o">|</span>   <span class="o">.</span>                                                
+        <span class="o">|</span>                                                    
+        <span class="o">|</span>  <span class="o">.</span>                                                 
+        <span class="o">|</span>                                                    
+   <span class="o">-</span><span class="mf">1.4</span> <span class="o">|</span> <span class="o">.</span>   
+          <span class="mi">0</span>                      <span class="mi">5</span>                        <span class="mi">10</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="method">
-<dt id="repetition.SpaceRepetition.generate_equations">
-<code class="descname">generate_equations</code><span class="sig-paren">(</span><em>ffn0</em>, <em>fn0_2</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetition.generate_equations" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dt id="repetition.SpaceRepetition.forgetting_curves">
+<code class="descname">forgetting_curves</code><span class="sig-paren">(</span><em>scale</em>, <em>offset</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetition.forgetting_curves" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function returns two other functions which have the values of <code class="docutils literal notranslate"><span class="pre">scale</span></code>
+and <code class="docutils literal notranslate"><span class="pre">offset</span></code> enclosed within them:</p>
+<ul class="simple">
+<li>fn(x):  the falling-exponential forgetting curve profile</li>
+<li>fn0(x, y): <code class="docutils literal notranslate"><span class="pre">y</span> <span class="pre">-</span> <span class="pre">fn(x)</span></code></li>
+</ul>
+<p>Where <code class="docutils literal notranslate"><span class="pre">fn(x)</span></code> is:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">e</span><span class="o">^</span><span class="p">(</span><span class="n">scale</span><span class="o">*</span><span class="p">(</span><span class="n">x</span><span class="o">-</span><span class="n">offset</span><span class="p">))</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">scale</span></code> determines how fast the forgetting curve falls</p>
+<p><code class="docutils literal notranslate"><span class="pre">offset</span></code> determines how far to shift the curve to the right</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">scale</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.7</span>
+<span class="n">offset</span> <span class="o">=</span> <span class="mi">10</span>
 
-<dl class="method">
-<dt id="repetition.SpaceRepetition.longterm_potentiation_curve">
-<code class="descname">longterm_potentiation_curve</code><span class="sig-paren">(</span><em>denominator_offset</em>, <em>root</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetition.longterm_potentiation_curve" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+
+<span class="mi">1096</span> <span class="o">|</span>                                                        
+     <span class="o">|</span>                                                        
+     <span class="o">|</span>  <span class="o">.</span>                                                     
+     <span class="o">|</span>                                                        
+     <span class="o">|</span>   <span class="o">.</span>                                                    
+     <span class="o">|</span>    <span class="o">.</span>                                                   
+     <span class="o">|</span>                                                        
+     <span class="o">|</span>     <span class="o">.</span>                                                  
+ <span class="mi">548</span> <span class="o">|</span> <span class="o">-----</span>\<span class="o">-------------------------------------------------</span>
+     <span class="o">|</span>       \                                                
+     <span class="o">|</span>        \                                               
+     <span class="o">|</span>         \                                              
+     <span class="o">|</span>          <span class="o">..</span>                                            
+     <span class="o">|</span>            \                                           
+     <span class="o">|</span>             <span class="o">...</span>                                        
+     <span class="o">|</span>                <span class="o">...</span>                                     
+     <span class="o">|</span>                   <span class="o">.....</span>                                
+<span class="mf">1.13</span> <span class="o">|</span>                        <span class="o">................................</span>
+          <span class="mi">0</span>                      <span class="mi">5</span>                          <span class="mi">10</span>
+</pre></div>
+</div>
+</dd></dl>
 
 <dl class="method">
 <dt id="repetition.SpaceRepetition.make_data">
@@ -248,6 +311,85 @@ zero’d form</p>
 <dt id="repetition.SpaceRepetition.outcome">
 <code class="descname">outcome</code><span class="sig-paren">(</span><em>time</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetition.outcome" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="method">
+<dt id="repetition.SpaceRepetition.plasticity_functions">
+<code class="descname">plasticity_functions</code><span class="sig-paren">(</span><em>denominator_offset</em>, <em>root</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetition.plasticity_functions" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function returns three other functions which have the values of
+<code class="docutils literal notranslate"><span class="pre">denominator_offset</span></code> and <code class="docutils literal notranslate"><span class="pre">root</span></code> enclosed within them:</p>
+<ul class="simple">
+<li>fn(x): the plasticity curve for the student</li>
+<li>fn0(x, y): <code class="docutils literal notranslate"><span class="pre">y</span> <span class="pre">-</span> <span class="pre">fn(x)</span></code></li>
+<li>invfn(y): returns the x value which provides y from <code class="docutils literal notranslate"><span class="pre">fn(x)</span></code></li>
+</ul>
+<p>Where <code class="docutils literal notranslate"><span class="pre">fn(x)</span></code> is:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>             <span class="n">x</span><span class="o">^</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="n">root</span><span class="p">)</span>
+<span class="o">------------------------------------</span> <span class="k">for</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="n">shift</span>
+ <span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="n">denominator_offset</span><span class="p">)</span><span class="o">^</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="n">root</span><span class="p">)</span>
+
+<span class="mi">0</span> <span class="k">for</span> <span class="n">x</span> <span class="o">&lt;=</span> <span class="n">shift</span>
+
+<span class="n">example</span><span class="p">:</span>
+  <span class="n">root</span> <span class="o">=</span> <span class="mf">1.8</span>
+  <span class="n">denominator_offset</span> <span class="o">=</span> <span class="mf">1.0</span>
+
+
+  <span class="mf">0.94754</span> <span class="o">|</span>                          <span class="o">...........................</span>
+          <span class="o">|</span>                 <span class="o">.........</span>                           
+          <span class="o">|</span>            <span class="o">.....</span>                                    
+          <span class="o">|</span>         <span class="o">...</span>                                         
+          <span class="o">|</span>       <span class="o">..</span>                                            
+          <span class="o">|</span>      <span class="o">/</span>                                              
+          <span class="o">|</span>     <span class="o">/</span>                                               
+          <span class="o">|</span>    <span class="o">/</span>                                                
+  <span class="mf">0.47377</span> <span class="o">|</span> <span class="o">--.-------------------------------------------------</span>
+          <span class="o">|</span>                                                     
+          <span class="o">|</span>                                                     
+          <span class="o">|</span>  <span class="o">.</span>                                                  
+          <span class="o">|</span>                                                     
+          <span class="o">|</span>                                                     
+          <span class="o">|</span>                                                     
+          <span class="o">|</span>                                                     
+          <span class="o">|</span>                                                     
+        <span class="mi">0</span> <span class="o">|</span> <span class="o">.</span>                                                   
+            <span class="mi">0</span>                      <span class="mi">5</span>                          <span class="mi">10</span>
+</pre></div>
+</div>
+<p>Where <code class="docutils literal notranslate"><span class="pre">fn0(x,y)</span></code> is:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">y</span> <span class="o">-</span> <span class="n">fn</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Where <code class="docutils literal notranslate"><span class="pre">invfn(y)</span></code> is:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>                             <span class="n">y</span><span class="o">^</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
+<span class="o">-</span><span class="mi">1</span> <span class="o">*</span><span class="n">denominator_offset</span> <span class="o">*</span> <span class="o">---------------</span> <span class="k">for</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">y</span> <span class="o">&lt;=</span> <span class="mi">1</span>
+                            <span class="n">y</span><span class="o">^</span><span class="p">(</span><span class="n">root</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+
+<span class="n">example</span>
+  <span class="n">root</span> <span class="o">=</span> <span class="mf">1.8</span>
+  <span class="n">denominator_offset</span> <span class="o">=</span> <span class="mf">1.0</span>
+
+  <span class="mf">6.89791</span> <span class="o">|</span>                                                    
+          <span class="o">|</span>                                                    
+          <span class="o">|</span>                                                    
+          <span class="o">|</span>                                                    
+          <span class="o">|</span>                                                    
+          <span class="o">|</span>        <span class="o">.</span>                                           
+          <span class="o">|</span>                                                    
+          <span class="o">|</span>         <span class="o">...</span>                                        
+  <span class="mf">0.77734</span> <span class="o">|</span> <span class="o">-----------........................................</span>
+          <span class="o">|</span>                                                    
+          <span class="o">|</span> <span class="o">....</span>                                               
+          <span class="o">|</span>                                                    
+          <span class="o">|</span>     <span class="o">.</span>                                              
+          <span class="o">|</span>                                                    
+          <span class="o">|</span>                                                    
+          <span class="o">|</span>                                                    
+          <span class="o">|</span>                                                    
+  <span class="o">-</span><span class="mf">5.3432</span> <span class="o">|</span>      <span class="o">.</span>                                             
+            <span class="mi">0</span>                      <span class="mi">5</span>                          <span class="mi">10</span>
+</pre></div>
+</div>
+</dd></dl>
 
 <dl class="method">
 <dt id="repetition.SpaceRepetition.plot_graph">
@@ -469,9 +611,83 @@ correctly recall something being tracked by the space repetition algorithm.</p>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="repetition.SpaceRepetitionFeedback.longterm_potentiation_curve">
-<code class="descname">longterm_potentiation_curve</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetitionFeedback.longterm_potentiation_curve" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dt id="repetition.SpaceRepetitionFeedback.plasticity_functions">
+<code class="descname">plasticity_functions</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetitionFeedback.plasticity_functions" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function returns three other functions which have the values of
+<code class="docutils literal notranslate"><span class="pre">denominator_offset</span></code> and <code class="docutils literal notranslate"><span class="pre">root</span></code> enclosed within them:</p>
+<ul class="simple">
+<li>fn(x): the plasticity curve for the student</li>
+<li>fn0(x, y): <code class="docutils literal notranslate"><span class="pre">y</span> <span class="pre">-</span> <span class="pre">fn(x)</span></code></li>
+<li>invfn(y): returns the x value which provides y from <code class="docutils literal notranslate"><span class="pre">fn(x)</span></code></li>
+</ul>
+<p>Where <code class="docutils literal notranslate"><span class="pre">fn(x)</span></code> is:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>             <span class="n">x</span><span class="o">^</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="n">root</span><span class="p">)</span>
+<span class="o">------------------------------------</span> <span class="k">for</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="n">shift</span>
+ <span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="n">denominator_offset</span><span class="p">)</span><span class="o">^</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="n">root</span><span class="p">)</span>
+
+<span class="mi">0</span> <span class="k">for</span> <span class="n">x</span> <span class="o">&lt;=</span> <span class="n">shift</span>
+
+<span class="n">example</span><span class="p">:</span>
+  <span class="n">root</span> <span class="o">=</span> <span class="mf">1.8</span>
+  <span class="n">denominator_offset</span> <span class="o">=</span> <span class="mf">1.0</span>
+
+
+  <span class="mf">0.94754</span> <span class="o">|</span>                          <span class="o">...........................</span>
+          <span class="o">|</span>                 <span class="o">.........</span>                           
+          <span class="o">|</span>            <span class="o">.....</span>                                    
+          <span class="o">|</span>         <span class="o">...</span>                                         
+          <span class="o">|</span>       <span class="o">..</span>                                            
+          <span class="o">|</span>      <span class="o">/</span>                                              
+          <span class="o">|</span>     <span class="o">/</span>                                               
+          <span class="o">|</span>    <span class="o">/</span>                                                
+  <span class="mf">0.47377</span> <span class="o">|</span> <span class="o">--.-------------------------------------------------</span>
+          <span class="o">|</span>                                                     
+          <span class="o">|</span>                                                     
+          <span class="o">|</span>  <span class="o">.</span>                                                  
+          <span class="o">|</span>                                                     
+          <span class="o">|</span>                                                     
+          <span class="o">|</span>                                                     
+          <span class="o">|</span>                                                     
+          <span class="o">|</span>                                                     
+        <span class="mi">0</span> <span class="o">|</span> <span class="o">.</span>                                                   
+            <span class="mi">0</span>                      <span class="mi">5</span>                          <span class="mi">10</span>
+</pre></div>
+</div>
+<p>Where <code class="docutils literal notranslate"><span class="pre">fn0(x,y)</span></code> is:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">y</span> <span class="o">-</span> <span class="n">fn</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Where <code class="docutils literal notranslate"><span class="pre">invfn(y)</span></code> is:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>                             <span class="n">y</span><span class="o">^</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
+<span class="o">-</span><span class="mi">1</span> <span class="o">*</span><span class="n">denominator_offset</span> <span class="o">*</span> <span class="o">---------------</span> <span class="k">for</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">y</span> <span class="o">&lt;=</span> <span class="mi">1</span>
+                            <span class="n">y</span><span class="o">^</span><span class="p">(</span><span class="n">root</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+
+<span class="n">example</span>
+  <span class="n">root</span> <span class="o">=</span> <span class="mf">1.8</span>
+  <span class="n">denominator_offset</span> <span class="o">=</span> <span class="mf">1.0</span>
+
+  <span class="mf">6.89791</span> <span class="o">|</span>                                                    
+          <span class="o">|</span>                                                    
+          <span class="o">|</span>                                                    
+          <span class="o">|</span>                                                    
+          <span class="o">|</span>                                                    
+          <span class="o">|</span>        <span class="o">.</span>                                           
+          <span class="o">|</span>                                                    
+          <span class="o">|</span>         <span class="o">...</span>                                        
+  <span class="mf">0.77734</span> <span class="o">|</span> <span class="o">-----------........................................</span>
+          <span class="o">|</span>                                                    
+          <span class="o">|</span> <span class="o">....</span>                                               
+          <span class="o">|</span>                                                    
+          <span class="o">|</span>     <span class="o">.</span>                                              
+          <span class="o">|</span>                                                    
+          <span class="o">|</span>                                                    
+          <span class="o">|</span>                                                    
+          <span class="o">|</span>                                                    
+  <span class="o">-</span><span class="mf">5.3432</span> <span class="o">|</span>      <span class="o">.</span>                                             
+            <span class="mi">0</span>                      <span class="mi">5</span>                          <span class="mi">10</span>
+</pre></div>
+</div>
+</dd></dl>
 
 <dl class="method">
 <dt id="repetition.SpaceRepetitionFeedback.plot_graph">
