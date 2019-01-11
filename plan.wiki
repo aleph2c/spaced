@@ -91,6 +91,36 @@
         will be easier to apply a generator
   * [ ] Create a simplified example of what you want to do in the experiment
         folder.
+  * [ ] Evaluate the example, will it work?
+        It is easier to make another example than to refactor your code
+        using the wrong example.
+        Goals:
+        * does this example do what it needs to do?
+          * Are the enclosures realistic?  Can you shape your forgetting
+            functions like this, is there a one-to-one correspondence between
+            the forgetting function and a schedule item?
+           
+            Yes, but it looks like we might only need one set of enclosure
+            functions stored.
+            
+          * Is the complicated generator analogous to the stickleback?
+      
+      
+            Yes, it seems like a good fit.
+            
+          * Will the g_schedule generator work as a schedule
+
+          * Will the deques work?  Do we need them?
+
+          * Is there anyway this thing can be simplified?  If not, is it
+            sufficently documented? Tested?
+            
+          * Is the query structure analogous to that in repitition.py?
+
+          * By adding the deques and the infinite series requirement, you are
+            making this package a lot harder to test and rarify.  Are the deques
+            needed?  Can you get rid of them?
+            
   * [ ] Perform the surgery
   * [ ] Re-run tests
   * [ ] Run Jupyter notebooks to see what has changed
