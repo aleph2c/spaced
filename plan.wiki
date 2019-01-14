@@ -94,6 +94,7 @@
   * [ ] Evaluate the example, will it work?
         It is easier to make another example than to refactor your code
         using the wrong example.
+        
         Goals:
         * does this example do what it needs to do?
           * Are the enclosures realistic?  Can you shape your forgetting
@@ -105,28 +106,73 @@
             
           * Is the complicated generator analogous to the stickleback?
       
-      
             Yes, it seems like a good fit.
             
           * Will the g_schedule generator work as a schedule
 
           * Will the deques work?  Do we need them?
+        
+            Yes, but this is the part that you have been having a hard time
+            thinking about.  It looks like you can't just follow the analogy,
+            you have to do some additional work, add a stub to the example so
+            you don't forget this.
 
           * Is there anyway this thing can be simplified?  If not, is it
             sufficently documented? Tested?
             
           * Is the query structure analogous to that in repitition.py?
+          
+            The query in the repition package seems very complicated.  This
+            design change might simplify it. 
 
           * By adding the deques and the infinite series requirement, you are
             making this package a lot harder to test and rarify.  Are the deques
             needed?  Can you get rid of them?
             
-  * [ ] Perform the surgery
-  * [ ] Re-run tests
-  * [ ] Run Jupyter notebooks to see what has changed
-  * [ ] Iterate on this OODA loop if required
-  * [ ] Write new tests if it makes sense to.
+            If you want an infinite schedule, with the ability to make queires,
+            you will need the deques.
+
+  * [O] Make a plan of attack:
+
+    stage 1:
+    
+      * [X] start with the enclosures and the deques, doc-string as you go
+      * [X] import the example tests
+      * [X] stickle back generator, doc-string as you go
+      * [X] import the example tests
+      * [X] create the schedule generator, doc-string as you go
+      * [X] import the example tests
+      * [X] create the schedule_offset method, doc-string as you go
+      * [X] import the example tests
+      * [X] create the schedule method, doc-string as you go
+      * [X] import the example tests
+    
+    state 2:
+   
+      * [X] update the graphing tools to use the new schedule api
+        * [X] repetition graph
+        * [X] feedback
+        * [X] control graph
+        * [X] learning tracker
+      * [X] update the learning tracker animation tool
+      * [X] update the query api
+      * [X] import the example tests
+      * [X] update the query ability, doc-string as you go
+      * [X] draw three prediction graphs on the control prediction plot
+      * [X] remove all old code, re-run tests
+      * [X] change refactored variable names to meaningful names
+      * [ ] update docstrings (with examples for useful apis)
+      * [ ] hide anything not useful then re-run tests
+    
+    stage 3:
+    
+      * [X] run all tests look at the graphs
+      * [ ] 
+      * [ ] run all notebooks, look at the graphs
+      * [ ] 
+            
   * [ ] Update the docs with the API changes.
+    * [ ] this is a project in itself
   * [ ] merge with master
   * [ ] push to github
   * [ ] release pip package

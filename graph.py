@@ -51,6 +51,8 @@ class SpaceRepetitionBasePlotClass:
 
       #figure, axarr = plt.subplots(kwargs['panes'], 1, sharex=True, figsize=(11, 8.5), facecolor='#07000d')
       figure, axarr = plt.subplots(kwargs['panes'], 1, sharex=True, figsize=(11, 8.5), facecolor='white')
+      self.figure = figure
+      self.axarr = axarr
       self.ppd = PlotPaneData(graph_location=-1,
         figure=figure,
         axarr=axarr,

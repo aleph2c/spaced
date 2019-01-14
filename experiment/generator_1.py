@@ -32,6 +32,7 @@ class GenExperiment1():
     return fn
 
   def _g_complicated_fun(self, k=None):
+    '''This will be like the stickleback'''
     fn1 = self.enclosure_1(k)
     fn2 = self.enclosure_2(k)
     self.enclosure_1s.append(fn1)
@@ -66,6 +67,9 @@ class GenExperiment1():
       next(self.g_schedule)
 
     return self.dates
+
+  def schedule_as_offset_in_days_from_epoch(self, stop, now=None):
+    return self.schedule()
 
   def next_schedule_date(self, now=None):
     if self.latest_data() < now:
