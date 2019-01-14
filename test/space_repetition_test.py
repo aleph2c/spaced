@@ -1,3 +1,4 @@
+# 
 from repetition import *
 from graph import *
 import numpy as np
@@ -16,7 +17,7 @@ def get_feedback1():
   There are 10 days matched to 10 results.
   '''
   x_v = [
-          0,
+          0.02,
           0.80640320160080037,
           1.7523761880940469,
           3.0240120060030016,
@@ -29,7 +30,7 @@ def get_feedback1():
         ]
 
   y_v = [
-          0.40,
+          0.30,
           0.44646101201172317,
           0.64510969552772512-0.1,
           0.76106659335521121-0.2,
@@ -84,7 +85,7 @@ def longterm_feedback():
           30.0,
           60,
         ]
-  y_v = [1,
+  y_v = [ 1,
           0.44646101201172317,
           0.64510969552772512,
           0.76106659335521121,
@@ -127,19 +128,6 @@ def get_feedback3():
           1.00
           ]
   return [x_v,y_v]
-
-def test_reference():
-  start_time = datetime.now()
-  x, y       = get_feedback1()
-  range_     = x[-1] * 1.5
-  hr = SpaceRepetitionReference(
-         plot=True,
-         range=range_,
-         epoch=start_time,
-         )
-  hr.plot_graph()
-  result = hr.datetime_for(curve=1)
-  #plt.close('all')
 
 @pytest.mark.reference
 def test_reference_deque_maxlen():
@@ -197,7 +185,7 @@ def test_reference_scheduled_datetimes_from_generator():
     t in targets]
 
   stop_date = start_time + timedelta(days=40)
-  for r, t in zip(hr.schedule(stop_date), datetime_targets):
+  for r, t in zip(hr.schedule(stop=stop_date), datetime_targets):
     assert abs(r-t) <= 0.001
 
 @pytest.mark.reference
@@ -316,12 +304,37 @@ def test_generator_controller():
   hdl.close()
 
 @pytest.mark.control
+def test_control_graph_too_short():
+  start_time = datetime.now()
+  x, y       = get_feedback1()
+  stop_date  = 5
+  hr         = SpaceRepetitionReference(
+                epoch=start_time)
+  hf = SpaceRepetitionFeedback(x[0:2], y, epoch=start_time)
+  hctrl = SpaceRepetitionController(reference=hr, feedback=hf, epoch=start_time)
+  graph_handle, data_dict  = hctrl.plot_graphs(stop_date=stop_date)
+  hctrl.save_figure("results/spaced_control_too_short.pdf")
+  graph_handle.close()
+
+@pytest.mark.control
+def test_control_graph_too_long():
+  start_time = datetime.now()
+  x, y       = get_feedback1()
+  stop_date  = 1000
+  hr         = SpaceRepetitionReference(
+                epoch=start_time)
+  hf = SpaceRepetitionFeedback(x[0:2], y, epoch=start_time)
+  hctrl = SpaceRepetitionController(reference=hr, feedback=hf, epoch=start_time)
+  graph_handle, data_dict  = hctrl.plot_graphs(stop_date=stop_date)
+  hctrl.save_figure("results/spaced_control_too_long.pdf")
+  graph_handle.close()
+
+@pytest.mark.control
 def test_a_control_series():
   start_time = datetime.now()
   x, y       = get_feedback1()
   stop_date  = 2 * x[-1] * 0.5
   hr         = SpaceRepetitionReference(
-                plot=False,
                 epoch=start_time)
   hf = SpaceRepetitionFeedback(x[0:2], y, epoch=start_time)
   hctrl = SpaceRepetitionController(reference=hr, feedback=hf, epoch=start_time)
@@ -419,16 +432,31 @@ def test_control_predition_for_feature():
   graph_handle.close()
 
 @pytest.mark.learning_tracker
-def test_learning_tracker_graph_to_short():
-  pass
+def test_learning_tracker_graph_too_short():
+  start_time = datetime.now()
+  moments, results = get_feedback1()
 
-@pytest.mark.learning_tracker
-def test_learning_tracker_graph_default():
-  pass
+  lt = LearningTracker(epoch=start_time)
+  for index, (moment, result) in enumerate(zip(moments[0:2], results)):
+    lt.learned(when=moment, result=result)
 
+  hd, _ = lt.plot_graphs(stop_date=5)
+  lt.save_figure("results/space_learning_tracker_too_short.pdf")
+  hd.close()
+
+@pytest.mark.longterm
 @pytest.mark.learning_tracker
-def test_learning_tracker_graph_too_long():
-  pass
+def test_learning_tracker_longterm_response():
+  start_time = datetime.now()
+  moments, results = get_feedback1()
+
+  lt = LearningTracker(epoch=start_time)
+  for index, (moment, result) in enumerate(zip(moments[0:2], results)):
+    lt.learned(when=moment, result=result)
+
+  hd, _ = lt.plot_graphs(stop_date=300)
+  lt.save_figure("results/space_learning_tracker_too_long.pdf")
+  hd.close()
 
 @pytest.mark.learning_tracker
 def test_learning_tracker():
@@ -447,169 +475,22 @@ def test_learning_tracker():
     stop_date=30,
   )
 
-#@pytest.mark.learning_tracker
-def test_predictions():
-  base = {}
-  base["frame"] = {}
-
-  start_time = datetime.now()
-  x, y       = get_feedback1()
-  t          = [start_time + timedelta(days=offset) for offset in x]
-  range_     = x[0] + x[-1] * 0.5
-  hr = SpaceRepetitionReference(
-      plot=False,
-      range=range_,
-      epoch=start_time,
-      plasticity_root=0.03699,
-      plasticity_denominator_offset=0.0054,
-      )
-  hf = SpaceRepetitionFeedback(x[0:5], y, range=range_, epoch=start_time)
-  hctrl = SpaceRepetitionController(
-      reference=hr,
-      feedback=hf,
-      range=range_,
-      epoch=start_time,
-  )
-  # plot the reference suggestion, the feedback, error and the updated training
-  # suggestions (control)
-  graph_handle, data_dict  = hctrl.plot_graphs()
-
-  # Ask a question using day offsets from epoch
-  curve = 1
-  #import pdb; pdb.set_trace()
-  training_moments = hctrl.range_for(curve=curve, day_step_size=0.01)
-  #training_moments = [training_moment - timedelta(days=0.666) for training_moment in training_moments]
-  print(training_moments[0])
-  print(hctrl.schedule())
-  #import pdb; pdb.set_trace()
-  results = [hctrl.recollect_scalar(training_moment, curve=curve) for training_moment in training_moments]
-  control_plot = graph_handle.axarr[-1]
-  control_plot.plot(training_moments, results, color='xkcd:azure')
-  print(hctrl.schedule())
-
-  curve = 2
-  ref_training_moments = hr.range_for(curve=curve, day_step_size=0.5)
-  ref_results = [hr.recollect_scalar(ref_training_moment, curve=curve) for ref_training_moment in ref_training_moments]
-  reference_plot = graph_handle.axarr[0]
-  reference_plot.plot(ref_training_moments, ref_results, color='xkcd:teal')
-
-  hctrl.save_figure("results/spaced_predict.pdf")
-  graph_handle.close()
-
-def test_datetime_for_curve():
-  start_time = datetime.now()
-  x, y       = get_feedback1()
-  t          = [start_time + timedelta(days=offset) for offset in x]
-  range_     = x[-1] + x[-1] * 0.5
-  hr         = SpaceRepetitionReference(plot=False, range=range_, epoch=start_time)
-  hf         = SpaceRepetitionFeedback(t[0:5], y, range=range_, epoch=start_time)
-  hctrl      = SpaceRepetitionController(reference=hr, feedback=hf, range=range_, ephoch=start_time)
-
-  result = hctrl.datetime_for(curve=1)
-  moments = hctrl.range_for(curve=1)
-#  graph_handle.epoch      # the epoch
-#  graph_handle.axarr      # array of matplotlib axes mapping the subplots
-#  graph_handle.figure     # the matplotlib figure
-#  graph_handle.axarr[-1]  # the control plot
-
-  
-def test_predictions_2():
-  epoch = datetime.now()
-  hr = SpaceRepetitionReference(
-    epoch=epoch,
-    plasticity_root=1.4, 
-    fdecaytau=1.87,
-    fdecay0 = 0.9,
-    )
-  x, y = get_feedback3()
-  range_ = x[-1] + x[-1] * 0.5
-  for index in range(1, len(x)):
-
-    hf = SpaceRepetitionFeedback(
-      x[0:index],
-      y,
-      range=range_,
-      epoch=epoch)
-
-    hctrl = SpaceRepetitionController(
-      reference=hr, 
-      feedback=hf, 
-      range=range_, 
-      epoch=epoch)
-
-    graph_handle, data_dict = hctrl.plot_graphs()
-    hctrl.save_figure("results/spaced_b_{}.pdf".format(index))
-    graph_handle.close()
-    data_dict.clear()
-
-
-def test_simplified_interface():
-
-  lt = LearningTracker(
-    epoch = datetime.now(),
-    plasticity_root=1.8, 
-  )
-
-  moments, results = get_feedback1()
-  for index, (moment, result) in enumerate(zip(moments, results)):
-    #print(lt.feedback.discovered_plasticity_root, lt.feedback.discovered_plasticity_denominator_offset)
-    #if index == 4:
-    # break
-    lt.learned(when=moment, result=result)
-
-  hdl, _ = lt.plot_graphs()
-  lt.save_figure("results/learning_tracker_guessed_parameters.pdf")
-  hdl.close()
-
-  lt_next = LearningTracker(
-    epoch = datetime.now(),
-    plasticity_root=lt.discovered_plasticity_root(), 
-    plasticity_denominator_offset=lt.discovered_plasticity_denominator_offset(), 
-    fdecay0=lt.discovered_fdecay0(),
-    fdecaytau=lt.discovered_fdecaytau()
-  )
-
-  moments, results = get_feedback1()
-  for index, (moment, result) in enumerate(zip(moments, results)):
-    lt_next.learned(when=moment, result=result)
-    if index == 3:
-      break
-
-  hdl, _ = lt_next.plot_graphs()
-  lt_next.save_figure("results/learning_tracker_learned_parameters.pdf")
-  hdl.close()
-
 @pytest.mark.pickle
+@pytest.mark.learning_tracker
 def test_serialization_epoch():
   lt = LearningTracker(
     epoch = datetime.now(),
   )
+  moments, results = get_feedback1()
+  for index, (moment, result) in enumerate(zip(moments[0:4], results)):
+    lt.learned(when=moment, result=result)
+
   byte_stream = pickle.dumps(lt)
   unpickled_learning_tracker = pickle.loads(byte_stream)
-  hdl, _ = unpickled_learning_tracker.plot_graphs()
+  hdl, _ = unpickled_learning_tracker.plot_graphs(stop_date=40)
   unpickled_learning_tracker.save_figure("results/post_pickle.pdf")
   hdl.close()
 
-@pytest.mark.longterm
-def test_longterm_response():
-  start_time = datetime.now()
-
-  lt = LearningTracker(
-    epoch=start_time,
-    range=500,
-    long_term_clamp=0.00005
-  )
-
-  offsets = [lt.days_from_epoch(dt) for dt in lt.schedule()]
-
-  moments, results = longterm_feedback()
-  for moment, result in zip(moments, results):
-    lt.learned(when=moment, result=result)
-
-  hdl, _ = lt.plot_graphs()
-  lt.save_figure("results/longterm.pdf")
-  hdl.close()
-  #print(offsets)
 
   
 

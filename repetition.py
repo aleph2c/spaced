@@ -548,16 +548,16 @@ class SpaceRepetitionReference(SpaceRepetition):
 
     return list(self.new_dates)[0:0]
 
-  def schedule(self, stop_date):
+  def schedule(self, stop):
     '''
     Returns a schedule of datetimes up until and possibly including the
-    stop_date
+    stop
 
       # schedule as offsets from the training epoch
-      stop_date = lt.days_from_epoch
+      stop = lt.days_from_epoch
 
     '''
-    stop_as_offset_in_days = self.days_from_epoch(stop_date)
+    stop_as_offset_in_days = self.days_from_epoch(stop)
     schedule_as_offsets_in_days = \
       self.schedule_as_offset(
         stop=stop_as_offset_in_days
@@ -735,19 +735,13 @@ class SpaceRepetitionReference(SpaceRepetition):
     self._vertical_bar_information()
 
   # reference
-  def plot_graph(self, stop_date, epoch=None, plot_pane_data=None, panes=None):
-
-    if epoch is None:
-      if self.epoch is None:
-        epoch = None
-      else:
-        epoch = self.epoch
+  def plot_graph(self, stop_date, plot_pane_data=None, panes=None):
 
     if type(stop_date) is datetime:
-      self.schedule(stop_date=stop_date)
+      self.schedule(stop=stop_date)
       stop_day_as_offset = self.days_from_epoch(stop_date)
     else:
-      self.schedule_as_offset(stop_date)
+      self.schedule_as_offset(stop=stop_date)
       stop_day_as_offset = stop_date
 
     self._make_data_for_plot(stop_day_as_offset)
@@ -778,7 +772,7 @@ class SpaceRepetitionReference(SpaceRepetition):
       scheduled          = vertical_bars,
       x_range            = stop_day_as_offset,
       y_domain           = self.domain + 0.01,
-      epoch              = epoch,
+      epoch              = self.epoch,
       panes              = panes,
       plot_pane_data     = plot_pane_data
     )
@@ -841,16 +835,17 @@ class SpaceRepetitionFeedback(SpaceRepetition):
 
     self.discovered_plasticity_root = self.plasticity_root
 
-    if(len(args[0]) == 0):
-      self.add_event(0, 1)
-    else:
-      for event_x, event_y in zip(args[0], args[1]):
-        conditioned_x = None
-        if isinstance(event_x, datetime) is False:
-          conditioned_x = self.days_offset_from_epoch_to_datetime(event_x)
-        else:
-          conditioned_x = event_x
-        self.add_event(conditioned_x, event_y)
+    # assume the have looked at it before they try to remember the
+    # idea through a self examination
+    self.add_event(0, 1)
+
+    for event_x, event_y in zip(args[0], args[1]):
+      conditioned_x = None
+      if isinstance(event_x, datetime) is False:
+        conditioned_x = self.days_offset_from_epoch_to_datetime(event_x)
+      else:
+        conditioned_x = event_x
+      self.add_event(conditioned_x, event_y)
 
     SpacedKwargInterface.__init__(self, *args, **kwargs)
 
@@ -1127,18 +1122,18 @@ class SpaceRepetitionController(SpaceRepetition):
     error = self.reference.fn(x) - self.feedback.fn(x)
     return error
 
-  def plot_error(self, stop_date=None, **kwargs):
-    x1     = np.linspace(0, self.feedback.range, SpaceRepetition.Default_Samples)
+  def plot_error(self, stop_date, **kwargs):
+    if type(stop_date) is datetime:
+      self.schedule(stop=stop_date)
+      stop_day_as_offset = self.days_from_epoch(stop_date)
+    else:
+      self.schedule_as_offset(stop=stop_date)
+      stop_day_as_offset = stop_date
+
+    x1     = np.linspace(0, stop_day_as_offset, SpaceRepetition.Default_Samples)
     y1     = self.error(x1)
     bars   = self._error_vertical_bars()
 
-    if stop_date is None:
-      stop_date = self.range
-
-    if("epoch" in kwargs):
-      epoch = kwargs['epoch']
-    else:
-      epoch = None
 
     if("plot_pane_data" in kwargs):
       plot_pane_data = kwargs['plot_pane_data']
@@ -1162,11 +1157,11 @@ class SpaceRepetitionController(SpaceRepetition):
     plt = ErrorPlot(x1,
                     y1,
                     *bars,
-                    x_range=self.range,
+                    x_range=stop_day_as_offset,
                     y_domain=0.4,
                     y_label="error signal",
                     x_lable="time",
-                    epoch=epoch,
+                    epoch=self.epoch,
                     panes=panes,
                     plot_pane_data=plot_pane_data
                     )
@@ -1276,9 +1271,9 @@ class SpaceRepetitionController(SpaceRepetition):
     return list(self.new_dates)[0:0]
 
   # controller
-  def schedule(self, stop_date):
+  def schedule(self, stop):
 
-    stop_as_offset_in_days = self.days_from_epoch(stop_date)
+    stop_as_offset_in_days = self.days_from_epoch(stop)
 
     schedule_as_offsets_in_days = \
       self.schedule_as_offset(
@@ -1293,20 +1288,25 @@ class SpaceRepetitionController(SpaceRepetition):
 
     return schedule
 
-  def plot_control(self, stop_date=None, **kwargs):
+  def plot_control(self, stop_date, **kwargs):
     control_x = self.control_x
 
-    if stop_date is None:
-      stop_date = self.range
+    if type(stop_date) is datetime:
+      self.updated_reference.schedule(stop_date=stop_date)
+      stop_day_as_offset = self.updated_reference.days_from_epoch(stop_date)
+    else:
+      self.updated_reference.schedule_as_offset(stop_date)
+      stop_day_as_offset = stop_date
+
+    if self.reference.o.latest_date_offset < stop_day_as_offset:
+      self.reference.o.schedule_as_offset(stop=stop_day_as_offset)
+
+    if self.updated_reference.latest_date_offset < stop_day_as_offset:
+      self.updated_reference.schedule_as_offset(stop=stop_day_as_offset)
 
     #updated_reference, x_reference_shift = self.control(control_x=control_x)
     x_ref = self.updated_reference.x_and_y[0]
     y_ref = self.updated_reference.x_and_y[1]
-
-    if("epoch" in kwargs):
-      epoch = kwargs['epoch']
-    else:
-      epoch = None
 
     if("panes" in kwargs):
       panes = kwargs['panes']
@@ -1322,7 +1322,7 @@ class SpaceRepetitionController(SpaceRepetition):
     control_ref_y = []
     for x_data, y_data in zip(x_ref, y_ref):
       x_new = self.x_reference_shift + x_data
-      if(x_new <= self.range):
+      if(x_new <= stop_day_as_offset):
         if(x_new >= control_x):
           control_ref_x.append(x_new)
           control_ref_y.append(y_data)
@@ -1334,13 +1334,13 @@ class SpaceRepetitionController(SpaceRepetition):
         self.updated_reference.ref_events_x[1:],
         self.updated_reference.ref_events_y[1:]):
       new_x = target_x + self.x_reference_shift
-      if(new_x <= self.range):
+      if(new_x <= stop_day_as_offset):
         schedule_x.append(new_x)
         schedule_y.append(target_y)
         self.schedule_vertical_bars.append([new_x, new_x])
         self.schedule_vertical_bars.append([0, target_y])
 
-    x = np.linspace(0, self.range, 500)
+    x = np.linspace(0, stop_day_as_offset, 500)
     rx = x[:]
     ry = self.reference.fn(rx - self.x_reference_shift)
     feedback_x = x[:]
@@ -1359,35 +1359,51 @@ class SpaceRepetitionController(SpaceRepetition):
     add_x_y("moments", self.feedback.o.a_events_x, self.feedback.o.a_events_y)
 
     # control
-    self.plot = SpaceRepetitionPlot(*data_args, x_range=self.range, y_domain=1 + 0.01, y_label="control", x_label="",
-                  scheduled=vertical_bars,
-                  first_graph_color=SpaceRepetitionFeedback.LongTermPotentiationColor,
-                  second_graph_color=SpaceRepetitionReference.LongTermPotentiationColor,
-                  third_graph_color=SpaceRepetitionReference.StickleBackColor,
-                  epoch=epoch,
-                  plot_pane_data=plot_pane_data,
-                  #range=self.range - x_reference_shift,
-                  range=self.range,
-                  panes=panes)
+    self.plot = SpaceRepetitionPlot(*data_args,
+      x_range=stop_day_as_offset,
+      y_domain=1 + 0.01,
+      y_label="control",
+      x_label="",
+      scheduled=vertical_bars,
+      first_graph_color=SpaceRepetitionFeedback.LongTermPotentiationColor,
+      second_graph_color=SpaceRepetitionReference.LongTermPotentiationColor,
+      third_graph_color=SpaceRepetitionReference.StickleBackColor,
+      epoch=self.epoch,
+      plot_pane_data=plot_pane_data,
+      range=stop_day_as_offset,
+      panes=panes)
     return self.plot, data_dict
 
   # control
   def plot_graphs(self, stop_date=None):
-    base = {}
-    db   = SpaceRepetitionDataBuilder()
 
+    if type(stop_date) is datetime:
+      self.updated_reference.schedule(stop_date=stop_date)
+
+      stop_day_as_offset = self.updated_reference.days_from_epoch(stop_date)
+    else:
+      self.updated_reference.schedule_as_offset(stop_date)
+      stop_day_as_offset = stop_date
+
+    if self.reference.o.latest_date_offset < stop_date:
+      self.reference.o.schedule_as_offset(stop=stop_date)
+
+    if self.updated_reference.latest_date_offset < stop_date:
+      self.updated_reference.schedule_as_offset(stop=stop_date)
+
+    base = {}
+    db = SpaceRepetitionDataBuilder()
 
     hdl, data_dict = self.reference.o.plot_graph(
       panes=4,
-      epoch=self.epoch,
-      stop_date=stop_date
+      stop_date=stop_day_as_offset
     )
     db._append_to_base(base, data_dict)
 
     h, data_dict = self.feedback.o.plot_graph(
       epoch=self.epoch,
       plot_pane_data=hdl,
-      stop_date=stop_date
+      stop_date=stop_day_as_offset
     )
 
     if stop_date is None:
@@ -1398,17 +1414,10 @@ class SpaceRepetitionController(SpaceRepetition):
     h, data_dict = self.plot_error(
       epoch=self.epoch,
       plot_pane_data=hdl,
-      stop_date=stop_date
+      stop_date=stop_day_as_offset
     )
 
     db._append_to_base(base, data_dict)
-
-    if type(stop_date) is datetime:
-      self.updated_reference.schedule(stop_date=stop_date)
-      stop_day_as_offset = self.updated_reference.days_from_epoch(stop_date)
-    else:
-      self.updated_reference.schedule_as_offset(stop_date)
-      stop_day_as_offset = stop_date
 
     self.updated_reference._make_data_for_plot(stop_date)
     h, data_dict = self.plot_control(
@@ -1627,20 +1636,20 @@ class LearningTracker():
     self.control.initialize_feedback(feedback=hf)
 
   # learning tracker
-  def plot_graphs(self):
-    return self.control.plot_graphs()
+  def plot_graphs(self, stop_date):
+    return self.control.plot_graphs(stop_date)
 
   # learning tracker
   def save_figure(self, filename=None):
     self.control.save_figure(filename)
 
   # learning tracker
-  def schedule(self):
-    return self.control.schedule()
+  def schedule(self, stop):
+    return self.control.schedule(stop)
 
   # learning tracker
-  def schedule_as_offset_in_days_from_epoch(self):
-    return self.control.schedule_as_offset_in_days_from_epoch()
+  def schedule_as_offset(self, stop):
+    return self.control.schedule_as_offset(stop)
 
   def learned(self, when, result):
     moment = when
