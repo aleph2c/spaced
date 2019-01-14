@@ -253,9 +253,9 @@ class SpaceRepetition():
                   0                      5                          10
     
     """
-
     def fn(x):
       return np.exp(scale * (x - offset))
+
 
     def fn0(x, y):
       """
@@ -266,6 +266,33 @@ class SpaceRepetition():
 
     return [fn, fn0]
 
+  def bob(self, a, b, *args, **kwargs):
+    '''short description
+
+    longer description
+
+    Note:
+       Do this not that recommendation
+
+    Args:
+       :param a: (type1), default: None
+       :param b: (type1), default: None
+       :param ``*args``: variable length arguement list
+       :param ``**kwargs``: arbitrary keyword arguements
+
+
+    Returns:
+       (type): 
+
+    Examples:
+      
+    .. code-block:: python
+       
+       print("hello world")
+
+  '''
+    pass
+    
   def days_from_epoch(self, time):
     '''
     Convert a time [datetime] into a number representing the days since the

@@ -52,9 +52,20 @@ class Handler(watchdog.events.PatternMatchingEventHandler):
       p.wait()
       print("{}".format(cmd))
       print(output)
-      shutil.rmtree('./../docs')
+      try:
+        shutil.rmtree('./../docs')
+      except:
+        pass
 
-      shutil.copytree('./_build/html/', './../docs')
+      cmd = 'mkdir ./../docs; /bin/cp -rf ./_build/html/* ./../docs'
+      p = subprocess.Popen(cmd,
+                      stdout=subprocess.PIPE,
+                      stdin=subprocess.PIPE,
+                      shell=True)
+      output = p.communicate()
+      p.wait()
+      print("{}".format(cmd))
+      print(output)
       open('./../docs/.nojekyll', 'a').close()
 
   on_created = on_modified

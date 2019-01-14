@@ -11,7 +11,6 @@ Quick Start
 
 Getting an Initial Schedule
 ---------------------------
-
 To build a schedule, import a learning tracker and provide it with its initial
 conditions:
 
