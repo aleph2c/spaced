@@ -162,17 +162,13 @@
       * [X] remove all old code, re-run tests
       * [X] change refactored variable names to meaningful names
       * [ ] update docstrings (with examples for useful apis)
-      * [ ] hide anything not useful then re-run tests
     
     stage 3:
     
       * [X] run all tests look at the graphs
-      * [ ] 
       * [ ] run all notebooks, look at the graphs
-      * [ ] 
+      * [ ] re-write documentation and generate new graphs
             
-  * [ ] Update the docs with the API changes.
-    * [ ] this is a project in itself
   * [ ] merge with master
   * [ ] push to github
   * [ ] release pip package

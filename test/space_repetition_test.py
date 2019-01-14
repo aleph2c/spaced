@@ -191,21 +191,21 @@ def test_reference_scheduled_datetimes_from_generator():
 @pytest.mark.reference
 def test_reference_graph_too_short():
   hr = SpaceRepetitionReference(epoch=datetime.now())
-  hdl, _ = hr.plot_graph(stop_date=4)
+  hdl, _ = hr.plot_graph(stop=4)
   hr.save_figure("results/space_reference_too_short_plot.pdf")
   hdl.close()
 
 @pytest.mark.reference
 def test_reference_graph_default():
   hr = SpaceRepetitionReference(epoch=datetime.now())
-  hdl, _ = hr.plot_graph(stop_date=43)
+  hdl, _ = hr.plot_graph(stop=43)
   hr.save_figure("results/space_reference_plot.pdf")
   hdl.close()
 
 @pytest.mark.reference
 def test_reference_graph_too_long():
   hr = SpaceRepetitionReference(epoch=datetime.now())
-  hdl, _ = hr.plot_graph(stop_date=60)
+  hdl, _ = hr.plot_graph(stop=60)
   hr.save_figure("results/space_reference_too_long_plot.pdf")
   hdl.close()
 
@@ -213,7 +213,7 @@ def test_reference_graph_too_long():
 def test_reference_plot_closing_features():
   start_time = datetime.now()
   hr         = SpaceRepetitionReference(epoch=start_time)
-  hdl, _ = hr.plot_graph(stop_date=42)
+  hdl, _ = hr.plot_graph(stop=42)
   hdl.close()
 
 @pytest.mark.reference
@@ -239,7 +239,7 @@ def test_reference_prediction_feature():
     epoch=start_time,
   )
   
-  graph_handle, data_dict  = hr.plot_graph(stop_date=30)
+  graph_handle, data_dict  = hr.plot_graph(stop=30)
   training_moments_1 = hr.range_for(stop_at=30, curve=1, day_step_size=0.1)
   results_1 = [hr.recollect_scalar(training_moment, curve=1)
     for training_moment in training_moments_1]
@@ -262,7 +262,7 @@ def test_feedback_graph_too_short():
   start_time = datetime.now()
   hr = SpaceRepetitionReference(epoch=start_time)
   hf = SpaceRepetitionFeedback(x, y, epoch=start_time)
-  hdl, _ = hf.plot_graph(stop_date=4)
+  hdl, _ = hf.plot_graph(stop=4)
   hr.save_figure("results/space_feedback_too_short.pdf")
   hdl.close()
 
@@ -282,7 +282,7 @@ def test_feedback_graph_too_long():
   start_time = datetime.now()
   hr = SpaceRepetitionReference(epoch=start_time)
   hf = SpaceRepetitionFeedback(x, y, epoch=start_time)
-  hdl, _ = hf.plot_graph(stop_date=50)  # it should automatically fit the data
+  hdl, _ = hf.plot_graph(stop=50)  # it should automatically fit the data
   hr.save_figure("results/space_feedback_too_long.pdf")
   hdl.close()
 
@@ -299,7 +299,7 @@ def test_generator_controller():
     epoch=start_time
   )
 
-  hdl, _ = hctrl.plot_graphs(stop_date=43)
+  hdl, _ = hctrl.plot_graphs(stop=43)
   hctrl.save_figure("results/space_control.pdf")
   hdl.close()
 
@@ -312,7 +312,7 @@ def test_control_graph_too_short():
                 epoch=start_time)
   hf = SpaceRepetitionFeedback(x[0:2], y, epoch=start_time)
   hctrl = SpaceRepetitionController(reference=hr, feedback=hf, epoch=start_time)
-  graph_handle, data_dict  = hctrl.plot_graphs(stop_date=stop_date)
+  graph_handle, data_dict  = hctrl.plot_graphs(stop=stop_date)
   hctrl.save_figure("results/spaced_control_too_short.pdf")
   graph_handle.close()
 
@@ -325,7 +325,7 @@ def test_control_graph_too_long():
                 epoch=start_time)
   hf = SpaceRepetitionFeedback(x[0:2], y, epoch=start_time)
   hctrl = SpaceRepetitionController(reference=hr, feedback=hf, epoch=start_time)
-  graph_handle, data_dict  = hctrl.plot_graphs(stop_date=stop_date)
+  graph_handle, data_dict  = hctrl.plot_graphs(stop=stop_date)
   hctrl.save_figure("results/spaced_control_too_long.pdf")
   graph_handle.close()
 
@@ -338,28 +338,28 @@ def test_a_control_series():
                 epoch=start_time)
   hf = SpaceRepetitionFeedback(x[0:2], y, epoch=start_time)
   hctrl = SpaceRepetitionController(reference=hr, feedback=hf, epoch=start_time)
-  graph_handle, data_dict  = hctrl.plot_graphs(stop_date=stop_date)
+  graph_handle, data_dict  = hctrl.plot_graphs(stop=stop_date)
   hctrl.save_figure("results/spaced_0.pdf")
   graph_handle.close()
 
   #hr = SpaceRepetitionReference(plot=False, range=range_, epoch=start_time)
   hf = SpaceRepetitionFeedback(x[0:3], y, epoch=start_time)
   hctrl.initialize_feedback(feedback=hf)
-  graph_handle, _ = hctrl.plot_graphs(stop_date=stop_date)
+  graph_handle, _ = hctrl.plot_graphs(stop=stop_date)
   hctrl.save_figure("results/spaced_1.pdf")
   graph_handle.close()
 
   #hr = SpaceRepetitionReference(plot=False,range=range_,epoch=start_time)
   hf = SpaceRepetitionFeedback(x[0:4], y, epoch=start_time)
   hctrl.initialize_feedback(feedback=hf)
-  graph_handle, _  = hctrl.plot_graphs(stop_date=stop_date)
+  graph_handle, _  = hctrl.plot_graphs(stop=stop_date)
   hctrl.save_figure("results/spaced_2.pdf")
   graph_handle.close()
 
   #hr = SpaceRepetitionReference(plot=False,range=range_,epoch=start_time)
   hf = SpaceRepetitionFeedback(x[0:5], y,epoch=start_time)
   hctrl.initialize_feedback(feedback=hf)
-  graph_handle, _ = hctrl.plot_graphs(stop_date=stop_date)
+  graph_handle, _ = hctrl.plot_graphs(stop=stop_date)
   data_dict.clear()
   hctrl.save_figure("results/spaced_3.pdf")
   graph_handle.close()
@@ -367,7 +367,7 @@ def test_a_control_series():
   #hr = SpaceRepetitionReference(plot=False,range=range_,epoch=start_time)
   hf = SpaceRepetitionFeedback(x[0:6], y, epoch=start_time)
   hctrl.initialize_feedback(feedback=hf)
-  graph_handle, _ = hctrl.plot_graphs(stop_date=stop_date)
+  graph_handle, _ = hctrl.plot_graphs(stop=stop_date)
   data_dict.clear()
   hctrl.save_figure("results/spaced_4.pdf")
   graph_handle.close()
@@ -375,7 +375,7 @@ def test_a_control_series():
   #hr = SpaceRepetitionReference(plot=False,range=range_,epoch=start_time)
   hf = SpaceRepetitionFeedback(x[0:7], y, epoch=start_time)
   hctrl.initialize_feedback(feedback=hf)
-  graph_handle, _ = hctrl.plot_graphs(stop_date=stop_date)
+  graph_handle, _ = hctrl.plot_graphs(stop=stop_date)
   data_dict.clear()
   hctrl.save_figure("results/spaced_5.pdf")
   graph_handle.close()
@@ -383,7 +383,7 @@ def test_a_control_series():
   #hr = SpaceRepetitionReference(plot=False,range=range_,epoch=start_time)
   hf = SpaceRepetitionFeedback(x[0:8], y, epoch=start_time)
   hctrl.initialize_feedback(feedback=hf)
-  graph_handle, _ = hctrl.plot_graphs(stop_date=stop_date)
+  graph_handle, _ = hctrl.plot_graphs(stop=stop_date)
   graph_handle.epoch      # the epoch
   graph_handle.axarr      # array of matplotlib axes mapping the subplots
   graph_handle.figure     # the matplotlib figure
@@ -414,7 +414,7 @@ def test_control_predition_for_feature():
   hf = SpaceRepetitionFeedback(x[0:4], y, epoch=start_time)
   hctrl = SpaceRepetitionController(epoch=start_time, reference=hr, feedback=hf)
 
-  graph_handle, data_dict = hctrl.plot_graphs(stop_date=30)
+  graph_handle, data_dict = hctrl.plot_graphs(stop=30)
   training_moments_1 = hctrl.range_for(stop_at=30, curve=1, day_step_size=0.1)
   results_1 = [hctrl.recollect_scalar(training_moment, curve=1)
     for training_moment in training_moments_1]
@@ -440,7 +440,7 @@ def test_learning_tracker_graph_too_short():
   for index, (moment, result) in enumerate(zip(moments[0:2], results)):
     lt.learned(when=moment, result=result)
 
-  hd, _ = lt.plot_graphs(stop_date=5)
+  hd, _ = lt.plot_graphs(stop=5)
   lt.save_figure("results/space_learning_tracker_too_short.pdf")
   hd.close()
 
@@ -454,7 +454,7 @@ def test_learning_tracker_longterm_response():
   for index, (moment, result) in enumerate(zip(moments[0:2], results)):
     lt.learned(when=moment, result=result)
 
-  hd, _ = lt.plot_graphs(stop_date=300)
+  hd, _ = lt.plot_graphs(stop=300)
   lt.save_figure("results/space_learning_tracker_too_long.pdf")
   hd.close()
 
@@ -472,7 +472,7 @@ def test_learning_tracker():
     name_of_mp4="results/example.mp4",
     student="Marnie MacMillan",
     time_per_event_in_seconds=1.0,
-    stop_date=30,
+    stop=30,
   )
 
 @pytest.mark.pickle
@@ -487,7 +487,7 @@ def test_serialization_epoch():
 
   byte_stream = pickle.dumps(lt)
   unpickled_learning_tracker = pickle.loads(byte_stream)
-  hdl, _ = unpickled_learning_tracker.plot_graphs(stop_date=40)
+  hdl, _ = unpickled_learning_tracker.plot_graphs(stop=40)
   unpickled_learning_tracker.save_figure("results/post_pickle.pdf")
   hdl.close()
 
