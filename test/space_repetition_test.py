@@ -139,8 +139,8 @@ def test_reference_sizeof_growing_deques():
   hr = SpaceRepetitionReference(epoch=datetime.now())
   # the deques should grow at the same rate, otherwise
   # we will have ring buffer slippage
-  assert len(hr.forgetting_enclosures) == len(hr.new_dates)
-  assert len(hr.forgetting_enclosures) == len(hr.new_results)
+  assert len(hr.forgetting_enclosures) == len(hr.dates_as_day_offsets)
+  assert len(hr.forgetting_enclosures) == len(hr.results_at_training_moments)
 
 @pytest.mark.reference
 def test_reference_scheduled_offsets_from_generator():
@@ -224,13 +224,13 @@ def test_reference_prediction_range_for_feature():
     plasticity_root=0.03699,
     plasticity_denominator_offset=0.0054,
   )
-  training_moments = hr.range_for(stop_at=30, curve=1, day_step_size=0.1)
-  assert training_moments[0] == hr.days_offset_from_epoch_to_datetime(hr.new_dates[0])
+  training_moments = hr.range_for(stop=30, curve=1, day_step_size=0.1)
+  assert training_moments[0] == hr.days_offset_from_epoch_to_datetime(hr.dates_as_day_offsets[0])
   assert training_moments[-1] == \
     hr.days_offset_from_epoch_to_datetime(30) - timedelta(days=0.1)
 
-  training_moments = hr.range_for(stop_at=30, curve=2, day_step_size=0.1)
-  assert training_moments[0] == hr.days_offset_from_epoch_to_datetime(hr.new_dates[1])
+  training_moments = hr.range_for(stop=30, curve=2, day_step_size=0.1)
+  assert training_moments[0] == hr.days_offset_from_epoch_to_datetime(hr.dates_as_day_offsets[1])
 
 @pytest.mark.reference
 def test_reference_prediction_feature():
@@ -240,13 +240,13 @@ def test_reference_prediction_feature():
   )
   
   graph_handle, data_dict  = hr.plot_graph(stop=30)
-  training_moments_1 = hr.range_for(stop_at=30, curve=1, day_step_size=0.1)
+  training_moments_1 = hr.range_for(stop=30, curve=1, day_step_size=0.1)
   results_1 = [hr.recollect_scalar(training_moment, curve=1)
     for training_moment in training_moments_1]
-  training_moments_2 = hr.range_for(stop_at=30, curve=2, day_step_size=0.1)
+  training_moments_2 = hr.range_for(stop=30, curve=2, day_step_size=0.1)
   results_2 = [hr.recollect_scalar(training_moment, curve=2)
     for training_moment in training_moments_2]
-  training_moments_3 = hr.range_for(stop_at=30, curve=3, day_step_size=0.1)
+  training_moments_3 = hr.range_for(stop=30, curve=3, day_step_size=0.1)
   results_3 = [hr.recollect_scalar(training_moment, curve=3)
     for training_moment in training_moments_3]
   reference_plot = graph_handle.axarr
@@ -400,11 +400,11 @@ def test_control_predition_range_for_feature():
   hr = SpaceRepetitionReference(epoch=start_time)
   hf = SpaceRepetitionFeedback(x[0:4], y, epoch=start_time)
   hctrl = SpaceRepetitionController(epoch=start_time, reference=hr, feedback=hf)
-  training_moments = hctrl.range_for(stop_at=30, curve=1, day_step_size=0.1)
-  assert training_moments[0] == hctrl.days_offset_from_epoch_to_datetime(hctrl.new_dates[0])
+  training_moments = hctrl.range_for(stop=30, curve=1, day_step_size=0.1)
+  assert training_moments[0] == hctrl.days_offset_from_epoch_to_datetime(hctrl.dates_as_day_offsets[0])
 
-  training_moments = hctrl.range_for(stop_at=30, curve=2, day_step_size=0.1)
-  assert training_moments[0] == hctrl.days_offset_from_epoch_to_datetime(hctrl.new_dates[1])
+  training_moments = hctrl.range_for(stop=30, curve=2, day_step_size=0.1)
+  assert training_moments[0] == hctrl.days_offset_from_epoch_to_datetime(hctrl.dates_as_day_offsets[1])
 
 @pytest.mark.control
 def test_control_predition_for_feature():
@@ -415,13 +415,13 @@ def test_control_predition_for_feature():
   hctrl = SpaceRepetitionController(epoch=start_time, reference=hr, feedback=hf)
 
   graph_handle, data_dict = hctrl.plot_graphs(stop=30)
-  training_moments_1 = hctrl.range_for(stop_at=30, curve=1, day_step_size=0.1)
+  training_moments_1 = hctrl.range_for(stop=30, curve=1, day_step_size=0.1)
   results_1 = [hctrl.recollect_scalar(training_moment, curve=1)
     for training_moment in training_moments_1]
-  training_moments_2 = hctrl.range_for(stop_at=30, curve=2, day_step_size=0.1)
+  training_moments_2 = hctrl.range_for(stop=30, curve=2, day_step_size=0.1)
   results_2 = [hctrl.recollect_scalar(training_moment, curve=2)
     for training_moment in training_moments_2]
-  training_moments_3 = hr.range_for(stop_at=30, curve=3, day_step_size=0.1)
+  training_moments_3 = hr.range_for(stop=30, curve=3, day_step_size=0.1)
   results_3 = [hctrl.recollect_scalar(training_moment, curve=3)
     for training_moment in training_moments_3]
   ctrl_plot = graph_handle.axarr[-1]

@@ -1,1 +1,6 @@
-/* This file intentionally left blank. */
+tt.descname, tt.descclassname, code.descname, code.descclassname {
+  font-size: 1.10em;
+}
+dl.method {
+  margin-bottom: 50px;
+}

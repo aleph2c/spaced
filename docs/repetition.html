@@ -141,7 +141,7 @@
 
 <dl class="method">
 <dt id="repetition.LearningTracker.range_for">
-<code class="descname">range_for</code><span class="sig-paren">(</span><em>curve=None</em>, <em>day_step_size=1</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.LearningTracker.range_for" title="Permalink to this definition">¶</a></dt>
+<code class="descname">range_for</code><span class="sig-paren">(</span><em>stop</em>, <em>curve=None</em>, <em>day_step_size=1</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.LearningTracker.range_for" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -191,111 +191,82 @@
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="repetition.SpaceRepetition.bob">
-<code class="descname">bob</code><span class="sig-paren">(</span><em>a</em>, <em>b</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetition.bob" title="Permalink to this definition">¶</a></dt>
-<dd><p>short description</p>
-<p>longer description</p>
-<dl class="docutils">
-<dt>Note:</dt>
-<dd>Do this not that recommendation</dd>
-<dt>Args:</dt>
-<dd><table class="first last docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">param a:</th><td class="field-body">(type1), default: None</td>
-</tr>
-<tr class="field-even field"><th class="field-name">param b:</th><td class="field-body">(type1), default: None</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">param <code class="docutils literal notranslate"><span class="pre">*args</span></code>:</th><td class="field-body">variable length arguement list</td>
-</tr>
-<tr class="field-even field"><th class="field-name">param <code class="docutils literal notranslate"><span class="pre">**kwargs</span></code>:</th><td class="field-body">arbitrary keyword arguements</td>
-</tr>
-</tbody>
-</table>
-</dd>
-<dt>Returns:</dt>
-<dd>(type):</dd>
-</dl>
-<p>Examples:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">print</span><span class="p">(</span><span class="s2">&quot;hello world&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-</dd></dl>
-
-<dl class="method">
 <dt id="repetition.SpaceRepetition.datetime_to_days_offset_from_epoch">
 <code class="descname">datetime_to_days_offset_from_epoch</code><span class="sig-paren">(</span><em>datetime_</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetition.datetime_to_days_offset_from_epoch" title="Permalink to this definition">¶</a></dt>
 <dd><p>convert a datetime into a float, representing the number of days
 difference between that datetime and when epoch</p>
+<dl class="docutils">
+<dt><strong>Args</strong>:</dt>
+<dd><div class="first last line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">datetime_</span></code> (datetime)</div>
+</div>
+</dd>
+<dt><strong>Returns</strong>:</dt>
+<dd>(float): <a href="#id1"><span class="problematic" id="id2">datetime_</span></a> - datetime of training epoch</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="repetition.SpaceRepetition.days_from_epoch">
 <code class="descname">days_from_epoch</code><span class="sig-paren">(</span><em>time</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetition.days_from_epoch" title="Permalink to this definition">¶</a></dt>
-<dd><p>Convert a time [datetime] into a number representing the days since the
+<dd><p>Convert a datetime object into a number representing the days since the
 training epoch.</p>
+<dl class="docutils">
+<dt><strong>Args</strong>:</dt>
+<dd><div class="first last line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">time</span></code> (int, float): days since the training epoch</div>
+</div>
+</dd>
+<dt>Returns:</dt>
+<dd>(float): days since training epoch</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="repetition.SpaceRepetition.days_offset_from_epoch_to_datetime">
 <code class="descname">days_offset_from_epoch_to_datetime</code><span class="sig-paren">(</span><em>offset_</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetition.days_offset_from_epoch_to_datetime" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>convert an days-offset-from-epoch into a datetime object</p>
+<dl class="docutils">
+<dt><strong>Args</strong>:</dt>
+<dd><div class="first last line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">offset_</span></code> (int, float): days since training epoch</div>
+</div>
+</dd>
+<dt><strong>Returns</strong>:</dt>
+<dd>(datetime):  datetime of the moment which was <code class="docutils literal notranslate"><span class="pre">offset_</span></code> days since the
+training epoch</dd>
+</dl>
+</dd></dl>
 
 <dl class="method">
 <dt id="repetition.SpaceRepetition.days_to_time">
 <code class="descname">days_to_time</code><span class="sig-paren">(</span><em>days</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetition.days_to_time" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert a time [offset in days from epoch] into a datetime object.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="repetition.SpaceRepetition.decay_of_decay">
-<code class="descname">decay_of_decay</code><span class="sig-paren">(</span><em>initial</em>, <em>tau</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetition.decay_of_decay" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function returns the <code class="docutils literal notranslate"><span class="pre">scale</span></code> values needed to generate the forgetting
-curves.  It returns a function with the values of <code class="docutils literal notranslate"><span class="pre">initial</span></code> and <code class="docutils literal notranslate"><span class="pre">tau</span></code>
-enclosed within it:</p>
-<ul class="simple">
-<li>fn(x): a curve which reaches an asymptote of 0, but is clamped to
-<code class="docutils literal notranslate"><span class="pre">-1*self.long_term_clamp</span></code> before it gets there.</li>
-</ul>
-<p>Where <code class="docutils literal notranslate"><span class="pre">fn(x)</span></code> is:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">-</span><span class="mi">1</span> <span class="o">*</span> <span class="n">initial</span> <span class="o">*</span> <span class="n">e</span><span class="o">^</span><span class="p">(</span><span class="o">-</span><span class="n">x</span><span class="o">/</span><span class="n">tau</span><span class="p">)</span> <span class="n">clamped</span> <span class="n">to</span> <span class="o">-</span><span class="mi">1</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">long_term_clamp</span>
-</pre></div>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><div class="first last line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">days</span></code> (int, float): days since epoch</div>
 </div>
-<p><code class="docutils literal notranslate"><span class="pre">initial</span></code> determines where to start the curve.  It is negated by the
-function, its value determines at what negative y value to start.</p>
-<p><code class="docutils literal notranslate"><span class="pre">tau</span></code> determines how fast the forgetting curves should transition from a
-fast state of forgetting to a slower state of forgetting.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>        <span class="o">|</span>
-        <span class="o">|</span> <span class="o">----------------------------</span> <span class="bp">self</span><span class="o">.</span><span class="n">long_term_clamp</span> <span class="o">-</span>
-<span class="o">-</span><span class="mf">0.0003</span> <span class="o">|</span>                     <span class="o">...............................</span>
-        <span class="o">|</span>                <span class="o">.....</span>                               
-        <span class="o">|</span>             <span class="o">...</span>                                    
-        <span class="o">|</span>           <span class="o">..</span>                                       
-        <span class="o">|</span>          <span class="o">/</span>                                         
-        <span class="o">|</span>         <span class="o">/</span>                                          
-        <span class="o">|</span>        <span class="o">/</span>                                           
-        <span class="o">|</span>       <span class="o">/</span>                                            
-<span class="o">-</span><span class="mf">0.7001</span> <span class="o">|</span> <span class="o">-----/---------------------------------------------</span>
-        <span class="o">|</span>     <span class="o">.</span>                                              
-        <span class="o">|</span>                                                    
-        <span class="o">|</span>    <span class="o">.</span>                                               
-        <span class="o">|</span>                                                    
-        <span class="o">|</span>   <span class="o">.</span>                                                
-        <span class="o">|</span>                                                    
-        <span class="o">|</span>  <span class="o">.</span>                                                 
-        <span class="o">|</span>                                                    
-   <span class="o">-</span><span class="mf">1.4</span> <span class="o">|</span> <span class="o">.</span>   
-          <span class="mi">0</span>                      <span class="mi">5</span>                        <span class="mi">10</span>
-</pre></div>
-</div>
+</dd>
+<dt>Returns:</dt>
+<dd>(datetime): datetime of epoch plus days</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="repetition.SpaceRepetition.forgetting_curves">
 <code class="descname">forgetting_curves</code><span class="sig-paren">(</span><em>scale</em>, <em>offset</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetition.forgetting_curves" title="Permalink to this definition">¶</a></dt>
 <dd><p>This function returns two other functions which have the values of <code class="docutils literal notranslate"><span class="pre">scale</span></code>
-and <code class="docutils literal notranslate"><span class="pre">offset</span></code> enclosed within them:</p>
+and <code class="docutils literal notranslate"><span class="pre">offset</span></code> enclosed within them.</p>
+<dl class="docutils">
+<dt><strong>Args</strong>:</dt>
+<dd><div class="first last line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">scale</span></code> (int, float): enclosed parameter</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">offset</span></code> (int, float): enclosed parameter</div>
+</div>
+</dd>
+</dl>
+<p>The returned functions are:</p>
 <ul class="simple">
 <li>fn(x):  the falling-exponential forgetting curve profile</li>
 <li>fn0(x, y): <code class="docutils literal notranslate"><span class="pre">y</span> <span class="pre">-</span> <span class="pre">fn(x)</span></code></li>
@@ -336,12 +307,168 @@ and <code class="docutils literal notranslate"><span class="pre">offset</span></
 <dl class="method">
 <dt id="repetition.SpaceRepetition.make_stickleback_data_for_plot">
 <code class="descname">make_stickleback_data_for_plot</code><span class="sig-paren">(</span><em>forgetting_functions</em>, <em>solutions</em>, <em>stop_day_as_offset</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetition.make_stickleback_data_for_plot" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>create the data set that can graph the stickleback curve</p>
+<dl class="docutils">
+<dt><strong>Args</strong>:</dt>
+<dd><div class="first last line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">forgetting_functions</span></code> (list): forgetting_functions</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">solutions</span></code> (list): x values where forgetting function intersects the plasticity curve</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">stop_day_as_offset</span></code> (float, int): days after epoch to stop construction of stickleback</div>
+</div>
+</dd>
+<dt><strong>Returns</strong>:</dt>
+<dd>(list of two lists):  x and y values of stickleback data</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="repetition.SpaceRepetition.plasticity_functions">
+<code class="descname">plasticity_functions</code><span class="sig-paren">(</span><em>denominator_offset</em>, <em>root</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetition.plasticity_functions" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function returns three other functions which have the values of
+<code class="docutils literal notranslate"><span class="pre">denominator_offset</span></code> and <code class="docutils literal notranslate"><span class="pre">root</span></code> enclosed within them.</p>
+<dl class="docutils">
+<dt><strong>Args</strong>:</dt>
+<dd><div class="first last line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">denominator_offset</span></code> (int, float): enclosed parameter</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">root</span></code> (int, float): enclosed parameter</div>
+</div>
+</dd>
+<dt><strong>Returns</strong>:</dt>
+<dd>(list): fn(x), fn0(x, y), invfn(y)</dd>
+</dl>
+<p>These returned functions are:</p>
+<ul class="simple">
+<li>fn(x): the plasticity curve for the student</li>
+<li>fn0(x, y): <code class="docutils literal notranslate"><span class="pre">y</span> <span class="pre">-</span> <span class="pre">fn(x)</span></code>, needed to find intersection with this curve and another</li>
+<li>invfn(y): returns the x value which provides y from <code class="docutils literal notranslate"><span class="pre">fn(x)</span></code></li>
+</ul>
+<p>Where <code class="docutils literal notranslate"><span class="pre">fn(x)</span></code> is:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>             <span class="n">x</span><span class="o">^</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="n">root</span><span class="p">)</span>
+<span class="o">------------------------------------</span> <span class="k">for</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="n">shift</span>
+ <span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="n">denominator_offset</span><span class="p">)</span><span class="o">^</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="n">root</span><span class="p">)</span>
+
+<span class="mi">0</span> <span class="k">for</span> <span class="n">x</span> <span class="o">&lt;=</span> <span class="n">shift</span>
+
+<span class="n">example</span><span class="p">:</span>
+  <span class="n">root</span> <span class="o">=</span> <span class="mf">1.8</span>
+  <span class="n">denominator_offset</span> <span class="o">=</span> <span class="mf">1.0</span>
+
+
+  <span class="mf">0.94754</span> <span class="o">|</span>                          <span class="o">...........................</span>
+          <span class="o">|</span>                 <span class="o">.........</span>                           
+          <span class="o">|</span>            <span class="o">.....</span>                                    
+          <span class="o">|</span>         <span class="o">...</span>                                         
+          <span class="o">|</span>       <span class="o">..</span>                                            
+          <span class="o">|</span>      <span class="o">/</span>                                              
+          <span class="o">|</span>     <span class="o">/</span>                                               
+          <span class="o">|</span>    <span class="o">/</span>                                                
+  <span class="mf">0.47377</span> <span class="o">|</span> <span class="o">--.-------------------------------------------------</span>
+          <span class="o">|</span>                                                     
+          <span class="o">|</span>                                                     
+          <span class="o">|</span>  <span class="o">.</span>                                                  
+          <span class="o">|</span>                                                     
+          <span class="o">|</span>                                                     
+          <span class="o">|</span>                                                     
+          <span class="o">|</span>                                                     
+          <span class="o">|</span>                                                     
+        <span class="mi">0</span> <span class="o">|</span> <span class="o">.</span>                                                   
+            <span class="mi">0</span>                      <span class="mi">5</span>                          <span class="mi">10</span>
+</pre></div>
+</div>
+<p>Where <code class="docutils literal notranslate"><span class="pre">fn0(x,y)</span></code> is:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">y</span> <span class="o">-</span> <span class="n">fn</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Where <code class="docutils literal notranslate"><span class="pre">invfn(y)</span></code> is:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>                             <span class="n">y</span><span class="o">^</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
+<span class="o">-</span><span class="mi">1</span> <span class="o">*</span><span class="n">denominator_offset</span> <span class="o">*</span> <span class="o">---------------</span> <span class="k">for</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">y</span> <span class="o">&lt;=</span> <span class="mi">1</span>
+                            <span class="n">y</span><span class="o">^</span><span class="p">(</span><span class="n">root</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+
+<span class="n">example</span>
+  <span class="n">root</span> <span class="o">=</span> <span class="mf">1.8</span>
+  <span class="n">denominator_offset</span> <span class="o">=</span> <span class="mf">1.0</span>
+
+  <span class="mf">6.89791</span> <span class="o">|</span>                                                    
+          <span class="o">|</span>                                                    
+          <span class="o">|</span>                                                    
+          <span class="o">|</span>                                                    
+          <span class="o">|</span>                                                    
+          <span class="o">|</span>        <span class="o">.</span>                                           
+          <span class="o">|</span>                                                    
+          <span class="o">|</span>         <span class="o">...</span>                                        
+  <span class="mf">0.77734</span> <span class="o">|</span> <span class="o">-----------........................................</span>
+          <span class="o">|</span>                                                    
+          <span class="o">|</span> <span class="o">....</span>                                               
+          <span class="o">|</span>                                                    
+          <span class="o">|</span>     <span class="o">.</span>                                              
+          <span class="o">|</span>                                                    
+          <span class="o">|</span>                                                    
+          <span class="o">|</span>                                                    
+          <span class="o">|</span>                                                    
+  <span class="o">-</span><span class="mf">5.3432</span> <span class="o">|</span>      <span class="o">.</span>                                             
+            <span class="mi">0</span>                      <span class="mi">5</span>                          <span class="mi">10</span>
+</pre></div>
+</div>
+</dd></dl>
 
 <dl class="method">
 <dt id="repetition.SpaceRepetition.plot_graph">
 <code class="descname">plot_graph</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetition.plot_graph" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>stub</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="repetition.SpaceRepetition.tune_decay_of_decay">
+<code class="descname">tune_decay_of_decay</code><span class="sig-paren">(</span><em>initial</em>, <em>tau</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetition.tune_decay_of_decay" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function returns a tuned-decay_of_decay function.  The decay_of_decay,
+function can be called over and over again with greater values of t, and it
+will return a set of scalars which can be used to build, less and less
+agressive forgetting curves.</p>
+<p>To make this function tunable, you can enclose the <code class="docutils literal notranslate"><span class="pre">initial</span></code> and <code class="docutils literal notranslate"><span class="pre">tau</span></code>
+parameters within it.</p>
+<dl class="docutils">
+<dt><strong>Args</strong>:</dt>
+<dd><div class="first last line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">initial</span></code> (float): enclosed parameter</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">tau</span></code> (float): enclosed parameter</div>
+</div>
+</dd>
+<dt><strong>Returns</strong>:</dt>
+<dd>(function): fn(x), a curve which reaches an asymptote of 0, but is clamped to
+<code class="docutils literal notranslate"><span class="pre">-1*self.long_term_clamp</span></code> before it gets there.</dd>
+</dl>
+<p><code class="docutils literal notranslate"><span class="pre">fn(x)</span></code> is:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">-</span><span class="mi">1</span> <span class="o">*</span> <span class="n">initial</span> <span class="o">*</span> <span class="n">e</span><span class="o">^</span><span class="p">(</span><span class="o">-</span><span class="n">x</span><span class="o">/</span><span class="n">tau</span><span class="p">)</span> <span class="n">clamped</span> <span class="n">to</span> <span class="o">-</span><span class="mi">1</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">long_term_clamp</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">initial</span></code> determines where to start the curve.  It is negated by the
+function, its value determines at what negative y value to start.</p>
+<p><code class="docutils literal notranslate"><span class="pre">tau</span></code> determines how fast the forgetting curves should transition from a
+fast state of forgetting to a slower state of forgetting.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>        <span class="o">|</span>
+        <span class="o">|</span> <span class="o">----------------------------</span> <span class="bp">self</span><span class="o">.</span><span class="n">long_term_clamp</span> <span class="o">-</span>
+<span class="o">-</span><span class="mf">0.0003</span> <span class="o">|</span>                     <span class="o">...............................</span>
+        <span class="o">|</span>                <span class="o">.....</span>                               
+        <span class="o">|</span>             <span class="o">...</span>                                    
+        <span class="o">|</span>           <span class="o">..</span>                                       
+        <span class="o">|</span>          <span class="o">/</span>                                         
+        <span class="o">|</span>         <span class="o">/</span>                                          
+        <span class="o">|</span>        <span class="o">/</span>                                           
+        <span class="o">|</span>       <span class="o">/</span>                                            
+<span class="o">-</span><span class="mf">0.7001</span> <span class="o">|</span> <span class="o">-----/---------------------------------------------</span>
+        <span class="o">|</span>     <span class="o">.</span>                                              
+        <span class="o">|</span>                                                    
+        <span class="o">|</span>    <span class="o">.</span>                                               
+        <span class="o">|</span>                                                    
+        <span class="o">|</span>   <span class="o">.</span>                                                
+        <span class="o">|</span>                                                    
+        <span class="o">|</span>  <span class="o">.</span>                                                 
+        <span class="o">|</span>                                                    
+   <span class="o">-</span><span class="mf">1.4</span> <span class="o">|</span> <span class="o">.</span>   
+          <span class="mi">0</span>                      <span class="mi">5</span>                        <span class="mi">10</span>
+</pre></div>
+</div>
+</dd></dl>
 
 </dd></dl>
 
@@ -433,11 +560,11 @@ indexed from zero</p>
 
 <dl class="method">
 <dt id="repetition.SpaceRepetitionController.range_for">
-<code class="descname">range_for</code><span class="sig-paren">(</span><em>stop_at</em>, <em>curve=None</em>, <em>day_step_size=1</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetitionController.range_for" title="Permalink to this definition">¶</a></dt>
+<code class="descname">range_for</code><span class="sig-paren">(</span><em>stop</em>, <em>curve=None</em>, <em>day_step_size=1</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetitionController.range_for" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a list of useful datetime values for a given curve, up to, but not
-including the stop_at value, in increments of day_step_size.</p>
+including the stop value, in increments of day_step_size.</p>
 <blockquote>
-<div>stop_at: can be a datetime or an offset from epoch in days
+<div>stop: can be a datetime or an offset from epoch in days
 curve: is which curve to be referenced, starting at 1
 day_step_size: defaults to 1</div></blockquote>
 </dd></dl>
@@ -529,14 +656,47 @@ so = lt.schedule_as_offset(stop=40)</div></blockquote>
 <dd></dd></dl>
 
 <dl class="method">
+<dt id="repetition.SpaceRepetitionFeedback.plasticity_functions">
+<code class="descname">plasticity_functions</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetitionFeedback.plasticity_functions" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns a function and two discovered plasticity parameters.</p>
+<dl class="docutils">
+<dt><strong>Returns</strong>:</dt>
+<dd><p class="first">(list): fn, discovered_plasticity_root, discovered_plasticity_denominator_offset</p>
+<ul class="simple">
+<li>fn: the plasticity curve that matches what the student is actually doing</li>
+<li><code class="docutils literal notranslate"><span class="pre">discovered_plasticity_root</span></code>:  can be fed into</li>
+</ul>
+<p class="last"><code class="docutils literal notranslate"><span class="pre">plasticity_functions</span></code> of the reference object to make a reference
+plasticty curve that matches this one.
+* <code class="docutils literal notranslate"><span class="pre">discovered_plasticity_denominator_offset</span></code>: can be fed into the
+<code class="docutils literal notranslate"><span class="pre">plasticity_functions</span></code> of the reference object to make a reference
+plasticity curve that matches this one.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
 <dt id="repetition.SpaceRepetitionFeedback.plot_graph">
-<code class="descname">plot_graph</code><span class="sig-paren">(</span><em>epoch=None</em>, <em>plot_pane_data=None</em>, <em>panes=None</em>, <em>stop=None</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetitionFeedback.plot_graph" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="descname">plot_graph</code><span class="sig-paren">(</span><em>plot_pane_data=None</em>, <em>panes=None</em>, <em>stop=None</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetitionFeedback.plot_graph" title="Permalink to this definition">¶</a></dt>
+<dd><p>plot the feedbackgraph</p>
+<dl class="docutils">
+<dt><strong>Args</strong>:</dt>
+<dd><div class="first last line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">stop</span></code> (datetime, float, int): when to stop graphing</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">plot_pane_data=None</span></code> (int, float):  plot handle</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">panes=None</span></code> (type1): number of sub-plot panes to make</div>
+</div>
+</dd>
+<dt><strong>Returns</strong>:</dt>
+<dd>(type):</dd>
+</dl>
+</dd></dl>
 
 <dl class="method">
 <dt id="repetition.SpaceRepetitionFeedback.show">
 <code class="descname">show</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetitionFeedback.show" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>show the plot after a plot_graph method call</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -611,23 +771,54 @@ so = lt.schedule_as_offset(stop=40)</div></blockquote>
 
 <dl class="method">
 <dt id="repetition.SpaceRepetitionReference.next_lesson">
-<code class="descname">next_lesson</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetitionReference.next_lesson" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="descname">next_lesson</code><span class="sig-paren">(</span><em>a</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetitionReference.next_lesson" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the next scheduled datetime suggested by the reference</p>
+<dl class="docutils">
+<dt><strong>Note</strong>:</dt>
+<dd>The schedules are created using a generator.  This is done so that an
+infinite number of times can be suggested.  To keep memory constrained,
+the internal dates, and forgetting functions are held in a deque.  A date
+will always be available, but the forgetting curves and past suggested
+dates can be over-written so that these objects don’t take up huge
+amounts of memory when they are run over the long term.</dd>
+<dt><strong>Returns</strong>:</dt>
+<dd>(datetime): The suggested datetime for the next lesson.</dd>
+</dl>
+</dd></dl>
 
 <dl class="method">
 <dt id="repetition.SpaceRepetitionReference.plot_graph">
 <code class="descname">plot_graph</code><span class="sig-paren">(</span><em>stop</em>, <em>plot_pane_data=None</em>, <em>panes=None</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetitionReference.plot_graph" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>plot the reference</p>
+<dl class="docutils">
+<dt><strong>Args</strong>:</dt>
+<dd><div class="first last line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">stop</span></code> (datetime, float, int): when to stop graphing</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">plot_pane_data=None</span></code> (int, float):  plot handle</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">panes=None</span></code> (type1): number of sub-plot panes to make</div>
+</div>
+</dd>
+<dt><strong>Returns</strong>:</dt>
+<dd>(type):</dd>
+</dl>
+</dd></dl>
 
 <dl class="method">
 <dt id="repetition.SpaceRepetitionReference.range_for">
-<code class="descname">range_for</code><span class="sig-paren">(</span><em>stop_at</em>, <em>curve=None</em>, <em>day_step_size=1</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetitionReference.range_for" title="Permalink to this definition">¶</a></dt>
+<code class="descname">range_for</code><span class="sig-paren">(</span><em>stop</em>, <em>curve=None</em>, <em>day_step_size=1</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetitionReference.range_for" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a list of useful datetime values for a given curve, up to, but not
-including the stop_at value, in increments of day_step_size.</p>
-<blockquote>
-<div>stop_at: can be a datetime or an offset from epoch in days
-curve: is which curve to be referenced, starting at 1
-day_step_size: defaults to 1</div></blockquote>
+including the stop value, in increments of day_step_size.</p>
+<dl class="docutils">
+<dt><strong>Args</strong>:</dt>
+<dd><div class="first last line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">stop</span></code> (datetime, float, int):  datetime or offset from epoch in days</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">curve=None</span></code> (type1): default: which forgetting curve, starting at 1</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">day_step_size=1</span></code> (type1): step size of the result (unit of days)</div>
+</div>
+</dd>
+<dt><strong>Returns</strong>:</dt>
+<dd>(list): list of datetimes that can be used in another query</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -657,32 +848,63 @@ correctly recall something being tracked by the space repetition algorithm.</p>
 <dl class="method">
 <dt id="repetition.SpaceRepetitionReference.save_figure">
 <code class="descname">save_figure</code><span class="sig-paren">(</span><em>filename='spaced.pdf'</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetitionReference.save_figure" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>save the file produced by the plot_graph method</p>
+<dl class="docutils">
+<dt><strong>Args</strong>:</dt>
+<dd><div class="first last line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">filename=&quot;spaced.pdf&quot;</span></code> (string): filename</div>
+</div>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="method">
 <dt id="repetition.SpaceRepetitionReference.schedule">
 <code class="descname">schedule</code><span class="sig-paren">(</span><em>stop</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetitionReference.schedule" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a schedule of datetimes up until and possibly including the
-stop</p>
-<blockquote>
-<div># schedule as offsets from the training epoch
-stop = lt.days_from_epoch</div></blockquote>
+<dd><p>Return a schedule as of datetimes up until and possibily including
+datetime or offset represented by <code class="docutils literal notranslate"><span class="pre">stop</span></code>.</p>
+<dl class="docutils">
+<dt><strong>Args</strong>:</dt>
+<dd><div class="first line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">stop</span></code> (float, int, datetime): at what point do you want the schedule</div>
+</div>
+<p class="last">information to stop.  If <code class="docutils literal notranslate"><span class="pre">stop</span></code> is an int or a float it will be
+interpreted as the number of days-from-epoch at which you would like this
+function to stop providing information. If <code class="docutils literal notranslate"><span class="pre">stop</span></code> is a datetime, the
+output schedule will include all of the schedule suggestions up until
+that time.</p>
+</dd>
+<dt><strong>Returns</strong>:</dt>
+<dd>(list of datetime objects): The schedule</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="repetition.SpaceRepetitionReference.schedule_as_offset">
 <code class="descname">schedule_as_offset</code><span class="sig-paren">(</span><em>stop</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetitionReference.schedule_as_offset" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a schedule in day offsets from epoch up up until and possiblity
-includeing the stop offset [days from offset].</p>
-<blockquote>
-<div># schedule as offsets from the training epoch
-so = lt.schedule_as_offset(stop=40)</div></blockquote>
+<dd><p>Return a schedule as a list of offsets measured in days from the training
+epoch.</p>
+<dl class="docutils">
+<dt><strong>Args</strong>:</dt>
+<dd><div class="first line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">stop</span></code> (float, int, datetime): at what point do you want the schedule</div>
+</div>
+<p class="last">information to stop.  If <code class="docutils literal notranslate"><span class="pre">stop</span></code> is an int or a float it will be
+interpreted as the number of days-from-epoch at which you would like this
+function to stop providing information. If <code class="docutils literal notranslate"><span class="pre">stop</span></code> is a datetime, the
+output schedule will include all of the schedule suggestions up until
+that time.</p>
+</dd>
+<dt><strong>Returns</strong>:</dt>
+<dd>(list of floats): The schedule as offset from the training epoch</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="repetition.SpaceRepetitionReference.show">
 <code class="descname">show</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetitionReference.show" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>show the plot after a plot_graph method call</p>
+</dd></dl>
 
 </dd></dl>
 

@@ -144,18 +144,28 @@ class SpaceRepetition():
     SpacedKwargInterface.__init__(self, *args, **kwargs)
 
   def plot_graph(self, **kwargs):
+    '''stub'''
     pass
 
-  def decay_of_decay(self, initial, tau):
+  def tune_decay_of_decay(self, initial, tau):
     """
-    This function returns the ``scale`` values needed to generate the forgetting
-    curves.  It returns a function with the values of ``initial`` and ``tau``
-    enclosed within it:
+    This function returns a tuned-decay_of_decay function.  The decay_of_decay,
+    function can be called over and over again with greater values of t, and it
+    will return a set of scalars which can be used to build, less and less
+    agressive forgetting curves.
+   
+    To make this function tunable, you can enclose the ``initial`` and ``tau``
+    parameters within it.
 
-    - fn(x): a curve which reaches an asymptote of 0, but is clamped to
+    **Args**:
+      | ``initial`` (float): enclosed parameter
+      | ``tau`` (float): enclosed parameter
+
+    **Returns**:
+      (function): fn(x), a curve which reaches an asymptote of 0, but is clamped to
       ``-1*self.long_term_clamp`` before it gets there.
 
-    Where ``fn(x)`` is:
+    ``fn(x)`` is:
 
     .. code-block:: python
 
@@ -211,7 +221,13 @@ class SpaceRepetition():
   def forgetting_curves(self, scale, offset):
     """
     This function returns two other functions which have the values of ``scale``
-    and ``offset`` enclosed within them:
+    and ``offset`` enclosed within them.
+
+    **Args**:
+      | ``scale`` (int, float): enclosed parameter
+      | ``offset`` (int, float): enclosed parameter
+
+    The returned functions are:
 
     - fn(x):  the falling-exponential forgetting curve profile
     - fn0(x, y): ``y - fn(x)``
@@ -265,40 +281,18 @@ class SpaceRepetition():
       return y - fn(x) 
 
     return [fn, fn0]
+  
+  def days_from_epoch(self, time):
+    '''Convert a datetime object into a number representing the days since the
+    training epoch.
 
-  def bob(self, a, b, *args, **kwargs):
-    '''short description
-
-    longer description
-
-    Note:
-       Do this not that recommendation
-
-    Args:
-       :param a: (type1), default: None
-       :param b: (type1), default: None
-       :param ``*args``: variable length arguement list
-       :param ``**kwargs``: arbitrary keyword arguements
-
+    **Args**:
+      | ``time`` (int, float): days since the training epoch
 
     Returns:
-       (type): 
+       (float): days since training epoch
 
-    Examples:
-      
-    .. code-block:: python
-       
-       print("hello world")
-
-  '''
-    pass
-    
-  def days_from_epoch(self, time):
     '''
-    Convert a time [datetime] into a number representing the days since the
-    training epoch.
-    '''
-
     if isinstance(time, datetime):
       time_since_start  = time
       time_since_start -= self.epoch
@@ -311,8 +305,13 @@ class SpaceRepetition():
     return c_time
 
   def days_to_time(self, days):
-    '''
-    Convert a time [offset in days from epoch] into a datetime object.
+    '''Convert a time [offset in days from epoch] into a datetime object.
+
+    Args:
+      | ``days`` (int, float): days since epoch
+
+    Returns:
+       (datetime): datetime of epoch plus days
     '''
     if isinstance(days, datetime):
       raise TypeError("datetime objects not supported")
@@ -321,15 +320,23 @@ class SpaceRepetition():
       time += timedelta(seconds=(days * 86400))
     return time
 
-  def _plasticity_functions(self, denominator_offset, root):
+  def plasticity_functions(self, denominator_offset, root):
     """
     This function returns three other functions which have the values of
-    ``denominator_offset`` and ``root`` enclosed within them:
+    ``denominator_offset`` and ``root`` enclosed within them.
+
+    **Args**:
+      | ``denominator_offset`` (int, float): enclosed parameter
+      | ``root`` (int, float): enclosed parameter
+
+    **Returns**:
+      (list): fn(x), fn0(x, y), invfn(y)
+
+    These returned functions are:
 
     - fn(x): the plasticity curve for the student
-    - fn0(x, y): ``y - fn(x)``
+    - fn0(x, y): ``y - fn(x)``, needed to find intersection with this curve and another
     - invfn(y): returns the x value which provides y from ``fn(x)``
-
 
     Where ``fn(x)`` is:
 
@@ -437,6 +444,16 @@ class SpaceRepetition():
     return [fn, fn0, invfn]
 
   def make_stickleback_data_for_plot(self, forgetting_functions, solutions, stop_day_as_offset):
+    '''create the data set that can graph the stickleback curve
+
+    **Args**:
+      | ``forgetting_functions`` (list): forgetting_functions
+      | ``solutions`` (list): x values where forgetting function intersects the plasticity curve
+      | ``stop_day_as_offset`` (float, int): days after epoch to stop construction of stickleback
+
+    **Returns**:
+       (list of two lists):  x and y values of stickleback data
+    '''
     return_set = [[], []]
 
     solutions = np.array(solutions)
@@ -471,12 +488,29 @@ class SpaceRepetition():
 
   def datetime_to_days_offset_from_epoch(self, datetime_):
     '''convert a datetime into a float, representing the number of days
-    difference between that datetime and when epoch'''
+    difference between that datetime and when epoch
+
+    **Args**:
+      | ``datetime_`` (datetime)
+
+    **Returns**:
+       (float): datetime_ - datetime of training epoch
+    '''
     result = (datetime_ - self.epoch).total_seconds()
     result /= (60 * 60 * 24)
     return result
 
   def days_offset_from_epoch_to_datetime(self, offset_):
+    '''convert an days-offset-from-epoch into a datetime object
+
+    **Args**:
+      | ``offset_`` (int, float): days since training epoch
+
+    **Returns**:
+       (datetime):  datetime of the moment which was ``offset_`` days since the
+       training epoch
+
+    '''
     result = self.epoch
     result += timedelta(days=offset_)
     return result
@@ -526,7 +560,6 @@ class SpaceRepetitionReference(SpaceRepetition):
 
     SpacedKwargInterface.__init__(self, *args, **kwargs)
 
-    # refactored
     self.maxlen = SpaceRepetitionReference.Max_Length
     if 'maxlen' in kwargs:
       self.maxlen = kwargs['maxlen']
@@ -535,20 +568,19 @@ class SpaceRepetitionReference(SpaceRepetition):
     # to keep their initial conditions, and held in a ring buffer (deque)
     # so that the scheduling of this object can happen indefinitely without 
     # causing a memory leak
-    # refactored
     self.forgetting_enclosures = deque(maxlen=self.maxlen)
-    self.new_dates = deque(maxlen=self.maxlen)
-    self.new_results = deque(maxlen=self.maxlen)
+    self.dates_as_day_offsets = deque(maxlen=self.maxlen)
+    self.results_at_training_moments = deque(maxlen=self.maxlen)
 
     # pc:  plasticity curve
     # pc0:  plasticity curve set to 0
     # ipc: inverse plasticity curve
-    self.pc, self.pc0, self.ipc = self._plasticity_functions(
+    self.pc, self.pc0, self.ipc = self.plasticity_functions(
       self.plasticity_denominator_offset,
       self.plasticity_root
     )
 
-    # refactored
+    # return a generator which can be used to build a stickle back
     self.g_stickleback = self._G_stickleback(
       fdecaytau=self.fdecaytau,
       fdecay0=self.fdecay0,
@@ -562,29 +594,52 @@ class SpaceRepetitionReference(SpaceRepetition):
 
   # reference
   def schedule_as_offset(self, stop):
-    '''
-    Returns a schedule in day offsets from epoch up up until and possiblity
-    includeing the stop offset [days from offset].
+    '''Return a schedule as a list of offsets measured in days from the training
+    epoch.
 
-      # schedule as offsets from the training epoch
-      so = lt.schedule_as_offset(stop=40)
+    **Args**:
+      | ``stop`` (float, int, datetime): at what point do you want the schedule
+      information to stop.  If ``stop`` is an int or a float it will be
+      interpreted as the number of days-from-epoch at which you would like this
+      function to stop providing information. If ``stop`` is a datetime, the
+      output schedule will include all of the schedule suggestions up until
+      that time.
+
+    **Returns**:
+       (list of floats): The schedule as offset from the training epoch
 
     '''
-    while stop > self.latest_date_offset:
+    if type(stop) is datetime:
+      stop_as_offset_in_days = self.days_from_epoch(stop)
+    else:
+      stop_as_offset_in_days = stop
+
+    while stop_as_offset_in_days > self.latest_date_offset:
       self.latest_date_offset, self.latest_result = next(self.g_stickleback)
 
-    return list(self.new_dates)[0:0]
+    return list(self.dates_as_day_offsets)[0:0]
 
   def schedule(self, stop):
-    '''
-    Returns a schedule of datetimes up until and possibly including the
-    stop
+    '''Return a schedule as of datetimes up until and possibily including
+    datetime or offset represented by ``stop``.
 
-      # schedule as offsets from the training epoch
-      stop = lt.days_from_epoch
+    **Args**:
+      | ``stop`` (float, int, datetime): at what point do you want the schedule
+      information to stop.  If ``stop`` is an int or a float it will be
+      interpreted as the number of days-from-epoch at which you would like this
+      function to stop providing information. If ``stop`` is a datetime, the
+      output schedule will include all of the schedule suggestions up until
+      that time.
+
+    **Returns**:
+       (list of datetime objects): The schedule
 
     '''
-    stop_as_offset_in_days = self.days_from_epoch(stop)
+    if type(stop) is datetime:
+      stop_as_offset_in_days = self.days_from_epoch(stop)
+    else:
+      stop_as_offset_in_days = float(stop)
+
     schedule_as_offsets_in_days = \
       self.schedule_as_offset(
         stop=stop_as_offset_in_days
@@ -597,16 +652,19 @@ class SpaceRepetitionReference(SpaceRepetition):
     ]
 
     return schedule
-    
-  # repetition
-  def range_for(self, stop_at, curve=None, day_step_size=1):
-    '''
-    Returns a list of useful datetime values for a given curve, up to, but not
-    including the stop_at value, in increments of day_step_size.
 
-      stop_at: can be a datetime or an offset from epoch in days
-      curve: is which curve to be referenced, starting at 1
-      day_step_size: defaults to 1
+  # repetition
+  def range_for(self, stop, curve=None, day_step_size=1):
+    '''Returns a list of useful datetime values for a given curve, up to, but not
+    including the stop value, in increments of day_step_size.
+
+    **Args**:
+       | ``stop`` (datetime, float, int):  datetime or offset from epoch in days
+       | ``curve=None`` (type1): default: which forgetting curve, starting at 1
+       | ``day_step_size=1`` (type1): step size of the result (unit of days)
+
+    **Returns**:
+       (list): list of datetimes that can be used in another query
 
     '''
     curve = curve if curve or curve >= 1 else 1
@@ -614,15 +672,15 @@ class SpaceRepetitionReference(SpaceRepetition):
     if curve >= self.maxlen:
       raise Exception('You can not query beyond the bounds of the current ring buffer')
 
-    if type(stop_at) is datetime:
-      stop_day_as_offset = self.days_from_epoch(stop_at)
+    if type(stop) is datetime:
+      stop_day_as_offset = self.days_from_epoch(stop)
     else:
-      stop_day_as_offset = stop_at
+      stop_day_as_offset = float(stop)
 
     if stop_day_as_offset > self.latest_date_offset:
       self.schedule_as_offset(stop=stop_day_as_offset)
 
-    days_offset_of_curve = self.new_dates[curve-1]
+    days_offset_of_curve = self.dates_as_day_offsets[curve-1]
 
     start_date = \
       self.days_offset_from_epoch_to_datetime(days_offset_of_curve)
@@ -640,39 +698,60 @@ class SpaceRepetitionReference(SpaceRepetition):
 
     return result
 
-  def next_lesson(self):
+  def next_lesson(self, a):
+    '''Returns the next scheduled datetime suggested by the reference 
+
+    **Note**:
+       The schedules are created using a generator.  This is done so that an
+       infinite number of times can be suggested.  To keep memory constrained,
+       the internal dates, and forgetting functions are held in a deque.  A date
+       will always be available, but the forgetting curves and past suggested
+       dates can be over-written so that these objects don't take up huge
+       amounts of memory when they are run over the long term.
+
+    **Returns**:
+       (datetime): The suggested datetime for the next lesson.
+
+    '''
     self.latest_date_offset, self.latest_result = next(self.g_stickleback)
-    return self.latest_date_offset
+    return self.days_offset_from_epoch_to_datetime(self.latest_date_offset)
 
   def _find_nearest(self, array, value):
-      idx = (np.abs(array - value)).argmin()
-      return array[idx], idx
+    idx = (np.abs(array - value)).argmin()
+    return array[idx], idx
 
   def _G_stickleback(self, fdecaytau, fdecay0, ifo=None):
-    """The stickleback generator constructor.  It will return a generator
-    function that can be called an infinite number of times to build forgetting
-    curves and schedule time offsets and results.  The forgetting curves will be
-    stored within the self.forgetting_enclosures deque and similarily the
-    schedule time offset and results will be stored within the self.new_dates
-    and self.results deques respectively.
+    '''The stickleback generator constructor.  
+    
+    It will return a generator function that can be called an infinite number of
+    times to build forgetting curves and schedule time offsets and results.  The
+    forgetting curves will be stored within the self.forgetting_enclosures deque
+    and similarily the schedule time offset and results will be stored within
+    the self.dates_as_day_offsets and self.results deques respectively.
 
-    The generator will return a [schedule_offset, result] tuple
-    """
+    **Args**:
+       | ``fdecaytau`` (type1): ``initial`` parameter for ``tune_decay_of_decay``
+       | ``fdecay0`` (type1): ``tau`` parameter for ``tune_decay_of_decay``
+       | ``ifo=None`` (type1): initial forgetting offset (days from epoch)
+
+    **Returns**:
+       (generator): a function which can be called an infinite number of times
+
+    '''
     # ifo: initial forgetting offset
     if ifo is None:
       ifo = 0.0
 
     # dod: decay of decay
     # describes how the student gets worse at forgetting after a refresh
-    self.dod = self.decay_of_decay(fdecay0, fdecaytau)
+    self.dod = self.tune_decay_of_decay(fdecay0, fdecaytau)
 
     # construct our first forgetting curve, they haven't see this information before.
     ffn, ffn0 = self.forgetting_curves(self.dod(ifo), ifo)
 
-    # refactored
     self.forgetting_enclosures.append(ffn)
-    self.new_dates.append(ifo)
-    self.new_results.append(1)
+    self.dates_as_day_offsets.append(ifo)
+    self.results_at_training_moments.append(1)
 
     # make an initial guess to help the solver
     self.solution_x, self.solution_y = 1.0, 0.5
@@ -690,13 +769,13 @@ class SpaceRepetitionReference(SpaceRepetition):
 
       # Place a contract.  If this contract is broken, this code would become
       # extremely difficult to debug for long running learning trackers
-      assert len(self.forgetting_enclosures) == len(self.new_dates)
-      assert len(self.forgetting_enclosures) == len(self.new_results)
+      assert len(self.forgetting_enclosures) == len(self.dates_as_day_offsets)
+      assert len(self.forgetting_enclosures) == len(self.results_at_training_moments)
 
       if len(self.forgetting_enclosures) >= self.maxlen:
         self.forgetting_enclosures.popleft()
-        self.new_dates.popleft()
-        self.new_results.popleft()
+        self.dates_as_day_offsets.popleft()
+        self.results_at_training_moments.popleft()
 
       # link the zero'd form of the forgetting function and the zero'd form of
       # the plasticity curve, this is needed by fsolve to find where these
@@ -709,8 +788,8 @@ class SpaceRepetitionReference(SpaceRepetition):
         # first guess to find the solutions for our next problem
         solution_x, solution_y = fsolve(equations, (self.solution_x, self.solution_y))
 
-      self.new_dates.append(solution_x)
-      self.new_results.append(solution_y)
+      self.dates_as_day_offsets.append(solution_x)
+      self.results_at_training_moments.append(solution_y)
 
       #self.solution_x = solution_x
       #self.solution_y = solution_y
@@ -732,8 +811,8 @@ class SpaceRepetitionReference(SpaceRepetition):
 
   # reference
   def _vertical_bar_information(self):
-    self.ref_events_x = list(self.new_dates)[:]
-    self.ref_events_y = list(self.new_results)[:]
+    self.ref_events_x = list(self.dates_as_day_offsets)[:]
+    self.ref_events_y = list(self.results_at_training_moments)[:]
 
     for target_x, target_y in zip(self.ref_events_x, self.ref_events_y):
       self.vertical_bars.append([target_x, target_x])
@@ -744,7 +823,7 @@ class SpaceRepetitionReference(SpaceRepetition):
 
     self.recollection_x = np.linspace(0, stop_day_as_offset, self.samples)
 
-    for solution_x, solution_y in zip(self.new_dates, self.new_results):
+    for solution_x, solution_y in zip(self.dates_as_day_offsets, self.results_at_training_moments):
       target_x, nearest_index = self._find_nearest(self.recollection_x, solution_x)
       self.recollection_x[nearest_index] = solution_x
 
@@ -754,16 +833,28 @@ class SpaceRepetitionReference(SpaceRepetition):
     # create the stickleback x and y data that can be plotted
     self.x_and_y = self.make_stickleback_data_for_plot(
       forgetting_functions = list(self.forgetting_enclosures),
-      solutions=list(self.new_dates),
+      solutions=list(self.dates_as_day_offsets),
       stop_day_as_offset=stop_day_as_offset
     )
 
     # parse our ref_events into vertical bar information for graphing
     self._vertical_bar_information()
 
+
   # reference
   def plot_graph(self, stop, plot_pane_data=None, panes=None):
+    '''plot the reference
 
+    **Args**:
+       | ``stop`` (datetime, float, int): when to stop graphing
+       | ``plot_pane_data=None`` (int, float):  plot handle
+       | ``panes=None`` (type1): number of sub-plot panes to make
+
+    **Returns**:
+       (type): 
+
+
+    '''
     if type(stop) is datetime:
       self.schedule(stop=stop)
       stop_day_as_offset = self.days_from_epoch(stop)
@@ -806,10 +897,18 @@ class SpaceRepetitionReference(SpaceRepetition):
 
     return self.plot.ppd, data_dict
 
+  # reference
   def save_figure(self, filename="spaced.pdf"):
+    '''save the file produced by the plot_graph method
+
+    **Args**:
+       | ``filename="spaced.pdf"`` (string): filename
+    '''
     plt.savefig(filename, dpi=300)
 
+  # reference
   def show(self):
+    '''show the plot after a plot_graph method call'''
     plt.show()
 
   # reference
@@ -843,7 +942,7 @@ class SpaceRepetitionReference(SpaceRepetition):
       curve = 1
 
     forgetting_function = self.forgetting_enclosures[curve-1]
-    curve_time_as_offset_in_days = self.new_dates[curve-1]
+    curve_time_as_offset_in_days = self.dates_as_day_offsets[curve-1]
 
     return forgetting_function(moment_as_offset_in_days)
 
@@ -866,13 +965,13 @@ class SpaceRepetitionFeedback(SpaceRepetition):
     # idea through a self examination
     self.add_event(0, 1)
 
-    for event_x, event_y in zip(args[0], args[1]):
+    for feedback_moment, result in zip(args[0], args[1]):
       conditioned_x = None
-      if isinstance(event_x, datetime) is False:
-        conditioned_x = self.days_offset_from_epoch_to_datetime(event_x)
+      if isinstance(feedback_moment, datetime) is False:
+        conditioned_x = self.days_offset_from_epoch_to_datetime(feedback_moment)
       else:
-        conditioned_x = event_x
-      self.add_event(conditioned_x, event_y)
+        conditioned_x = feedback_moment
+      self.add_event(conditioned_x, result)
 
     SpacedKwargInterface.__init__(self, *args, **kwargs)
 
@@ -882,7 +981,7 @@ class SpaceRepetitionFeedback(SpaceRepetition):
       self.range = 10
 
     self.domain = 1.01
-    self.pc, dpo, dpr = self._plasticity_functions()
+    self.pc, dpo, dpr = self.plasticity_functions()
     self.discovered_plasticity_root = dpr
     self.discovered_plasticity_denominator_offset = dpo
 
@@ -892,19 +991,40 @@ class SpaceRepetitionFeedback(SpaceRepetition):
       result /= np.power(x + adder_, 1.0 / pdiv_)
     return result
 
-  def add_event(self, event_x, event_y):
-    if isinstance(event_x, datetime):
-      c_event_x = self.days_from_epoch(event_x)
+  def add_event(self, feedback_moment, result):
+    '''short description
+
+    **Note**:
+       Do this not that recommendation
+
+    **Args**:
+       | ``feedback_moment`` (int, float, datetime): the self examination moment
+       | ``result`` (type1): how well they did 0.0 to  1,0
+
+    **Returns**:
+       (list)  [plasticity curve, ``discovered_plasticity_root``,
+       ``discovered_plasticity_denominator_offset``]
+
+       * fn: the plasticity curve that matches what the student is actually doing
+       * ``discovered_plasticity_root``:  can be fed into
+       ``plasticity_functions`` of the reference object to make a reference
+       plasticty curve that matches this one.
+       * ``discovered_plasticity_denominator_offset``: can be fed into the
+       ``plasticity_functions`` of the reference object to make a reference
+       plasticity curve that matches this one.
+    '''
+    if isinstance(feedback_moment, datetime):
+      c_feedback_moment = self.days_from_epoch(feedback_moment)
     else:
-      c_event_x = event_x
+      c_feedback_moment = feedback_moment
 
-    if event_x not in self.a_events_x:
-      self.a_events_x.append(c_event_x)
-      self.a_events_y.append(event_y)
-      if c_event_x > self.range:
-        self.range = c_event_x
+    if feedback_moment not in self.a_events_x:
+      self.a_events_x.append(c_feedback_moment)
+      self.a_events_y.append(result)
+      if c_feedback_moment > self.range:
+        self.range = c_feedback_moment
 
-    self.pc, dpo, dpr = self._plasticity_functions()
+    self.pc, dpo, dpr = self.plasticity_functions()
     self.discovered_plasticity_denominator_offset = dpo
     self.discovered_plasticity_root = dpr
     return [self.pc, dpo, dpr]
@@ -916,7 +1036,22 @@ class SpaceRepetitionFeedback(SpaceRepetition):
           bounds=(0, [2.0, 2.0]))
     return [popt, pcov]
 
-  def _plasticity_functions(self):
+  # feedback
+  def plasticity_functions(self):
+    '''returns a function and two discovered plasticity parameters. 
+
+    **Returns**:
+       (list): fn, discovered_plasticity_root, discovered_plasticity_denominator_offset
+
+       * fn: the plasticity curve that matches what the student is actually doing
+       * ``discovered_plasticity_root``:  can be fed into
+       ``plasticity_functions`` of the reference object to make a reference
+       plasticty curve that matches this one.
+       * ``discovered_plasticity_denominator_offset``: can be fed into the
+       ``plasticity_functions`` of the reference object to make a reference
+       plasticity curve that matches this one.
+
+    '''
     rx = self.a_events_x
     ry = self.a_events_y
     weights = np.flip(np.linspace(0.1, 1.0, len(rx)))
@@ -935,15 +1070,20 @@ class SpaceRepetitionFeedback(SpaceRepetition):
     return fn, rparams[0], rparams[1]
 
   # feedback
-  def plot_graph(self, epoch=None, plot_pane_data=None, panes=None, stop=None):
+  def plot_graph(self, plot_pane_data=None, panes=None, stop=None):
+    '''plot the feedbackgraph
+
+    **Args**:
+       | ``stop`` (datetime, float, int): when to stop graphing
+       | ``plot_pane_data=None`` (int, float):  plot handle
+       | ``panes=None`` (type1): number of sub-plot panes to make
+
+    **Returns**:
+       (type): 
+
+
+    '''
     observed_events = [[], []]
-
-
-    if epoch is None:
-      if self.epoch is None:
-        epoch = None
-      else:
-        epoch = self.epoch
 
     if panes is None:
       panes = 1
@@ -992,12 +1132,14 @@ class SpaceRepetitionFeedback(SpaceRepetition):
                      title=SpaceRepetitionFeedback.Title,
                      x_range=stop,
                      y_domain=self.domain + 0.01,
-                     epoch=epoch,
+                     epoch=self.epoch,
                      plot_pane_data=plot_pane_data
                      )
     return self.plot, data_dict
 
+  # feedback
   def show(self):
+    '''show the plot after a plot_graph method call'''
     plt.show()
 
 class ControlData():
@@ -1290,12 +1432,12 @@ class SpaceRepetitionController(SpaceRepetition):
       latest_ref_offset, self.latest_result = next(self.updated_reference.g_stickleback)
       self.latest_date_offset = latest_ref_offset + self.x_reference_shift
 
-    self.new_dates = [
+    self.dates_as_day_offsets = [
       ref_as_offset + self.x_reference_shift for
       ref_as_offset in
-      self.updated_reference.new_dates]
+      self.updated_reference.dates_as_day_offsets]
 
-    return list(self.new_dates)[0:0]
+    return list(self.dates_as_day_offsets)[0:0]
 
   # controller
   def schedule(self, stop):
@@ -1428,7 +1570,6 @@ class SpaceRepetitionController(SpaceRepetition):
     db._append_to_base(base, data_dict)
 
     h, data_dict = self.feedback.o.plot_graph(
-      epoch=self.epoch,
       plot_pane_data=hdl,
       stop=stop_day_as_offset
     )
@@ -1514,15 +1655,15 @@ class SpaceRepetitionController(SpaceRepetition):
       index = 0
     else:
       index = curve - 1
-    return self.new_dates[index]
+    return self.dates_as_day_offsets[index]
 
   # control
-  def range_for(self, stop_at, curve=None, day_step_size=1):
+  def range_for(self, stop, curve=None, day_step_size=1):
     '''
     Returns a list of useful datetime values for a given curve, up to, but not
-    including the stop_at value, in increments of day_step_size.
+    including the stop value, in increments of day_step_size.
 
-      stop_at: can be a datetime or an offset from epoch in days
+      stop: can be a datetime or an offset from epoch in days
       curve: is which curve to be referenced, starting at 1
       day_step_size: defaults to 1
 
@@ -1532,15 +1673,15 @@ class SpaceRepetitionController(SpaceRepetition):
     if curve >= self.updated_reference.maxlen:
       raise Exception('You can not query beyond the bounds of the current ring buffer')
 
-    if type(stop_at) is datetime:
-      stop_day_as_offset = self.days_from_epoch(stop_at)
+    if type(stop) is datetime:
+      stop_day_as_offset = self.days_from_epoch(stop)
     else:
-      stop_day_as_offset = stop_at
+      stop_day_as_offset = stop
 
     if stop_day_as_offset > self.latest_date_offset:
       self.schedule_as_offset(stop=stop_day_as_offset)
 
-    days_offset_of_curve = self.new_dates[curve-1]
+    days_offset_of_curve = self.dates_as_day_offsets[curve-1]
 
     start_date = \
       self.days_offset_from_epoch_to_datetime(days_offset_of_curve)
@@ -1653,9 +1794,9 @@ class LearningTracker():
           self.add_event(x_, y_)
 
   # learning tracker
-  def add_event(self, event_x, event_y):
-    self.feedback_x.append(event_x)
-    self.feedback_y.append(event_y)
+  def add_event(self, feedback_moment, result):
+    self.feedback_x.append(feedback_moment)
+    self.feedback_y.append(result)
     self.frame = np.arange(1, len(self.feedback_x))
     hf = SpaceRepetitionFeedback(self.feedback_x,
         self.feedback_y,
@@ -1784,8 +1925,8 @@ class LearningTracker():
     ani.save(self.name_of_mp4, writer=writer)
 
   # learning tracker
-  def range_for(self, curve=None, day_step_size=1):
-    return self.control.range_for(curve, day_step_size)
+  def range_for(self, stop, curve=None, day_step_size=1):
+    return self.control.range_for(stop, curve, day_step_size)
 
   # learning tracker
   def predict_result(self, moment, curve=None):
