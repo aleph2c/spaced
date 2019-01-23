@@ -29,8 +29,9 @@ a student actually does.
 You can use the results of one training session to feed in better expectations
 about how a student remembers and how they forget for their next session.  In
 this way, the ``spaced`` schedules are adaptive and will become more useful for
-the student as they interact with the system.  So, ``spaced`` helps the student
-learn, and it learns from the student as they engage with their education.
+the student as they interact with the system; ``spaced`` helps
+the student learn, and it learns from the student as they engage with their
+education.
 
 The ``spaced`` package :ref:`can provide graphs <recipes-diagrams>` and
 :ref:`video feedback to give insights <recipes-animating-a-learning-tracker>` on
@@ -41,7 +42,11 @@ provide insights into the quality of the material, how distracted the student is
 or isn't, how fast they remember over the longer term and how fast they forget
 over the short-term.
 
-However, if you don't need to drill down to this level of detail, you can used the ``spaced`` algorithm in a less memory-intensive way.  
+If you don't need to drill down to this level of detail, you can used the
+``spaced`` algorithm in a less computer-memory-intensive way, by just making predictions
+about a memory and getting the next schedule time for training.
+
+The ``spaced`` package can track a memory indefinitely.
 
 .. raw:: html
 

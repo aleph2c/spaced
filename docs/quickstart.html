@@ -48,36 +48,35 @@ conditions:</p>
 <span class="kn">from</span> <span class="nn">space.repitition</span> <span class="kn">import</span> <span class="n">pp</span>
 <span class="kn">from</span> <span class="nn">space.repitition</span> <span class="kn">import</span> <span class="n">LearningTracker</span>
 
-<span class="n">days_to_track</span> <span class="o">=</span> <span class="mi">43</span>  <span class="c1"># used for graphing</span>
-
-<span class="n">lt</span> <span class="o">=</span> <span class="n">LearningTracker</span><span class="p">(</span>
-  <span class="n">epoch</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">new</span><span class="p">(),</span>
-  <span class="nb">range</span><span class="o">=</span><span class="n">days_to_track</span>
-<span class="p">)</span>
+<span class="n">lt</span> <span class="o">=</span> <span class="n">LearningTracker</span><span class="p">(</span><span class="n">epoch</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">new</span><span class="p">())</span>
 </pre></div>
 </div>
 <p>Then ask your learning tracker for its schedule:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">print</span><span class="p">(</span><span class="s2">&quot;Scheduled as dates&quot;</span><span class="p">)</span>
-<span class="n">pp</span><span class="p">(</span><span class="n">lt</span><span class="o">.</span><span class="n">schedule</span><span class="p">())</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">days_after_epoch</span><span class="o">=</span><span class="mi">43</span>
+<span class="k">print</span><span class="p">(</span><span class="s2">&quot;Schedule as dates&quot;</span><span class="p">)</span>
+<span class="n">pp</span><span class="p">(</span><span class="n">lt</span><span class="o">.</span><span class="n">schedule</span><span class="p">(</span><span class="n">stop</span><span class="o">=</span><span class="n">days_after_epoch</span><span class="p">))</span>
 </pre></div>
 </div>
 <p>Something like this would appear in your terminal window:</p>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Scheduled as dates
-[ datetime.datetime(2018, 12, 22, 4, 23, 42, 247300),
-        datetime.datetime(2018, 12, 22, 15, 28, 53, 456841),
-        datetime.datetime(2018, 12, 23, 4, 3, 40, 733013),
-        datetime.datetime(2018, 12, 23, 19, 20, 14, 562054),
-        datetime.datetime(2018, 12, 24, 15, 33, 37, 943760),
-        datetime.datetime(2018, 12, 25, 22, 9, 53, 666487),
-        datetime.datetime(2018, 12, 28, 9, 45, 48, 339845),
-        datetime.datetime(2019, 1, 6, 9, 51, 41, 920278)]
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Schedule as dates
+[ datetime.datetime(2019, 1, 23, 17, 19, 47, 366483),
+  datetime.datetime(2019, 1, 24, 3, 48, 2, 179641),
+  datetime.datetime(2019, 1, 24, 14, 53, 13, 389181),
+  datetime.datetime(2019, 1, 25, 3, 28, 0, 665353),
+  datetime.datetime(2019, 1, 25, 18, 44, 34, 494393),
+  datetime.datetime(2019, 1, 26, 14, 57, 57, 876099),
+  datetime.datetime(2019, 1, 27, 21, 34, 13, 598825),
+  datetime.datetime(2019, 1, 30, 9, 10, 8, 272185),
+  datetime.datetime(2019, 2, 8, 9, 16, 1, 852609)]
 </pre></div>
 </div>
 </div>
 <div class="section" id="understanding-where-a-schedule-comes-from">
 <span id="quickstart-understanding-where-a-schedule-comes-from"></span><h2>Understanding where a Schedule Comes from<a class="headerlink" href="#understanding-where-a-schedule-comes-from" title="Permalink to this headline">¶</a></h2>
 <p>To see the graph from which this schedule was derived:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">hdl</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">reference</span><span class="o">.</span><span class="n">plot_graph</span><span class="p">()</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">hdl</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">reference</span><span class="o">.</span><span class="n">plot_graph</span><span class="p">(</span><span class="n">stop</span><span class="o">=</span><span class="mi">43</span><span class="p">)</span>
+<span class="n">lt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="n">hdl</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>  <span class="c1"># save your computer-memory</span>
 </pre></div>
 </div>
 <a class="reference external image-reference" href="_static/quickstart_reference.pdf"><div align="center" class="align-center"><img alt="_images/quickstart_reference.svg" src="_images/quickstart_reference.svg" /></div>
@@ -105,53 +104,73 @@ schedule.</p>
 </div>
 <div class="section" id="adding-student-feedback">
 <span id="quickstart-adding-student-feedback"></span><h2>Adding Student Feedback<a class="headerlink" href="#adding-student-feedback" title="Permalink to this headline">¶</a></h2>
-<p>To begin with the schedule is completely arbitrary.  This is because the model
-doesn’t understand anything about the student yet.  But each time you give it
-student data it adapts its schedule to the student’s behavior, and how they
-appear to be forgetting things.</p>
+<p>When the <code class="docutils literal notranslate"><span class="pre">spaced</span></code> algorithm is first turned on, its schedule is entirely
+arbitrary:  this is because the model doesn’t understand anything about the
+student yet.  But each time you give it student data it adapts its schedule to
+the student’s behaviour, and how they appear to be forgetting things.</p>
 <p>Imagine that immediately after looking at the material for the first time; our
-student tries to remember what they just learned.  They determine that they can
-recall about 40 percent of the material.  To tell <code class="docutils literal notranslate"><span class="pre">spaced</span></code> about this, we
-would write the following code:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">days_since_training_epoch</span> <span class="o">=</span> <span class="mi">0</span>
+student tries to remember what they just learned.  They decide to test
+themselves and determine that they can recall about 40 percent of the material
+nine seconds after looking at it for the first time.  To tell <code class="docutils literal notranslate"><span class="pre">spaced</span></code> about
+this, we would write the following code:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">days_since_training_epoch</span> <span class="o">=</span> <span class="mf">0.0001</span>  <span class="c1"># ~ 9 seconds</span>
 <span class="n">lt</span><span class="o">.</span><span class="n">learned</span><span class="p">(</span><span class="n">result</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span> <span class="n">when</span><span class="o">=</span><span class="n">days_since_training_epoch</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Immediately after finishing their test, the student reviews the material until
-they understand all of it.</p>
+<p>After our student finished this self review, they would study their material
+until they could recall all of it.</p>
 <p>Suppose that 19 hours later (0.8 days later), the student tests themselves
-again.  This time they can remember 44 percent of it.  Let’s feed this into the
-learning tracker, by writing the following code:</p>
+again.  This time they can remember 44 percent of what they wanted.  Let’s feed
+this into the learning tracker, by writing the following code:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">days_since_training_epoch</span> <span class="o">=</span> <span class="mf">0.8</span>
 <span class="n">lt</span><span class="o">.</span><span class="n">learned</span><span class="p">(</span><span class="n">result</span><span class="o">=</span><span class="mf">0.44</span><span class="p">,</span> <span class="n">when</span><span class="o">=</span><span class="n">days_since_training_epoch</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>As before, the student reviews the material until they have complete
-understanding, immediately after they have tested themselves.</p>
+<p>As before, after they finish this self examination, they would restudy their
+material until they could remember all of it.</p>
 </div>
 <div class="section" id="getting-a-schedule-which-responds-to-the-student-s-feedback">
 <span id="quickstart-getting-a-schedule-which-responds-to-the-student-s-feedback"></span><h2>Getting a Schedule which Responds to the Student’s Feedback<a class="headerlink" href="#getting-a-schedule-which-responds-to-the-student-s-feedback" title="Permalink to this headline">¶</a></h2>
-<p>Now that <code class="docutils literal notranslate"><span class="pre">spaced</span></code> has more data, let’s ask it for its new schedule:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">print</span><span class="p">(</span><span class="s2">&quot;Scheduled as dates&quot;</span><span class="p">)</span>
-<span class="n">pp</span><span class="p">(</span><span class="n">lt</span><span class="o">.</span><span class="n">schedule</span><span class="p">())</span>
+<p>Now that <code class="docutils literal notranslate"><span class="pre">spaced</span></code> has more data, let’s ask it for a new schedule that spans
+the time between the last feedback moment and up to 5 days after the training
+began.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">print</span><span class="p">(</span><span class="s2">&quot;Schedule as dates&quot;</span><span class="p">)</span>
+<span class="n">pp</span><span class="p">(</span><span class="n">lt</span><span class="o">.</span><span class="n">schedule</span><span class="p">(</span><span class="n">stop</span><span class="o">=</span><span class="mi">5</span><span class="p">))</span>
 </pre></div>
 </div>
 <p>In your terminal you will see something like this:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Schedule as dates
+[ datetime.datetime(2019, 1, 25, 0, 47, 23, 383894),
+  datetime.datetime(2019, 1, 25, 13, 14, 43, 265794)]
+</pre></div>
+</div>
+<p>You could get the same schedule by providing a datetime object as the stop
+argument:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">print</span><span class="p">(</span><span class="s2">&quot;Scheduled as dates&quot;</span><span class="p">)</span>
+<span class="c1"># get a schedule from epoch to five days from epoch</span>
+<span class="n">pp</span><span class="p">(</span><span class="n">lt</span><span class="o">.</span><span class="n">schedule</span><span class="p">(</span><span class="n">stop</span><span class="o">=</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2019</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">26</span><span class="p">))</span>
+</pre></div>
+</div>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Scheduled as dates
-[ datetime.datetime(2018, 12, 23, 1, 53, 3, 865177),
-        datetime.datetime(2018, 12, 23, 16, 32, 43, 271301),
-        datetime.datetime(2018, 12, 24, 11, 49, 1, 151759),
-        datetime.datetime(2018, 12, 25, 17, 9, 28, 362910),
-        datetime.datetime(2018, 12, 28, 3, 57, 43, 777324),
-        datetime.datetime(2019, 1, 7, 0, 21, 16, 69957),
-        datetime.datetime(2018, 12, 21, 14, 0, 13, 200220),
-        datetime.datetime(2018, 12, 22, 1, 26, 21, 259959),
-        datetime.datetime(2018, 12, 22, 13, 46, 42, 422666),
-        datetime.datetime(2018, 12, 23, 4, 26, 21, 828789),
-        datetime.datetime(2018, 12, 23, 23, 42, 39, 709248),
-        datetime.datetime(2018, 12, 25, 5, 3, 6, 920399),
-        datetime.datetime(2018, 12, 27, 15, 51, 22, 334813),
-        datetime.datetime(2019, 1, 6, 12, 14, 54, 627446)]
+[ datetime.datetime(2019, 1, 23, 3, 13, 45, 753025),
+  datetime.datetime(2019, 1, 23, 15, 41, 5, 635312),
+  datetime.datetime(2019, 1, 24, 6, 39, 35, 613096),
+  datetime.datetime(2019, 1, 25, 2, 28, 43, 835472)]
+</pre></div>
+</div>
+<p>If you would have rather seen the schedule as a set of date-offsets from the
+starting moment of training (it’s epoch) you could use the
+<code class="docutils literal notranslate"><span class="pre">schedule_as_offset</span></code> api:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">print</span><span class="p">(</span><span class="s2">&quot;Schedule as offsets in days from the training epoch&quot;</span><span class="p">)</span>
+<span class="n">pp</span><span class="p">(</span><span class="n">lt</span><span class="o">.</span><span class="n">schedule_as_offset</span><span class="p">(</span><span class="n">stop</span><span class="o">=</span><span class="mi">5</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Schedule as offsets in days from the training epoch
+[ 1.2507216586504115,
+  1.7374520166988208,
+  2.3041058337185985,
+  3.0183370061964974,
+  4.022524650984104]
 </pre></div>
 </div>
 </div>
@@ -160,10 +179,13 @@ understanding, immediately after they have tested themselves.</p>
 <p>The <code class="docutils literal notranslate"><span class="pre">spaced</span></code> schedule changes as it reacts to feedback from the student. To
 see why this change has occurred we can look at the plots from which this
 schedule is derived:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">hdl</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">plot_graphs</span><span class="p">()</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">hdl</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">plot_graphs</span><span class="p">(</span><span class="n">stop</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">lt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="n">hdl</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </pre></div>
 </div>
-<a class="reference external image-reference" href="_static/quickstart_control_after_two_events.pdf"><img alt="_images/quickstart_control_after_two_events.png" class="align-center" src="_images/quickstart_control_after_two_events.png" /></a>
+<a class="reference external image-reference" href="_static/quickstart_control_after_two_events.pdf"><div align="center" class="align-center"><img alt="_images/quickstart_control_after_two_events.svg" src="_images/quickstart_control_after_two_events.svg" /></div>
+</a>
 <p>The learning tracker diagram above contains four different graphs.  The first
 graph is called the recommendation.  It represents the goal of our training
 engagement with this student for the thing that they are trying to learn.  It is
@@ -198,6 +220,7 @@ the reference-plasticity curve at this intersection point.</p>
 <span class="c1"># they recall about 64 percent of the thing they are studying</span>
 <span class="n">days_since_training_epoch</span> <span class="o">=</span> <span class="mf">1.75</span>
 <span class="n">lt</span><span class="o">.</span><span class="n">learned</span><span class="p">(</span><span class="n">result</span><span class="o">=</span><span class="mf">0.64</span><span class="p">,</span> <span class="n">when</span><span class="o">=</span><span class="n">days_since_training_epoch</span><span class="p">)</span>
+
 <span class="c1"># the student reviews their material until</span>
 <span class="c1"># they have a perfect recollection</span>
 
@@ -212,35 +235,78 @@ the reference-plasticity curve at this intersection point.</p>
 <a class="reference external image-reference" href="_static/quickstart_control_after_four_events.pdf"><img alt="_images/quickstart_control_after_four_events.png" class="align-center" src="_images/quickstart_control_after_four_events.png" /></a>
 <p>Now suppose the student trains six more times:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">days_and_results</span> <span class="o">=</span> <span class="p">[</span>
-  <span class="p">[</span><span class="mf">4.8</span><span class="p">,</span>  <span class="mf">7.33</span><span class="p">,</span> <span class="mf">10.93</span><span class="p">,</span> <span class="mf">16.00</span><span class="p">,</span> <span class="mf">23.00</span><span class="p">,</span> <span class="mf">29.00</span><span class="p">],</span>
-  <span class="p">[</span><span class="mf">0.83</span><span class="p">,</span> <span class="mf">0.89</span><span class="p">,</span>  <span class="mf">1.00</span><span class="p">,</span>  <span class="mf">0.99</span><span class="p">,</span> <span class="mf">0.99</span><span class="p">,</span>   <span class="mf">1.00</span><span class="p">],</span>
+  <span class="p">[</span><span class="mf">4.8</span><span class="p">,</span>  <span class="mf">7.33</span><span class="p">,</span> <span class="mf">10.93</span><span class="p">,</span> <span class="mf">16.00</span><span class="p">,</span> <span class="mf">23.00</span><span class="p">],</span>
+  <span class="p">[</span><span class="mf">0.83</span><span class="p">,</span> <span class="mf">0.89</span><span class="p">,</span>  <span class="mf">1.00</span><span class="p">,</span>  <span class="mf">0.99</span><span class="p">,</span> <span class="mf">0.99</span><span class="p">],</span>
 <span class="p">]</span>
 
 <span class="k">for</span> <span class="n">d</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">days_and_results</span><span class="p">):</span>
-  <span class="n">days_since_training_epoch</span><span class="p">,</span> <span class="n">result</span> <span class="o">=</span> <span class="n">d</span><span class="p">,</span> <span class="n">r</span>
-  <span class="n">lt</span><span class="o">.</span><span class="n">learned</span><span class="p">(</span><span class="n">result</span><span class="o">=</span><span class="n">result</span><span class="p">,</span> <span class="n">when</span><span class="o">=</span><span class="n">days_since_training_epoch</span><span class="p">)</span>
+  <span class="n">lt</span><span class="o">.</span><span class="n">learned</span><span class="p">(</span><span class="n">result</span><span class="o">=</span><span class="n">r</span><span class="p">,</span> <span class="n">when</span><span class="o">=</span><span class="n">d</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Now let’s ask the learning tracker for it’s schedule up to the 30th days after
+the training began:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">print</span><span class="p">(</span><span class="s2">&quot;Schedule as dates up until 30 days after the training began:&quot;</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">lt</span><span class="o">.</span><span class="n">schedule</span><span class="p">(</span><span class="n">stop</span><span class="o">=</span><span class="mi">30</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>The above code will output:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Schedule as dates up until 30 days after the training began:
+[]
+</pre></div>
+</div>
+<p>The schedule result is empty.  Is this right? To find why it is empty, let’s
+look at this learning tracker’s graph:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">hdl</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">plot_graphs</span><span class="p">(</span><span class="n">stop</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+<span class="n">lt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="n">hdl</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>  <span class="c1"># save your computer&#39;s memory</span>
+</pre></div>
+</div>
+<a class="reference external image-reference" href="_static/quickstart_control_after_ten_events.pdf"><div align="center" class="align-center"><img alt="_images/quickstart_control_after_ten_events.svg" src="_images/quickstart_control_after_ten_events.svg" /></div>
+</a>
+<p>By looking at the above graph we can see why the schedule results are empty when we
+give it a stop date of 30 days after epoch.  Our last training moment was at a
+23 day offset, and our next training day has been spaced out into the future
+beyond the right hand side of the graph.</p>
+<p>To get the next training dates we can just ask for it like this:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">print</span><span class="p">(</span><span class="s2">&quot;Next scheduled training date:&quot;</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">lt</span><span class="o">.</span><span class="n">next</span><span class="p">())</span>
+<span class="k">print</span><span class="p">(</span><span class="s2">&quot;Next scheduled training date as an offset:&quot;</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">lt</span><span class="o">.</span><span class="n">next_offset</span><span class="p">())</span>
 
-<span class="k">print</span><span class="p">(</span><span class="n">lt</span><span class="o">.</span><span class="n">schedule</span><span class="p">())</span>
+<span class="k">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Asking a second time&quot;</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s2">&quot;Next scheduled training date (same as before):&quot;</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">lt</span><span class="o">.</span><span class="n">next</span><span class="p">())</span>
+<span class="k">print</span><span class="p">(</span><span class="s2">&quot;Next scheduled training date as an offset (same as before):&quot;</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">lt</span><span class="o">.</span><span class="n">next_offset</span><span class="p">())</span>
 </pre></div>
 </div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2019</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">18</span><span class="p">,</span> <span class="mi">21</span><span class="p">,</span> <span class="mi">24</span><span class="p">,</span> <span class="mi">51</span><span class="p">,</span> <span class="mi">192016</span><span class="p">)]</span>
+<p>This will output:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Next scheduled training date:
+2019-05-21 15:09:07.385615
+Next scheduled training date as an offset:
+118.37
+
+Asking a second time
+Next scheduled training date (same as before):
+2019-05-21 15:09:07.385615
+Next scheduled training date as an offset (same as before):
+118.37
 </pre></div>
 </div>
-<p>Let’s take a look at the graph:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">hdl</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">plot_graphs</span><span class="p">()</span>
-</pre></div>
-</div>
-<a class="reference external image-reference" href="_static/quickstart_control_after_ten_events.pdf"><img alt="_images/quickstart_control_after_ten_events.png" class="align-center" src="_images/quickstart_control_after_ten_events.png" /></a>
-<p>This last graph really isn’t that useful: the next recommended training date
-isn’t on its control plot.</p>
-<p>In fact, it’s hard to get a clear idea about what is going on by looking at any
-of these plots in isolation.  What is better is to flip through them one at a
-time in sequential succession; in this way you can look at a plot while having
-it’s history in your recent visual memory, so as to give it some context.</p>
-<p>What would be nice would be an animation of each training event followed by the
-next.  You could watch it for 10 seconds and get a good idea about their
-training history.  The <code class="docutils literal notranslate"><span class="pre">spaced</span></code> library provides such an animation feature and
-it is described in the next section.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">next</span></code> API will always return information about when the next training
+date should occur.  You can call it multiple times and its answer won’t change,
+unless you provide the learning tracker with more <code class="docutils literal notranslate"><span class="pre">learned</span></code> feedback.</p>
+<p>The last graph answered the problem about our missing schedule, but other than
+that, it wasn’t that useful: the next recommended training date wasn’t on its
+control plot.</p>
+<p>It’s hard to get a clear idea about what is going on by looking at any of these
+plots in isolation.  What is better is to flip through them one at a time in
+sequential succession; in this way, you can look at a plot while having its
+history in your recent visual memory to provide context about how things are
+changing.  What we want is an oscilloscope; a device that animates plots in
+real-time.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">spaced</span></code> library provides this animation feature, and it is described in
+the next section.</p>
 </div>
 <div class="section" id="animating-the-reactive-schedule-to-get-an-intuitive-feeling-about-results">
 <span id="quickstart-animating-reactive-schedule-to-get-an-intuitive-feel"></span><h2>Animating the Reactive Schedule to get an Intuitive Feeling about Results<a class="headerlink" href="#animating-the-reactive-schedule-to-get-an-intuitive-feeling-about-results" title="Permalink to this headline">¶</a></h2>
@@ -268,23 +334,23 @@ the material. When the dark blue reference curve in the control box moved to the
 left, the student was doing better than expected, and when it shifted to the
 right, the student was doing worse than expected.</p>
 <p>We also see that our initial forgetting curves were too pessimistic, and as a
-result our initial schedule was too aggressive. But after a few training events,
-the spaced algorithm began to match the forgetting parameters to how the student
-actually forgot things.</p>
+result, our initial schedule was too aggressive. But after a few training
+events, the spaced algorithm began to match the forgetting parameters to how the
+student forgot things.</p>
 <p>The video plays a training event every second, which means that we are
 accelerating time since the training events become more and more spaced out the
 later they occur.</p>
 </div>
 <div class="section" id="predicting-future-results">
 <span id="quickstart-predicting-future-results"></span><h2>Predicting Future Results<a class="headerlink" href="#predicting-future-results" title="Permalink to this headline">¶</a></h2>
-<p>But, it is unlikely that you will be using <code class="docutils literal notranslate"><span class="pre">spaced</span></code> to track just one object.  You
+<p>It is unlikely that you will be using <code class="docutils literal notranslate"><span class="pre">spaced</span></code> to track just one object.  You
 will probably have thousands of them running, and you will have to select from a
-small subset of these thousands of tracked objects to compile a review session for your
-student.  To do this, you need to know which of your tracked <code class="docutils literal notranslate"><span class="pre">spaced</span></code> objects
-are in the most need of attention.</p>
-<p>For this reason you will need to query a <code class="docutils literal notranslate"><span class="pre">spaced</span></code> object so that it can make a
-prediction about a student’s ability to recall a fact at some datetime.  To predict
-a result, you can use the learning tracker’s <code class="docutils literal notranslate"><span class="pre">predict_result</span></code> api.</p>
+small subset of these thousands of tracked objects to compile a review session
+for your student.  To do this, you need to know which of your tracked <code class="docutils literal notranslate"><span class="pre">spaced</span></code>
+objects are in the most need of attention.</p>
+<p>For this reason, you will need to query a <code class="docutils literal notranslate"><span class="pre">spaced</span></code> object so that it can
+predict a student’s ability to recall a fact at some datetime.  To predict a
+result, you can use the learning tracker’s <code class="docutils literal notranslate"><span class="pre">predict_result</span></code> API.</p>
 <p>To demonstrate this, I will make a set of predictions and graph them onto the
 plot generated by the learning tracker.</p>
 <p>Here is how to do this:</p>
@@ -319,6 +385,9 @@ plot generated by the learning tracker.</p>
 <span class="n">control_plot</span> <span class="o">=</span> <span class="n">hdl</span><span class="o">.</span><span class="n">axarr</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 <span class="n">control_plot</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
   <span class="n">useful_range_of_datetimes</span><span class="p">,</span> <span class="n">results</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;xkcd:azure&#39;</span><span class="p">)</span>
+
+<span class="n">lt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="n">hdl</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>  <span class="c1"># save your computer&#39;s memory</span>
 </pre></div>
 </div>
 <p>Here is the resulting plot:</p>
@@ -328,6 +397,90 @@ plot generated by the learning tracker.</p>
 curve over a set of datetimes, that the line representing this information
 extends downward past the plasticity line.  This is because the query assumes
 that no additional training event will occur.</p>
+<p>But this graphing code is kind of awkward: we create a plot, get the matplotlib
+graph handle, then plot some more data into the same graph and then close it
+down.  That is a lot for you to remember.  If you forget to close the plot
+handle, you use a lot of memory.  If you do this too many times you will have a
+memory leak, something that could show up far in the future and evade simple
+reproduction steps when you are trying to trouble shoot your system.</p>
+<p>Python has an answer for these kinds of build-up-and-tear-down problems, it is
+called a context manager.  The <code class="docutils literal notranslate"><span class="pre">spaced</span></code> library uses a context manager to give
+you a cleaner API for graphing.  You can see how it works in the following
+example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">repetition</span> <span class="kn">import</span> <span class="n">LearningTracker</span>
+
+<span class="c1"># create a learning tracker</span>
+<span class="c1"># and give it some student feedback</span>
+<span class="n">lt</span> <span class="o">=</span> <span class="n">LearningTracker</span><span class="p">(</span><span class="n">epoch</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">())</span>
+
+<span class="k">for</span> <span class="n">d</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+  <span class="p">[</span><span class="mi">0</span><span class="p">,</span>    <span class="mf">0.8</span><span class="p">,</span>  <span class="mf">1.75</span><span class="p">,</span> <span class="mf">3.02</span><span class="p">,</span> <span class="mf">4.8</span><span class="p">,</span>  <span class="mf">7.33</span><span class="p">],</span>
+  <span class="p">[</span><span class="mf">0.40</span><span class="p">,</span> <span class="mf">0.44</span><span class="p">,</span> <span class="mf">0.64</span><span class="p">,</span> <span class="mf">0.76</span><span class="p">,</span> <span class="mf">0.83</span><span class="p">,</span> <span class="mf">0.89</span><span class="p">]):</span>
+
+  <span class="n">lt</span><span class="o">.</span><span class="n">learned</span><span class="p">(</span><span class="n">result</span><span class="o">=</span><span class="n">r</span><span class="p">,</span> <span class="n">when</span><span class="o">=</span><span class="n">d</span><span class="p">)</span>
+
+<span class="c1"># plot some control predictions on the first forgetting curve</span>
+<span class="c1"># of the control graph</span>
+<span class="k">with</span> <span class="n">lt</span><span class="o">.</span><span class="n">graphs</span><span class="p">(</span>
+  <span class="n">stop</span><span class="o">=</span><span class="mi">43</span><span class="p">,</span>
+  <span class="n">show</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+  <span class="n">control_handle</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+  <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;context_manager_one_handle.svg&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ch</span><span class="p">:</span>
+
+  <span class="n">moments</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">range_for</span><span class="p">(</span><span class="n">curve</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="mi">43</span><span class="p">,</span> <span class="n">day_step_size</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+  <span class="n">predictions</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">lt</span><span class="o">.</span><span class="n">predict_result</span><span class="p">(</span><span class="n">moment</span><span class="p">,</span> <span class="n">curve</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">moment</span> <span class="ow">in</span> <span class="n">moments</span>
+  <span class="p">]</span>
+  <span class="n">ch</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">moments</span><span class="p">,</span> <span class="n">predictions</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;xkcd:azure&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This code will provide a graph handle to the controller subplot in the learning
+tracker graph, let you plot against it and then close everything after you have
+finished with it.  The resulting file would look like this:</p>
+<a class="reference external image-reference" href="_static/context_manager_one_handle.pdf"><div align="center" class="align-center"><img alt="_images/context_manager_one_handle.svg" src="_images/context_manager_one_handle.svg" /></div>
+</a>
+<p>You can use the same context manager to make predictions on the reference and
+the control graph, by specifying you want graph handles for both subplots.  Here
+is some example code that show how to plot a prediction on the reference and the
+control graphs:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">repetition</span> <span class="kn">import</span> <span class="n">LearningTracker</span>
+
+<span class="c1"># create a learning tracker</span>
+<span class="c1"># and give it some student feedback</span>
+<span class="n">lt</span> <span class="o">=</span> <span class="n">LearningTracker</span><span class="p">(</span><span class="n">epoch</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">())</span>
+
+<span class="k">for</span> <span class="n">d</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+  <span class="p">[</span><span class="mi">0</span><span class="p">,</span>    <span class="mf">0.8</span><span class="p">,</span>  <span class="mf">1.75</span><span class="p">,</span> <span class="mf">3.02</span><span class="p">,</span> <span class="mf">4.8</span><span class="p">,</span>  <span class="mf">7.33</span><span class="p">],</span>
+  <span class="p">[</span><span class="mf">0.40</span><span class="p">,</span> <span class="mf">0.44</span><span class="p">,</span> <span class="mf">0.64</span><span class="p">,</span> <span class="mf">0.76</span><span class="p">,</span> <span class="mf">0.83</span><span class="p">,</span> <span class="mf">0.89</span><span class="p">]):</span>
+
+  <span class="n">lt</span><span class="o">.</span><span class="n">learned</span><span class="p">(</span><span class="n">result</span><span class="o">=</span><span class="n">r</span><span class="p">,</span> <span class="n">when</span><span class="o">=</span><span class="n">d</span><span class="p">)</span>
+
+<span class="c1"># plot some reference predictions on the 3rd reference forgetting</span>
+<span class="c1"># curve and the 1st control forgetting curve using the</span>
+<span class="c1"># spaced context manager</span>
+<span class="k">with</span> <span class="n">lt</span><span class="o">.</span><span class="n">graphs</span><span class="p">(</span>
+<span class="n">stop</span><span class="o">=</span><span class="mi">43</span><span class="p">,</span>
+<span class="n">control_handle</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+<span class="n">show</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+<span class="n">reference_handle</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+<span class="n">filename</span><span class="o">=</span><span class="s1">&#39;context_manager_two_handles.svg&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="p">(</span><span class="n">rh</span><span class="p">,</span> <span class="n">ch</span><span class="p">):</span>
+
+<span class="c1"># plot some reference predictions</span>
+<span class="n">r_m</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">reference</span><span class="o">.</span><span class="n">range_for</span><span class="p">(</span><span class="n">curve</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="mi">43</span><span class="p">,</span> <span class="n">day_step_size</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="n">r_p</span> <span class="o">=</span> <span class="p">[</span><span class="n">lt</span><span class="o">.</span><span class="n">reference</span><span class="o">.</span><span class="n">predict_result</span><span class="p">(</span><span class="n">moment</span><span class="p">,</span> <span class="n">curve</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span> <span class="k">for</span> <span class="n">moment</span> <span class="ow">in</span> <span class="n">r_m</span><span class="p">]</span>
+<span class="n">rh</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">r_m</span><span class="p">,</span> <span class="n">r_p</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;xkcd:ruby&#39;</span><span class="p">)</span>
+
+<span class="c1"># plot some control predictions</span>
+<span class="n">c_m</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">range_for</span><span class="p">(</span><span class="n">curve</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="mi">43</span><span class="p">,</span> <span class="n">day_step_size</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="n">c_p</span> <span class="o">=</span> <span class="p">[</span><span class="n">lt</span><span class="o">.</span><span class="n">predict_result</span><span class="p">(</span><span class="n">moment</span><span class="p">,</span> <span class="n">curve</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">moment</span> <span class="ow">in</span> <span class="n">c_m</span><span class="p">]</span>
+<span class="n">ch</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">c_m</span><span class="p">,</span> <span class="n">c_p</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;xkcd:azure&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This code would product a graph that looks like this:</p>
+<a class="reference external image-reference" href="_static/context_manager_two_handles.pdf"><div align="center" class="align-center"><img alt="_images/context_manager_two_handles.svg" src="_images/context_manager_two_handles.svg" /></div>
+</a>
 </div>
 <div class="section" id="building-a-better-initial-student-model">
 <span id="quickstart-building-a-better-initial-student-model"></span><h2>Building a Better Initial Student Model<a class="headerlink" href="#building-a-better-initial-student-model" title="Permalink to this headline">¶</a></h2>
@@ -335,7 +488,7 @@ that no additional training event will occur.</p>
 idea about how the student remembers and forgets in their current environment.
 It’s control system tunes the forgetting and plasticity parameters as it tries
 to build a better schedule.</p>
-<p>Now imagine we let one learning tracker run for a while, then we pulled it’s
+<p>Now imagine we let one learning tracker run for a while, then we pulled its
 discovered parameters to create some initial conditions for another learning
 tracker, one with a more realistic set of goals.  These goals would be based on
 how a student has behaved in the past, instead of some imagined thing.</p>
@@ -368,7 +521,10 @@ lessons) using the arbitrary default values of the <code class="docutils literal
 
   <span class="c1"># plot the lesson we want to graph</span>
   <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="n">lesson_to_graph</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
-    <span class="n">hdl</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">lt_arbitrary</span><span class="o">.</span><span class="n">plot_graphs</span><span class="p">()</span>
+    <span class="n">hdl</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">lt_arbitrary</span><span class="o">.</span><span class="n">plot_graphs</span><span class="p">(</span><span class="n">stop</span><span class="o">=</span><span class="mi">43</span><span class="p">)</span>
+
+ <span class="n">lt_arbitrary</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+ <span class="n">hdl</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </pre></div>
 </div>
 <a class="reference external image-reference" href="_static/quickstart_arbitrary.pdf"><div align="center" class="align-center"><img alt="_images/quickstart_arbitrary.svg" src="_images/quickstart_arbitrary.svg" /></div>
@@ -415,7 +571,10 @@ letting the first learning tracker run for ten lessons:</p>
 
   <span class="c1"># plot the lesson we want to graph</span>
   <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="n">lesson_to_graph</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
-    <span class="n">lt_better_fit</span><span class="o">.</span><span class="n">plot_graphs</span><span class="p">()</span>
+    <span class="n">hdl</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">lt_better_fit</span><span class="o">.</span><span class="n">plot_graphs</span><span class="p">(</span><span class="n">stop</span><span class="o">=</span><span class="mi">43</span><span class="p">)</span>
+
+  <span class="n">lt_better_fit</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+  <span class="n">hdl</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </pre></div>
 </div>
 <a class="reference external image-reference" href="_static/quickstart_better_fit.pdf"><div align="center" class="align-center"><img alt="_images/quickstart_better_fit.svg" src="_images/quickstart_better_fit.svg" /></div>
@@ -488,11 +647,10 @@ example:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">start_time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
 
 <span class="c1"># track for 2 years</span>
-<span class="n">range_in_days</span> <span class="o">=</span> <span class="mi">365</span><span class="o">*</span><span class="mi">2</span>
+<span class="n">days_since_epoch</span> <span class="o">=</span> <span class="mi">365</span><span class="o">*</span><span class="mi">2</span>
 
 <span class="n">lt</span> <span class="o">=</span> <span class="n">LearningTracker</span><span class="p">(</span>
   <span class="n">epoch</span><span class="o">=</span><span class="n">start_time</span><span class="p">,</span>
-  <span class="nb">range</span><span class="o">=</span><span class="n">range_in_days</span><span class="p">,</span>
   <span class="n">long_term_clamp</span><span class="o">=</span><span class="mf">0.00005</span><span class="p">,</span>  <span class="c1"># default</span>
 <span class="p">)</span>
 
@@ -502,13 +660,13 @@ example:</p>
   <span class="p">[</span><span class="mf">0.40</span><span class="p">,</span> <span class="mf">0.44</span><span class="p">,</span> <span class="mf">0.64</span><span class="p">,</span> <span class="mf">0.84</span><span class="p">,</span> <span class="mf">0.83</span><span class="p">,</span> <span class="mf">0.89</span><span class="p">,</span>  <span class="mf">0.99</span><span class="p">,</span> <span class="mf">0.99</span><span class="p">,</span>   <span class="mf">0.90</span><span class="p">,</span> <span class="mf">0.99</span><span class="p">],</span>
 <span class="p">]</span>
 
-<span class="k">for</span> <span class="n">d</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">day_offset_from_epoch_and_results</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">d</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">day_offset_from_epoch_and_results</span><span class="p">):</span>
   <span class="c1"># r: result</span>
   <span class="c1"># d: days since training epoch</span>
   <span class="n">lt</span><span class="o">.</span><span class="n">learned</span><span class="p">(</span><span class="n">result</span><span class="o">=</span><span class="n">r</span><span class="p">,</span> <span class="n">when</span><span class="o">=</span><span class="n">d</span><span class="p">)</span>
 
 <span class="c1"># look at the schedule over two years</span>
-<span class="n">hdl</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">plot_graphs</span><span class="p">()</span>
+<span class="n">hdl</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">plot_graphs</span><span class="p">(</span><span class="n">stop</span><span class="o">=</span><span class="n">days_since_epoch</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>We create feedback for 60 days and look at the schedule recommendations provided
@@ -519,12 +677,12 @@ term. The schedule is sparse immediately after mastery then it tightens up more
 and more into the future.</p>
 <p>Doesn’t this mean that as time progresses, spaced will annoy the student with
 maintenance reviews?</p>
-<p>To answer this question, I will first have to provide more context. There will
-be a lot of spaced learning trackers for each student in a system. As a student
-adds more items to their education, in aggregate, their learning tracker’s
-schedule suggestions will cause a kind of attention-jam. The student can only
-look at so much per review without being exhausted. So the system will have to
-ignore some schedule suggestions, or the system will stop working as it scales.</p>
+<p>There will be a lot of spaced learning trackers for each student in a system. As
+a student adds more items to their education, in aggregate, their learning
+tracker’s schedule suggestions will cause a kind of attention-jam. The student
+can only look at so much per review without being exhausted. So the system will
+have to ignore some schedule suggestions, or the system will stop working as it
+scales.</p>
 <p>The client code using spaced will query each of the objects and select a subset
 of them which are in most need of maintenance, then it will use these items for
 the review. Well, this is almost true.</p>
@@ -548,10 +706,10 @@ tickets.</p>
 times as moments a geriatric memory is given a single lottery ticket, in a
 lottery that is rigged for youthful memories.</p>
 <p>What happens if a geriatric memory wins a lottery and gets into a review? Well,
-it will stop trying to get tickets for a while, you can see this in on the above graph
-at 2019-04. The time between review suggestions swells a bit.  Then a pressure
-will build again and it will try to get into more and more lotteries (but the
-client will only give it one ticket).</p>
+it will stop trying to get tickets for a while, you can see this in on the above
+graph at 2019-04. The time between review suggestions swells a bit.  Then a
+pressure will build again, and it will try to get into more and more lotteries
+(but the client will only give it one ticket).</p>
 <a class="reference internal" href="introduction.html"<span class="std-ref">prev</span></a>, <a class="reference internal" href="index.html#top"><span class="std std-ref">top</span></a>, <a class="reference internal" href="recipes.html"><span class="std std-ref">next</span></a><div class="toctree-wrapper compound">
 </div>
 </div>

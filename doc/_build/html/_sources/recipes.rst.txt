@@ -31,10 +31,7 @@ To generate the learning tracker curves:
   days_to_track = 43
   lesson_to_graph = 3
 
-  lt = LearningTracker(
-    epoch=datetime.new(),
-    range=days_to_track
-  )
+  lt = LearningTracker(epoch=datetime.new())
 
   day_offset_from_epoch_and_results = [ 
       [0,    0.81, 1.75, 3.02, 4.8,  8.33, 10.93, 16.00, 23.00, 29.00],
@@ -52,7 +49,7 @@ To generate the learning tracker curves:
     if index is lesson_to_graph - 1:
      
       # PLOTTING THE GRAPHS
-      hdl, _ = lt.plot_graphs()
+      hdl, _ = lt.plot_graphs(stop=days_to_track)
 
 The third set of learning tracker plots would look like this:
 
@@ -73,7 +70,7 @@ To generate a reference curve:
 
   # create a learning tracker
   learning_tracker = LearningTracker(epoch=datetime.now())
-  hdl, _ = learning_tracker.reference.plot_graph()
+  hdl, _ = learning_tracker.reference.plot_graph(stop=43)
 
   # to save this plot (usual api, since I can't imagine why a 
   # regular user would save the reference, but I have included it
@@ -104,11 +101,9 @@ To save a diagram:
 
   from datetime import datetime
   from space.repitition import LearningTracker
-  lt = LearningTracker(
-    epoch=datetime.new(),
-  )
+  lt = LearningTracker(epoch=datetime.new())
 
-  hdl, _ = lt.plot_graphs()
+  hdl, _ = lt.plot_graphs(stop=43)
 
   # SAVE SVG
   lt.save_figure("replace_with_the_filename_you_want.svg")
@@ -136,7 +131,7 @@ graph so as to save system memory:
   lt = LearningTracker(epoch=datetime.new())
 
   # plot something
-  hdl, _ = lt.plot_graphs()
+  hdl, _ = lt.plot_graphs(stop=43)
 
   # CLOSE THE GRAPH HANDLE
   hdl.close()
@@ -173,9 +168,7 @@ Animating a Learning Tracker
   ]
 
   # create a learning tracker with arbitrary default parameters
-  lt_arbitrary = LearningTracker(
-    epoch=datetime.now(),
-  )
+  lt_arbitrary = LearningTracker(epoch=datetime.now())
 
   for d, r in zip(*day_offset_from_epoch_and_results):
     # r: result
@@ -185,7 +178,8 @@ Animating a Learning Tracker
   lt.animate(
     student="Name of Student",
     name_of_mp4="results/report_card.mp4",
-    time_per_event_in_seconds=2.2)
+    time_per_event_in_seconds=2.2,
+    stop=43)
 
 This would generate the following ``mp4``:
 
@@ -240,9 +234,7 @@ for another:
   ]
 
   # create a learning tracker with arbitrary default parameters
-  lt_arbitrary = LearningTracker(
-    epoch=datetime.now(),
-  )
+  lt_arbitrary = LearningTracker(epoch=datetime.now())
 
   # mimic a full training session
   for d, r in \
@@ -452,18 +444,15 @@ To change the control system parameters:
       [0,    0.81, 1.75, 3.02, 4.8,  8.33],
       [0.40, 0.44, 0.64, 0.84, 0.83, 0.89]
 
-  range_in_days = 45
-  
   # you can feed custom control parameters to the learning tracker
   lt = LearningTracker(
-		epoch=start_time,
-		range=range_in_days)
-		fdecaytau_kp=1.0,  # kp for fdecay control (PID)
-		fdecaytau_ki=0.1,  # ki " "
-		fdecaytau_kd=0.04, # kd " "
-		fdecay0_kp=1.0,    # kp for fdecaytau_kp (PID)
-		fdecay0_ki=0.1,    # ki " "
-		fdecay0_kd=0.03,   # kd " "
+    epoch=start_time,
+    fdecaytau_kp=1.0,  # kp for fdecay control (PID)
+    fdecaytau_ki=0.1,  # ki " "
+    fdecaytau_kd=0.04, # kd " "
+    fdecay0_kp=1.0,    # kp for fdecaytau_kp (PID)
+    fdecay0_ki=0.1,    # ki " "
+    fdecay0_kd=0.03,   # kd " "
   )
 
 .. _recipes-queries:
@@ -560,7 +549,7 @@ To pickle a learning tracker into a bytestream:
   unpickled_learning_tracker = pickle.loads(byte_stream)
 
   hdl, _ = unpickled_learning_tracker.plot_graphs() 
-  hdl.plot_graphs() # plots the graph
+  hdl.plot_graphs(stop=43) # plots the graph
 
   # close the plot to save memory
   hdl.close()

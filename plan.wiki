@@ -161,15 +161,17 @@
       * [X] draw three prediction graphs on the control prediction plot
       * [X] remove all old code, re-run tests
       * [X] change refactored variable names to meaningful names
+      * [X] add context manager for graphing
+      * [X] implement the next features (tests and notebooks)
       * [ ] update docstrings (with examples for useful apis)
     
     stage 3:
     
       * [X] run all tests look at the graphs
-      * [ ] run all notebooks, look at the graphs
-      * [ ] re-write documentation and generate new graphs
+      * [X] run all notebooks, look at the graphs
+      * [X] re-write documentation and generate new graphs
             
-  * [ ] merge with master
+  * [X] merge with master
   * [ ] push to github
   * [ ] release pip package
 

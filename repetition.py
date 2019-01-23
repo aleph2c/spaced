@@ -16,6 +16,7 @@ from datetime import timedelta
 import matplotlib.pyplot as plt
 from scipy.optimize import fsolve
 from scipy.optimize import curve_fit
+from contextlib import contextmanager
 from graph import SpaceRepetitionPlot
 import matplotlib.animation as animation
 from animate import LearningTrackerAnimation
@@ -102,10 +103,9 @@ class SpaceRepetitionDataBuilder():
 
 class SpaceRepetition():
 
-  Title           = "Spaced Memory Repetition Strategy\n"
   Horizontal_Axis = ""
   Vertical_Axis   = ""
-  Default_Samples = 1000
+  Default_Samples = 100
 
   def __init__(self, *args, **kwargs):
     self.epoch         = datetime.now()
@@ -143,13 +143,9 @@ class SpaceRepetition():
     self.long_term_clamp = SpaceRepetitionController.LONG_TERM_CLAMP
     SpacedKwargInterface.__init__(self, *args, **kwargs)
 
-  def plot_graph(self, **kwargs):
-    '''stub'''
-    pass
-
   def tune_decay_of_decay(self, initial, tau):
     """
-    This function returns a tuned-decay_of_decay function.  The decay_of_decay,
+    Returns a tuned-decay_of_decay function.  The decay_of_decay,
     function can be called over and over again with greater values of t, and it
     will return a set of scalars which can be used to build, less and less
     agressive forgetting curves.
@@ -220,12 +216,15 @@ class SpaceRepetition():
 
   def forgetting_curves(self, scale, offset):
     """
-    This function returns two other functions which have the values of ``scale``
+    Returns two other functions which have the values of ``scale``
     and ``offset`` enclosed within them.
 
     **Args**:
       | ``scale`` (int, float): enclosed parameter
       | ``offset`` (int, float): enclosed parameter
+
+    **Returns**:
+       (tuple): fn, fn0
 
     The returned functions are:
 
@@ -283,14 +282,14 @@ class SpaceRepetition():
     return [fn, fn0]
   
   def days_from_epoch(self, time):
-    '''Convert a datetime object into a number representing the days since the
+    '''Converts a datetime object into a number representing the days since the
     training epoch.
 
     **Args**:
-      | ``time`` (int, float): days since the training epoch
+      | ``time`` (int, float, datetime): days since the training epoch
 
-    Returns:
-       (float): days since training epoch
+    **Returns**:
+       (float): days, as an offset, since the training epoch
 
     '''
     if isinstance(time, datetime):
@@ -299,18 +298,32 @@ class SpaceRepetition():
       time_in_seconds   = time_since_start.total_seconds()
       c_time            = float(time_in_seconds / 86400.0)
     else:
-      raise TypeError("only datetime objects supported")
+      n_time = self.days_offset_from_epoch_to_datetime(time)
+      c_time = self.days_from_epoch(time=n_time)
 
     c_time = 0 if c_time < 0 else c_time
     return c_time
 
-  def days_to_time(self, days):
-    '''Convert a time [offset in days from epoch] into a datetime object.
+  def days_from_start(self, time):
+    '''(alias for days_from_epoch) Converts a datetime object into a number
+    representing the days since the training epoch.
 
-    Args:
+    **Args**:
+      | ``time`` (int, float): days since the training epoch
+
+    **Returns**:
+       (float): days since training epoch
+
+    '''
+    return self.days_from_epoch(time)  
+
+  def days_to_time(self, days):
+    '''Converts a time [offset in days from epoch] into a datetime object.
+
+    **Args**:
       | ``days`` (int, float): days since epoch
 
-    Returns:
+    **Returns**:
        (datetime): datetime of epoch plus days
     '''
     if isinstance(days, datetime):
@@ -322,7 +335,7 @@ class SpaceRepetition():
 
   def plasticity_functions(self, denominator_offset, root):
     """
-    This function returns three other functions which have the values of
+    Returns three other functions which have the values of
     ``denominator_offset`` and ``root`` enclosed within them.
 
     **Args**:
@@ -330,7 +343,7 @@ class SpaceRepetition():
       | ``root`` (int, float): enclosed parameter
 
     **Returns**:
-      (list): fn(x), fn0(x, y), invfn(y)
+      (tuple): fn(x), fn0(x, y), invfn(y)
 
     These returned functions are:
 
@@ -444,7 +457,7 @@ class SpaceRepetition():
     return [fn, fn0, invfn]
 
   def make_stickleback_data_for_plot(self, forgetting_functions, solutions, stop_day_as_offset):
-    '''create the data set that can graph the stickleback curve
+    '''Creates the data set that can be used to graph the stickleback curve.
 
     **Args**:
       | ``forgetting_functions`` (list): forgetting_functions
@@ -487,8 +500,8 @@ class SpaceRepetition():
     return return_set
 
   def datetime_to_days_offset_from_epoch(self, datetime_):
-    '''convert a datetime into a float, representing the number of days
-    difference between that datetime and when epoch
+    '''Convert a datetime object into a float, representing the number of days
+    difference between that datetime and when epoch.
 
     **Args**:
       | ``datetime_`` (datetime)
@@ -501,7 +514,7 @@ class SpaceRepetition():
     return result
 
   def days_offset_from_epoch_to_datetime(self, offset_):
-    '''convert an days-offset-from-epoch into a datetime object
+    '''Convert a days-offset-from-epoch into a datetime object.
 
     **Args**:
       | ``offset_`` (int, float): days since training epoch
@@ -594,7 +607,7 @@ class SpaceRepetitionReference(SpaceRepetition):
 
   # reference
   def schedule_as_offset(self, stop):
-    '''Return a schedule as a list of offsets measured in days from the training
+    '''Returns a training schedule as a list of offsets measured in days from the training
     epoch.
 
     **Args**:
@@ -617,10 +630,16 @@ class SpaceRepetitionReference(SpaceRepetition):
     while stop_as_offset_in_days > self.latest_date_offset:
       self.latest_date_offset, self.latest_result = next(self.g_stickleback)
 
-    return list(self.dates_as_day_offsets)[0:0]
+    results = [
+      offset for
+      offset in
+      self.dates_as_day_offsets if
+      offset < stop_as_offset_in_days]
+
+    return results
 
   def schedule(self, stop):
-    '''Return a schedule as of datetimes up until and possibily including
+    '''Returns a training schedule as of datetimes up until and possibily including
     datetime or offset represented by ``stop``.
 
     **Args**:
@@ -698,30 +717,12 @@ class SpaceRepetitionReference(SpaceRepetition):
 
     return result
 
-  def next_lesson(self, a):
-    '''Returns the next scheduled datetime suggested by the reference 
-
-    **Note**:
-       The schedules are created using a generator.  This is done so that an
-       infinite number of times can be suggested.  To keep memory constrained,
-       the internal dates, and forgetting functions are held in a deque.  A date
-       will always be available, but the forgetting curves and past suggested
-       dates can be over-written so that these objects don't take up huge
-       amounts of memory when they are run over the long term.
-
-    **Returns**:
-       (datetime): The suggested datetime for the next lesson.
-
-    '''
-    self.latest_date_offset, self.latest_result = next(self.g_stickleback)
-    return self.days_offset_from_epoch_to_datetime(self.latest_date_offset)
-
   def _find_nearest(self, array, value):
     idx = (np.abs(array - value)).argmin()
     return array[idx], idx
 
   def _G_stickleback(self, fdecaytau, fdecay0, ifo=None):
-    '''The stickleback generator constructor.  
+    '''Returns stickleback generator (co-routine).
     
     It will return a generator function that can be called an infinite number of
     times to build forgetting curves and schedule time offsets and results.  The
@@ -843,7 +844,7 @@ class SpaceRepetitionReference(SpaceRepetition):
 
   # reference
   def plot_graph(self, stop, plot_pane_data=None, panes=None):
-    '''plot the reference
+    '''Plots the reference data.
 
     **Args**:
        | ``stop`` (datetime, float, int): when to stop graphing
@@ -851,8 +852,7 @@ class SpaceRepetitionReference(SpaceRepetition):
        | ``panes=None`` (type1): number of sub-plot panes to make
 
     **Returns**:
-       (type): 
-
+       (tuple):  (PlotPaneData, dict)
 
     '''
     if type(stop) is datetime:
@@ -894,12 +894,11 @@ class SpaceRepetitionReference(SpaceRepetition):
       panes              = panes,
       plot_pane_data     = plot_pane_data
     )
-
     return self.plot.ppd, data_dict
 
   # reference
   def save_figure(self, filename="spaced.pdf"):
-    '''save the file produced by the plot_graph method
+    '''Saves the file produced by the plot_graph method.
 
     **Args**:
        | ``filename="spaced.pdf"`` (string): filename
@@ -914,8 +913,8 @@ class SpaceRepetitionReference(SpaceRepetition):
   # reference
   def recollect_scalar(self, moment, curve=None):
     '''
-    This will return a scalar representing the probability that a student can
-    correctly recall something being tracked by the space repetition algorithm.
+    Provides a recollection prediction at a provided moment after a given
+    schedule point.
 
     The ``moment`` input can be one of these types:
 
@@ -945,6 +944,25 @@ class SpaceRepetitionReference(SpaceRepetition):
     curve_time_as_offset_in_days = self.dates_as_day_offsets[curve-1]
 
     return forgetting_function(moment_as_offset_in_days)
+
+  # reference
+  def predict_result(self, moment, curve=None):
+    '''
+    (alias for recollect_scalar) Provides a recollection prediction at a
+    provided moment after a given schedule point.
+
+    The ``moment`` input can be one of these types:
+
+      * float     - representing the number of days since epoch (when the
+                    spaced_repetition algorithm started to track)
+      * datetime  - a datetime object, which must be after epoch
+      * timedelta - the difference in time from when the client wants to know
+                    something and epoch
+
+    The ``moment`` must occur after the ``curve`` number has been activated
+
+    '''
+    return self.recollect_scalar(moment, curve)
 
 class SpaceRepetitionFeedback(SpaceRepetition):
   Title = "Spaced Memory Feedback\n"
@@ -992,10 +1010,7 @@ class SpaceRepetitionFeedback(SpaceRepetition):
     return result
 
   def add_event(self, feedback_moment, result):
-    '''short description
-
-    **Note**:
-       Do this not that recommendation
+    '''Adds a feedback moment to the feedback dataset.
 
     **Args**:
        | ``feedback_moment`` (int, float, datetime): the self examination moment
@@ -1024,6 +1039,10 @@ class SpaceRepetitionFeedback(SpaceRepetition):
       if c_feedback_moment > self.range:
         self.range = c_feedback_moment
 
+    # sort the times and results of a_events_x and a_events_y together
+    s = sorted(zip(self.a_events_x, self.a_events_y))
+    self.a_events_x, self.a_events_y = map(list, zip(*s))
+
     self.pc, dpo, dpr = self.plasticity_functions()
     self.discovered_plasticity_denominator_offset = dpo
     self.discovered_plasticity_root = dpr
@@ -1038,7 +1057,7 @@ class SpaceRepetitionFeedback(SpaceRepetition):
 
   # feedback
   def plasticity_functions(self):
-    '''returns a function and two discovered plasticity parameters. 
+    '''Returns the observed plasticity function and two discovered plasticity parameters. 
 
     **Returns**:
        (list): fn, discovered_plasticity_root, discovered_plasticity_denominator_offset
@@ -1071,7 +1090,7 @@ class SpaceRepetitionFeedback(SpaceRepetition):
 
   # feedback
   def plot_graph(self, plot_pane_data=None, panes=None, stop=None):
-    '''plot the feedbackgraph
+    '''Plots the feedback data.
 
     **Args**:
        | ``stop`` (datetime, float, int): when to stop graphing
@@ -1079,8 +1098,7 @@ class SpaceRepetitionFeedback(SpaceRepetition):
        | ``panes=None`` (type1): number of sub-plot panes to make
 
     **Returns**:
-       (type): 
-
+       (type):  SpaceRepetitionPlot, dict
 
     '''
     observed_events = [[], []]
@@ -1139,7 +1157,7 @@ class SpaceRepetitionFeedback(SpaceRepetition):
 
   # feedback
   def show(self):
-    '''show the plot after a plot_graph method call'''
+    '''Shows the feedback plot after the ``plot_graph`` method is call.'''
     plt.show()
 
 class ControlData():
@@ -1228,6 +1246,7 @@ class SpaceRepetitionController(SpaceRepetition):
     self.input_y          = self.feedback.o.a_events_y[:]
     self.control_x        = self.input_x[-1]
 
+    self.next_scheduled_day_as_offset = 0
     SpacedKwargInterface.__init__(self, *args, **kwargs)
 
     self.discovered_plasticity_root = self.feedback.o.discovered_plasticity_root
@@ -1261,7 +1280,14 @@ class SpaceRepetitionController(SpaceRepetition):
     self.latest_date_offset = 0
     self.latest_result = 0
 
-  def initialize_feedback(self, feedback, stop=None, *args, **kwargs):
+  def initialize_feedback(self, feedback, stop=None):
+    '''Initializes the controller's feedback information.
+
+    **Args**:
+       | ``feedback`` (SpaceRepetitionFeedback): feedback object
+       | ``stop=None`` (int, float):  days offset since epoch
+
+    '''
     self.feedback         = ControlData(feedback)
     self.feedback.fn      = self.feedback.o.pc
     self.feedback.range   = self.feedback.o.range
@@ -1284,14 +1310,36 @@ class SpaceRepetitionController(SpaceRepetition):
     for day in self.updated_reference.ref_events_x:
       self._schedule.append(self.days_to_time(day))
 
-
   def error(self, x):
-    # a positive error means we need to push harder
-    # a negative error means we are pushing too hard
+    '''Build an error signal event given x.
+
+    The error signal is the result of the reference-plasticity-function(x), minus the
+    feedback-plasticity-function(x).
+
+    **Args**:
+       | ``x`` (int, float): offset in days from epoch
+
+    **Returns**:
+       | (float): reference plasticity result - feedback plasticity result
+       |          a positive error means we need to push harder
+       |          a negative error means we are pushing too hard
+
+    '''
     error = self.reference.fn(x) - self.feedback.fn(x)
     return error
 
-  def plot_error(self, stop, **kwargs):
+  def plot_error(self, stop, plot_pane_data=None, panes=None):
+    '''Plots the error signal.
+
+    **Args**:
+       | ``stop`` (datetime, float, int): when to stop graphing
+       | ``plot_pane_data=None`` (int, float):  plot handle
+       | ``panes=None`` (type1): number of sub-plot panes to make
+
+    **Returns**:
+       (tuple): (PlotPaneData, dict)
+
+    '''
     if type(stop) is datetime:
       self.schedule(stop=stop)
       stop_day_as_offset = self.days_from_epoch(stop)
@@ -1302,17 +1350,6 @@ class SpaceRepetitionController(SpaceRepetition):
     x1     = np.linspace(0, stop_day_as_offset, SpaceRepetition.Default_Samples)
     y1     = self.error(x1)
     bars   = self._error_vertical_bars()
-
-
-    if("plot_pane_data" in kwargs):
-      plot_pane_data = kwargs['plot_pane_data']
-    else:
-      plot_pane_data = None
-
-    if("panes" in kwargs):
-      panes = kwargs['panes']
-    else:
-      panes = None
 
     data_dict = {}
     data_dict["error"] = []
@@ -1335,7 +1372,7 @@ class SpaceRepetitionController(SpaceRepetition):
                     plot_pane_data=plot_pane_data
                     )
 
-    return self.plot, data_dict
+    return plt.ppd, data_dict
 
   def _error_vertical_bars(self):
     x1 = self.feedback.o.a_events_x
@@ -1349,6 +1386,14 @@ class SpaceRepetitionController(SpaceRepetition):
     return vertical_bars
 
   def control(self, control_x=None):
+    '''Runs the space repetition control system.
+
+    **Args**:
+       | ``control_x=None`` (int, float): offset in days where to start control
+       system.  This value defaults to the last time the student provided
+       feedback.
+
+    '''
     x = np.linspace(0, self.range, 50)
     rx = x[:]
 
@@ -1420,28 +1465,69 @@ class SpaceRepetitionController(SpaceRepetition):
 
   # controller
   def schedule_as_offset(self, stop):
-    '''
-    Returns a schedule in day offsets from epoch up up until and possiblity
-    includeing the stop offset [days from offset].
+    '''Returns the learning schedule as a list offsets measure in days since
+       they training epoch.
 
-      # schedule as offsets from the training epoch
-      so = lt.schedule_as_offset(stop=40)
+    This list will contain the recommended training moments up to, and
+    possibly including the date described by the ``stop`` input argument.
+
+    **Args**:
+       | ``stop`` (int, float, datetime): At what point to stop the schedule
+       |          if stop is an int or float it represents the days since the training epoch
+
+    **Returns**:
+       (list): list of floats containing a the recommended schedule in days
+               since the training epoch
 
     '''
-    while stop > self.latest_date_offset:
+
+    if type(stop) is datetime:
+      stop_day_as_offset = self.updated_reference.days_from_epoch(stop)
+    else:
+      stop_day_as_offset = stop
+
+    while stop_day_as_offset >= self.latest_date_offset:
       latest_ref_offset, self.latest_result = next(self.updated_reference.g_stickleback)
       self.latest_date_offset = latest_ref_offset + self.x_reference_shift
 
-    self.dates_as_day_offsets = [
-      ref_as_offset + self.x_reference_shift for
-      ref_as_offset in
-      self.updated_reference.dates_as_day_offsets]
+    if len(self.feedback.o.a_events_x) > 0:
+      last_feedback_event = self.feedback.o.a_events_x[-1]
+    else:
+      last_feedback_event = 0
 
-    return list(self.dates_as_day_offsets)[0:0]
+    self.dates_as_day_offsets = []
+
+    next_found = False
+    for ref_item in self.updated_reference.dates_as_day_offsets:
+      schedule_item = ref_item + self.x_reference_shift
+
+      if last_feedback_event < schedule_item:
+
+        if not next_found:
+          next_found = True
+          self.next_scheduled_day_as_offset = schedule_item
+
+        if schedule_item < stop_day_as_offset:
+          self.dates_as_day_offsets.append(schedule_item)
+
+    # return up to the last item in the list
+    return list(self.dates_as_day_offsets)
 
   # controller
   def schedule(self, stop):
+    '''Returns the learning schedule.
 
+    This list will contain the recommended training moments up to, and possibly
+    including the date described by the ``stop`` input argument.
+
+    **Args**:
+       | ``stop`` (int, float, datetime): At what point to stop the schedule
+       |          if stop is an int or float it represents the days since the training epoch
+
+    **Returns**:
+       (list): list of datetime objects containing the recommended training schedule.
+
+    '''
     stop_as_offset_in_days = self.days_from_epoch(stop)
 
     schedule_as_offsets_in_days = \
@@ -1457,7 +1543,18 @@ class SpaceRepetitionController(SpaceRepetition):
 
     return schedule
 
-  def plot_control(self, stop, **kwargs):
+  def plot_control(self, stop, plot_pane_data=None, panes=None):
+    '''Plots the control data.
+
+    **Args**:
+       | ``stop`` (datetime, float, int): when to stop graphing
+       | ``plot_pane_data=None`` (int, float):  plot handle
+       | ``panes=None`` (type1): number of sub-plot panes to make
+
+    **Returns**:
+       (tuple): (PlotPaneData, dict)
+
+    '''
     control_x = self.control_x
 
     if type(stop) is datetime:
@@ -1476,16 +1573,6 @@ class SpaceRepetitionController(SpaceRepetition):
     #updated_reference, x_reference_shift = self.control(control_x=control_x)
     x_ref = self.updated_reference.x_and_y[0]
     y_ref = self.updated_reference.x_and_y[1]
-
-    if("panes" in kwargs):
-      panes = kwargs['panes']
-    else:
-      panes = None
-
-    if("plot_pane_data" in kwargs):
-      plot_pane_data = kwargs['plot_pane_data']
-    else:
-      plot_pane_data = None
 
     control_ref_x = []
     control_ref_y = []
@@ -1545,7 +1632,16 @@ class SpaceRepetitionController(SpaceRepetition):
 
   # control
   def plot_graphs(self, stop=None):
+    '''Plots the reference, feedback, error and control data points on one
+    graph.
 
+    **Args**:
+       | ``stop`` (datetime, float, int): when to stop graphing
+
+    **Returns**:
+       (tuple): (PlotPaneData, dict)
+
+    '''
     if type(stop) is datetime:
       self.updated_reference.schedule(stop=stop)
 
@@ -1580,7 +1676,6 @@ class SpaceRepetitionController(SpaceRepetition):
     db._append_to_base(base, data_dict)
 
     h, data_dict = self.plot_error(
-      epoch=self.epoch,
       plot_pane_data=hdl,
       stop=stop_day_as_offset
     )
@@ -1589,7 +1684,6 @@ class SpaceRepetitionController(SpaceRepetition):
 
     self.updated_reference._make_data_for_plot(stop)
     h, data_dict = self.plot_control(
-      epoch=self.epoch,
       plot_pane_data=hdl,
       stop=stop_day_as_offset
     )
@@ -1599,23 +1693,36 @@ class SpaceRepetitionController(SpaceRepetition):
     #graph_handle = hdl.ppd
     return graph_handle, base
 
+  # control
   def show(self):
+    '''Show the graph you have plotted using the ``plot_graphs`` method.'''
     mng = plt.get_current_fig_manager()
     mng.full_screen_toggle()
     plt.show()
 
   # control
   def save_figure(self, filename="spaced.pdf"):
+    '''Saves a graph made with the ``plot_graphs`` method, to file.
+
+    **Args**:
+       | ``filename="spaced.pdf"`` (string): The file name and extension (defining how it will be saved)
+
+    **Notes**:
+      This method uses the matplotlib library, which will automatically save the
+      plot in the format indicated by the file name's extension.
+
+    '''
     plt.savefig(filename, dpi=300)
 
   def predict_result(self, moment, curve=None):
-    return self.recollect_scalar(moment, curve)
+    '''(alias for recollect_scalar) Predicts a student's recollection ability at
+    a specified time on a specified forgetting curve.
 
-  # controller
-  def recollect_scalar(self, moment, curve=None):
-    '''
-    This will return a scalar representing the probability that a student can
-    correctly recall something being tracked by the space repetition algorithm.
+    **Args**:
+       | ``moment`` (float, int, datetime, timedelta):  see note
+       | ``curve=None`` (int): Which forgetting curve to use in the prediction
+
+    **Note**:
 
     The ``moment`` input can be one of these types:
 
@@ -1625,7 +1732,60 @@ class SpaceRepetitionController(SpaceRepetition):
       * timedelta - the difference in time from when the client wants to know
                     something and epoch
 
-    The ``moment`` must occur after the ``curve`` number has been activated
+    **Returns**:
+       (float): a number between 0 and 1.  0 means the idea is completely
+       forgotten and 1 means the idea is perfectly remembered.
+
+    '''
+    return self.recollect_scalar(moment, curve)
+
+  def prediction(self, moment, curve=None):
+    '''(alias for recollect_scalar) Predicts a student's recollection ability at
+    a specified time on a specified forgetting curve.
+
+    **Args**:
+       | ``moment`` (float, int, datetime, timedelta):  see note
+       | ``curve=None`` (int): Which forgetting curve to use in the prediction
+
+    **Note**:
+
+    The ``moment`` input can be one of these types:
+
+      * float     - representing the number of days since epoch (when the
+                    spaced_repetition algorithm started to track)
+      * datetime  - a datetime object, which must be after epoch
+      * timedelta - the difference in time from when the client wants to know
+                    something and epoch
+
+    **Returns**:
+       (float): a number between 0 and 1.  0 means the idea is completely
+       forgotten and 1 means the idea is perfectly remembered.
+
+    '''
+    return self.recollect_scalar(moment, curve)
+
+  # controller
+  def recollect_scalar(self, moment, curve=None):
+    '''Predicts a student's recollection ability at a specified time on a
+    specified forgetting curve.
+
+    **Args**:
+       | ``moment`` (float, int, datetime, timedelta):  see note
+       | ``curve=None`` (int): Which forgetting curve to use in the prediction
+
+    **Note**:
+
+    The ``moment`` input can be one of these types:
+
+      * float     - representing the number of days since epoch (when the
+                    spaced_repetition algorithm started to track)
+      * datetime  - a datetime object, which must be after epoch
+      * timedelta - the difference in time from when the client wants to know
+                    something and epoch
+
+    **Returns**:
+       (float): a number between 0 and 1.  0 means the idea is completely
+       forgotten and 1 means the idea is perfectly remembered.
 
     '''
     if(isinstance(moment, datetime)):
@@ -1649,23 +1809,39 @@ class SpaceRepetitionController(SpaceRepetition):
 
   # controller
   def datetime_for(self, curve=None):
-    '''get the datetime stampe of a curve in the stickleback.  Curves are
-    indexed from zero'''
+    '''Returns the datetime of a specified training suggestion.
+    
+    The moment of this suggestion is represented by the ``curve`` input
+    argument.  The curve numbers are indexed from 1, not 0.  The curve is the
+    forgetting curve for which you want the start-date of.
+
+    **Args**:
+       | ``curve=None`` (int): The number of the forgetting curve.  The curves
+       are indexed from 1, not 0.  If no argument is provided, the curve number
+       will be set to 1.
+
+    **Returns**:
+       (datetime): The suggested training moment.
+
+    '''
     if curve is None or curve <= 0:
       index = 0
     else:
       index = curve - 1
-    return self.dates_as_day_offsets[index]
+    return self.days_to_time(self.dates_as_day_offsets[index])
 
   # control
   def range_for(self, stop, curve=None, day_step_size=1):
-    '''
-    Returns a list of useful datetime values for a given curve, up to, but not
-    including the stop value, in increments of day_step_size.
+    '''Returns a list of useful datetime values for a given forgetting-curve, up
+    to, but not including the stop value, in increments of day_step_size.
 
-      stop: can be a datetime or an offset from epoch in days
-      curve: is which curve to be referenced, starting at 1
-      day_step_size: defaults to 1
+    **Args**:
+       | ``stop`` (datetime, float, int):  datetime or offset from epoch in days
+       | ``curve=None`` (type1): default: which forgetting curve, starting at 1
+       | ``day_step_size=1`` (type1): step size of the result (unit of days)
+
+    **Returns**:
+       (list): list of datetimes that can be used in another query
 
     '''
     curve = curve if curve or curve >= 1 else 1
@@ -1699,8 +1875,36 @@ class SpaceRepetitionController(SpaceRepetition):
 
     return result
 
-  def next_lesson(self):
-    return self.schedule()[0]
+  # control
+  def next_offset(self):
+    '''Returns the next suggested time to study as a float, representing the
+       number of days since the training epoch.
+
+    **Returns**:
+       (float): next suggested lesson [days since training epoch]
+
+    '''
+    if len(self.feedback.o.a_events_x) > 0:
+      last_feedback_event = self.feedback.o.a_events_x[-1]
+    else:
+      last_feedback_event = 0
+
+    if not hasattr(self, 'next_scheduled_day_as_offset') or \
+      self.next_scheduled_day_as_offset < last_feedback_event:
+
+      self.schedule_as_offset(stop=last_feedback_event)
+
+    return self.next_scheduled_day_as_offset
+
+  # control
+  def next(self):
+    '''Returns the next suggested time to study as a datetime object
+
+    **Returns**:
+       (datetime): next suggested lesson
+
+    '''
+    return self.days_to_time(self.next_offset())
 
 class LearningTracker():
   def __init__(self, *args, **kwargs):
@@ -1795,8 +1999,21 @@ class LearningTracker():
 
   # learning tracker
   def add_event(self, feedback_moment, result):
+    '''Adds a training event to the learning tracker.
+
+    **Args**:
+       | ``feedback_moment`` (int, float): moment as time offset in days from
+       epoch
+       | ``result`` (float): how well the student performed (0.0-1.0)
+
+    '''
     self.feedback_x.append(feedback_moment)
     self.feedback_y.append(result)
+
+    # sort the times and results of a_events_x and a_events_y together
+    s = sorted(zip(self.feedback_x, self.feedback_y))
+    self.feedback_x, self.feedback_y, map(list, zip(*s))
+
     self.frame = np.arange(1, len(self.feedback_x))
     hf = SpaceRepetitionFeedback(self.feedback_x,
         self.feedback_y,
@@ -1805,31 +2022,258 @@ class LearningTracker():
 
   # learning tracker
   def plot_graphs(self, stop):
+    '''Plots the reference, feedback, error and control data points on one graph.
+
+    **Args**:
+       | ``stop`` (datetime, float, int): when to stop graphing
+
+    **Returns**:
+       (tuple): (PlotPaneData, dict)
+
+    '''
     return self.control.plot_graphs(stop)
+
+  @contextmanager
+  def graphs(self, stop,
+      filename=None,
+      reference_handle=False,
+      feedback_handle=False,
+      error_handle=False,
+      control_handle=False,
+      show=False):
+    '''Writes graphs, yields the requested graph handles, writes to file
+       and automatically closes the graph handlers all within a context manager.
+
+    **Args**:
+       | ``stop`` (datetime, float, int): when to stop graphing
+       | ``filename="None"`` (string): The file name and extension (defining how it will be saved)
+       | ``reference_handle="False"`` (bool): Reference graph handle needed?
+       | ``feedback_handle="False"`` (bool): Feedback graph handle needed?
+       | ``error_handle="False"`` (bool): Error graph handle needed?
+       | ``control_handle="False"`` (bool): Control graph handle needed?
+
+    **Yields**:
+       (tuple): graphs handles as described by input args
+
+    **Example(s)**:
+      
+    .. code-block:: python
+        
+        from datetime import datetime
+        from spaced import LearningTracker
+ 
+        lt = LearningTracker(epoch=datetime.now())
+ 
+        moments = lt.range_for(curve=1, stop=43, day_step_size=0.5)
+        predictions = [
+          lt.recollect_scalar(moment, curve=1) for 
+          moment in momemts]
+
+        with lt.graphs(stop=43, filename='contenxt_demo.pdf') as c_hdl:
+          c_hdl.plot(moments, predictions, color='xkcd:azure')
+
+        # the ordering of the handles provided by the context manager
+        # matches the graph ordering.
+        # 1 - reference
+        # 2 - feedback
+        # 3 - error
+        # 4 - control
+        with lt.graphs(stop=43, filename='contenxt_demo.pdf',
+          control_handle=True, reference_handle=True) as (r_dl, c_hdl):
+
+          c_hdl.plot(moments, predictions, color='xkcd:azure')
+
+    '''
+    try:
+      gh, _ = self.plot_graphs(stop) 
+
+      # 0000
+      if reference_handle is False and \
+         feedback_handle is False and \
+         error_handle is False and \
+         control_handle is False:
+        yield
+
+      # 0001
+      elif reference_handle is False and \
+         feedback_handle is False and \
+         error_handle is False and \
+         control_handle is True:
+        # default behavior
+        yield gh.axarr[3]
+
+      # 0010
+      elif reference_handle is False and \
+         feedback_handle is False and \
+         error_handle is True and \
+         control_handle is False:
+        yield gh.axarr[2]
+
+      # 0011
+      elif reference_handle is False and \
+         feedback_handle is False and \
+         error_handle is True and \
+         control_handle is True:
+        yield gh.axarr[2], gh.ararr[3]
+
+      # 0100
+      elif reference_handle is False and \
+         feedback_handle is True and \
+         error_handle is False and \
+         control_handle is False:
+        yield gh.axarr[1]
+
+      # 0101
+      elif reference_handle is False and \
+         feedback_handle is True and \
+         error_handle is False and \
+         control_handle is True:
+        yield gh.axarr[1], gh.axarr[3]
+
+      # 0110
+      elif reference_handle is False and \
+         feedback_handle is True and \
+         error_handle is True and \
+         control_handle is False:
+        yield gh.axarr[1], gh.axarr[2]
+
+      # 0111
+      elif reference_handle is False and \
+         feedback_handle is True and \
+         error_handle is True and \
+         control_handle is True:
+        yield gh.axarr[1], gh.axarr[2], gh.axarr[3]
+
+      # 1000
+      elif reference_handle is True and \
+         feedback_handle is False and \
+         error_handle is False and \
+         control_handle is False:
+        yield gh.axarr[0]
+
+      # 1001
+      elif reference_handle is True and \
+         feedback_handle is False and \
+         error_handle is False and \
+         control_handle is True:
+        yield gh.axarr[0], gh.axarr[3]
+
+      # 1010
+      elif reference_handle is True and \
+         feedback_handle is False and \
+         error_handle is True and \
+         control_handle is False:
+        yield gh.axarr[0], gh.axarr[2]
+
+      # 1011
+      elif reference_handle is True and \
+         feedback_handle is False and \
+         error_handle is True and \
+         control_handle is True:
+        yield gh.axarr[0], gh.axarr[2], gh.axarr[3]
+
+      # 1100
+      elif reference_handle is True and \
+         feedback_handle is True and \
+         error_handle is False and \
+         control_handle is False:
+        yield gh.axarr[0], gh.axarr[1]
+
+      # 1101
+      elif reference_handle is True and \
+         feedback_handle is True and \
+         error_handle is False and \
+         control_handle is True:
+        yield gh.axarr[0], gh.axarr[1], gh.axarr[3]
+
+      # 1110
+      elif reference_handle is True and \
+         feedback_handle is True and \
+         error_handle is True and \
+         control_handle is False:
+        yield gh.axarr[0], gh.axarr[1], gh.axarr[2]
+
+      # 1111
+      else:
+        yield gh.axarr[0], gh.axarr[1], gh.axarr[2], gh.axarr[3]
+
+    finally:
+      if filename is not None:
+        self.save_figure(filename)
+
+      # show has to happen after a save or jupyter will save a blank file
+      if show:
+        plt.show()
+      gh.close() 
 
   # learning tracker
   def save_figure(self, filename=None):
+    '''Save the graph plotted by the ``plot_graphs`` method to file.
+
+    **Args**:
+       | ``filename="spaced.pdf"`` (string): The file name and extension (defining how it will be saved)
+
+    **Notes**:
+      This method uses the matplotlib library, which will automatically save the
+      plot in the format indicated by the file name's extension.
+
+    '''
     self.control.save_figure(filename)
 
   # learning tracker
   def schedule(self, stop):
+    '''Returns a schedule as of datetimes, up-until and possibily-including the
+    datetime or offset represented by the ``stop`` argument.
+
+    **Args**:
+      | ``stop`` (float, int, datetime): at what point do you want the schedule
+      information to stop.  If ``stop`` is an int or a float it will be
+      interpreted as the number of days-from-epoch at which you would like this
+      function to stop providing information. If ``stop`` is a datetime, the
+      output schedule will include all of the schedule suggestions up until
+      that time.
+
+    **Returns**:
+       (list of datetime objects): The schedule
+
+    '''
     return self.control.schedule(stop)
 
   # learning tracker
   def schedule_as_offset(self, stop):
+    '''Return a schedule as a list of offsets measured in days from the training
+    epoch, up-until and possibily-including the datetime or offset reprented by
+    the ``stop`` argument.
+
+    **Args**:
+      | ``stop`` (float, int, datetime): at what point do you want the schedule
+      information to stop.  If ``stop`` is an int or a float it will be
+      interpreted as the number of days-from-epoch at which you would like this
+      function to stop providing information. If ``stop`` is a datetime, the
+      output schedule will include all of the schedule suggestions up until
+      that time.
+
+    **Returns**:
+       (list of floats): The schedule as offset from the training epoch
+
+    '''
     return self.control.schedule_as_offset(stop)
 
   def learned(self, when, result):
+    '''Tells the learning tracker about something the student has learned.
+
+    **Args**:
+       | ``when`` (int, float, datetime): moment as either time offset in days from epoch, or the moment of training represented by a datetime object
+       | ``result`` (float): how well the student performed (0.0-1.0)
+    '''
     moment = when
     if(isinstance(moment, datetime)):
       assert(moment + timedelta(days=0.01) > self.epoch)
       moment_as_datetime = moment
-    
-      moment_as_datetime = self.epoch + timedelta
     elif(isinstance(moment, float) or isinstance(moment, int)):
       moment_as_datetime = self.epoch + timedelta(days=float(moment))
     else:
-      raise
+      raise("object not supported")
 
     moment_as_offset_in_days = self.control.days_from_epoch(moment_as_datetime)
 
@@ -1839,11 +2283,24 @@ class LearningTracker():
       result)
 
   # learning tracker
-  def animate(self,
-      name_of_mp4=None,
+  def animate(self, name_of_mp4=None,
       student=None,
       time_per_event_in_seconds=None,
       stop=None):
+    '''Creates an mp4 video of a student's training up to the moment indicated by the
+    ``stop`` input argument.
+
+    **Note**:
+       This function uses the animation feature of the matplotlib library.
+
+    **Args**:
+       | ``name_of_mp4=None`` (string): name and path of the resulting output video
+       | ``student=None`` (string): name of the student to be placed on the video
+       | ``time_per_event_in_seconds=None`` (int): time per frame event
+       | ``stop=None`` (int, float, datetime): when to stop the video.  If an
+       int or float provided, this indicates the number of days since the
+       training epoch.
+    '''
     self.base          = {}
     self.base["frame"] = {}
 
@@ -1926,54 +2383,137 @@ class LearningTracker():
 
   # learning tracker
   def range_for(self, stop, curve=None, day_step_size=1):
+    '''Returns a list of useful datetime values for a given curve, up to, but not
+    including the stop value, in increments of day_step_size.
+
+    **Args**:
+       | ``stop`` (datetime, float, int):  datetime or offset from epoch in days
+       | ``curve=None`` (type1): default: which forgetting curve, starting at 1
+       | ``day_step_size=1`` (type1): step size of the result (unit of days)
+
+    **Returns**:
+       (list): list of datetimes that can be used in another query
+
+    '''
     return self.control.range_for(stop, curve, day_step_size)
 
   # learning tracker
   def predict_result(self, moment, curve=None):
+    '''(alias for recollect_scalar) Predicts a student's recollection ability, at
+    a specified time, on a specifiy forgetting curve.
+
+    **Args**:
+       | ``moment`` (float, int, datetime, timedelta):  see note
+       | ``curve=None`` (int): Which forgetting curve to use in the prediction
+
+    **Note**:
+
+    The ``moment`` input can be one of these types:
+
+      * float     - representing the number of days since epoch (when the
+                    spaced_repetition algorithm started to track)
+      * datetime  - a datetime object, which must be after epoch
+      * timedelta - the difference in time from when the client wants to know
+                    something and epoch
+
+    **Returns**:
+       (float): a number between 0 and 1.  0 means the idea is completely
+       forgotten and 1 means the idea is perfectly remembered.
+
+    '''
     return self.recollect_scalar(moment, curve)
 
   # learning tracker
   def recollect_scalar(self, moment, curve=None):
+    '''Predicts a student's recollection ability, at a specified time, on a
+    specifiy forgetting curve.
+
+    **Args**:
+       | ``moment`` (float, int, datetime, timedelta):  see note
+       | ``curve=None`` (int): Which forgetting curve to use in the prediction
+
+    **Note**:
+
+    The ``moment`` input can be one of these types:
+
+      * float     - representing the number of days since epoch (when the
+                    spaced_repetition algorithm started to track)
+      * datetime  - a datetime object, which must be after epoch
+      * timedelta - the difference in time from when the client wants to know
+                    something and epoch
+
+    **Returns**:
+       (float): a number between 0 and 1.  0 means the idea is completely
+       forgotten and 1 means the idea is perfectly remembered.
+
+    '''
     return self.control.recollect_scalar(moment, curve)
 
   # learning tracker
   def epoch_fdecaytau(self):
+    '''Returns the reference's fdcecaytau parameter.'''
     return self.reference.fdecaytau
 
   # learning tracker
   def epoch_fdecay0(self):
+    '''Returns the reference's fdecay0 parameter.'''
     return self.reference.fdecaytau
 
   # learning tracker
   def epoch_plasticity_root(self):
+    '''Returns the reference's plasticity_root parameter.'''
     return self.reference.plasticity_root
 
   # learning tracker
   def epoch_plasticity_denominator_offset(self):
+    '''Returns the reference's plasticity_denominator_offset parameter.'''
     return self.reference.plasticity_denominator_offset
 
   # learning tracker
   def discovered_fdecaytau(self):
+    '''Returns the control's discovered fdecaytau parameter.'''
     return self.control.fdecaytau
 
   # learning tracker
   def discovered_fdecay0(self):
+    '''Returns the control's discovered fdecay0 parameter.'''
     return self.control.fdecay0
 
   # learning tracker
   def days_from_epoch(self, time):
+    '''Converts a datetime object into a number representing the days since the
+    training epoch.
+
+    **Args**:
+      | ``time`` (int, float): days since the training epoch
+
+    **Returns**:
+       (float): days since training epoch
+
+    '''
     return self.control.days_from_epoch(time)
 
   # learning tracker
   def discovered_plasticity_root(self):
+    '''Returns the control's discovered plasticity_root parameter.'''
     return self.control.discovered_plasticity_root
 
   # learning tracker
   def discovered_plasticity_denominator_offset(self):
+    '''Returns the control's discovered denominator_offset parameter.'''
     return self.control.discovered_plasticity_denominator_offset
 
   # learning tracker
   def feedback(self, time_format=None):
+    '''Returns a list of the feedback events seen by this learning tracker.
+
+    **Args**:
+       | ``time_format(None)`` (TimeFormat): OFFSET or DATE_TIME
+
+    **Returns**:
+       (list): moment of feedback in the specified format.
+
+    '''
     results = None
 
     if time_format is None:
@@ -1986,8 +2526,33 @@ class LearningTracker():
 
     return results
 
+  # learning tracker
+  def next_offset(self):
+    '''Returns the next suggested time to study as a float, representing the
+       number of days since the training epoch.
+
+    **Returns**:
+       (float): next suggested lesson [days since training epoch]
+
+    '''
+    return self.control.next_offset()
+
+  # learning tracker
+  def next(self):
+    '''Returns the next suggested time to study as a datetime object
+
+    **Returns**:
+       (datetime): next suggested lesson
+
+    '''
+    return self.control.next()
+
+  # learning tracker
+  def show(self):
+    self.control.show()
+
   def __getstate__(self):
-    '''This magic method over-writes the load, or pickling process, by returning
+    '''Over-writes the load, or pickling process, by returning
     a custom dictionary that the pickle process can work with.  Without this
     method, the LearningTracker __dict__ object would be used by the pickler.
 

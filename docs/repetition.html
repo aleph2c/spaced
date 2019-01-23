@@ -66,102 +66,370 @@
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="method">
 <dt id="repetition.LearningTracker.add_event">
-<code class="descname">add_event</code><span class="sig-paren">(</span><em>event_x</em>, <em>event_y</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.LearningTracker.add_event" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="descname">add_event</code><span class="sig-paren">(</span><em>feedback_moment</em>, <em>result</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.LearningTracker.add_event" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a training event to the learning tracker.</p>
+<dl class="docutils">
+<dt><strong>Args</strong>:</dt>
+<dd><div class="first line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">feedback_moment</span></code> (int, float): moment as time offset in days from</div>
+</div>
+<p class="last">epoch
+| <code class="docutils literal notranslate"><span class="pre">result</span></code> (float): how well the student performed (0.0-1.0)</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="method">
 <dt id="repetition.LearningTracker.animate">
 <code class="descname">animate</code><span class="sig-paren">(</span><em>name_of_mp4=None</em>, <em>student=None</em>, <em>time_per_event_in_seconds=None</em>, <em>stop=None</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.LearningTracker.animate" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Creates an mp4 video of a student’s training up to the moment indicated by the
+<code class="docutils literal notranslate"><span class="pre">stop</span></code> input argument.</p>
+<dl class="docutils">
+<dt><strong>Note</strong>:</dt>
+<dd>This function uses the animation feature of the matplotlib library.</dd>
+<dt><strong>Args</strong>:</dt>
+<dd><div class="first line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">name_of_mp4=None</span></code> (string): name and path of the resulting output video</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">student=None</span></code> (string): name of the student to be placed on the video</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">time_per_event_in_seconds=None</span></code> (int): time per frame event</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">stop=None</span></code> (int, float, datetime): when to stop the video.  If an</div>
+</div>
+<p class="last">int or float provided, this indicates the number of days since the
+training epoch.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="method">
 <dt id="repetition.LearningTracker.days_from_epoch">
 <code class="descname">days_from_epoch</code><span class="sig-paren">(</span><em>time</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.LearningTracker.days_from_epoch" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Converts a datetime object into a number representing the days since the
+training epoch.</p>
+<dl class="docutils">
+<dt><strong>Args</strong>:</dt>
+<dd><div class="first last line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">time</span></code> (int, float): days since the training epoch</div>
+</div>
+</dd>
+<dt><strong>Returns</strong>:</dt>
+<dd>(float): days since training epoch</dd>
+</dl>
+</dd></dl>
 
 <dl class="method">
 <dt id="repetition.LearningTracker.discovered_fdecay0">
 <code class="descname">discovered_fdecay0</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#repetition.LearningTracker.discovered_fdecay0" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the control’s discovered fdecay0 parameter.</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="repetition.LearningTracker.discovered_fdecaytau">
 <code class="descname">discovered_fdecaytau</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#repetition.LearningTracker.discovered_fdecaytau" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the control’s discovered fdecaytau parameter.</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="repetition.LearningTracker.discovered_plasticity_denominator_offset">
 <code class="descname">discovered_plasticity_denominator_offset</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#repetition.LearningTracker.discovered_plasticity_denominator_offset" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the control’s discovered denominator_offset parameter.</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="repetition.LearningTracker.discovered_plasticity_root">
 <code class="descname">discovered_plasticity_root</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#repetition.LearningTracker.discovered_plasticity_root" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the control’s discovered plasticity_root parameter.</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="repetition.LearningTracker.epoch_fdecay0">
 <code class="descname">epoch_fdecay0</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#repetition.LearningTracker.epoch_fdecay0" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the reference’s fdecay0 parameter.</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="repetition.LearningTracker.epoch_fdecaytau">
 <code class="descname">epoch_fdecaytau</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#repetition.LearningTracker.epoch_fdecaytau" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the reference’s fdcecaytau parameter.</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="repetition.LearningTracker.epoch_plasticity_denominator_offset">
 <code class="descname">epoch_plasticity_denominator_offset</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#repetition.LearningTracker.epoch_plasticity_denominator_offset" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the reference’s plasticity_denominator_offset parameter.</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="repetition.LearningTracker.epoch_plasticity_root">
 <code class="descname">epoch_plasticity_root</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#repetition.LearningTracker.epoch_plasticity_root" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the reference’s plasticity_root parameter.</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="repetition.LearningTracker.feedback">
 <code class="descname">feedback</code><span class="sig-paren">(</span><em>time_format=None</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.LearningTracker.feedback" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns a list of the feedback events seen by this learning tracker.</p>
+<dl class="docutils">
+<dt><strong>Args</strong>:</dt>
+<dd><div class="first last line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">time_format(None)</span></code> (TimeFormat): OFFSET or DATE_TIME</div>
+</div>
+</dd>
+<dt><strong>Returns</strong>:</dt>
+<dd>(list): moment of feedback in the specified format.</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="repetition.LearningTracker.graphs">
+<code class="descname">graphs</code><span class="sig-paren">(</span><em>stop</em>, <em>filename=None</em>, <em>reference_handle=False</em>, <em>feedback_handle=False</em>, <em>error_handle=False</em>, <em>control_handle=False</em>, <em>show=False</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.LearningTracker.graphs" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Writes graphs, yields the requested graph handles, writes to file</dt>
+<dd>and automatically closes the graph handlers all within a context manager.</dd>
+<dt><strong>Args</strong>:</dt>
+<dd><div class="first last line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">stop</span></code> (datetime, float, int): when to stop graphing</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">filename=&quot;None&quot;</span></code> (string): The file name and extension (defining how it will be saved)</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">reference_handle=&quot;False&quot;</span></code> (bool): Reference graph handle needed?</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">feedback_handle=&quot;False&quot;</span></code> (bool): Feedback graph handle needed?</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">error_handle=&quot;False&quot;</span></code> (bool): Error graph handle needed?</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">control_handle=&quot;False&quot;</span></code> (bool): Control graph handle needed?</div>
+</div>
+</dd>
+<dt><strong>Yields</strong>:</dt>
+<dd>(tuple): graphs handles as described by input args</dd>
+</dl>
+<p><strong>Example(s)</strong>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">spaced</span> <span class="kn">import</span> <span class="n">LearningTracker</span>
+
+<span class="n">lt</span> <span class="o">=</span> <span class="n">LearningTracker</span><span class="p">(</span><span class="n">epoch</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">())</span>
+
+<span class="n">moments</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">range_for</span><span class="p">(</span><span class="n">curve</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="mi">43</span><span class="p">,</span> <span class="n">day_step_size</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="n">predictions</span> <span class="o">=</span> <span class="p">[</span>
+  <span class="n">lt</span><span class="o">.</span><span class="n">recollect_scalar</span><span class="p">(</span><span class="n">moment</span><span class="p">,</span> <span class="n">curve</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="k">for</span> 
+  <span class="n">moment</span> <span class="ow">in</span> <span class="n">momemts</span><span class="p">]</span>
+
+<span class="k">with</span> <span class="n">lt</span><span class="o">.</span><span class="n">graphs</span><span class="p">(</span><span class="n">stop</span><span class="o">=</span><span class="mi">43</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="s1">&#39;contenxt_demo.pdf&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">c_hdl</span><span class="p">:</span>
+  <span class="n">c_hdl</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">moments</span><span class="p">,</span> <span class="n">predictions</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;xkcd:azure&#39;</span><span class="p">)</span>
+
+<span class="c1"># the ordering of the handles provided by the context manager</span>
+<span class="c1"># matches the graph ordering.</span>
+<span class="c1"># 1 - reference</span>
+<span class="c1"># 2 - feedback</span>
+<span class="c1"># 3 - error</span>
+<span class="c1"># 4 - control</span>
+<span class="k">with</span> <span class="n">lt</span><span class="o">.</span><span class="n">graphs</span><span class="p">(</span><span class="n">stop</span><span class="o">=</span><span class="mi">43</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="s1">&#39;contenxt_demo.pdf&#39;</span><span class="p">,</span>
+  <span class="n">control_handle</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">reference_handle</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span> <span class="k">as</span> <span class="p">(</span><span class="n">r_dl</span><span class="p">,</span> <span class="n">c_hdl</span><span class="p">):</span>
+
+  <span class="n">c_hdl</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">moments</span><span class="p">,</span> <span class="n">predictions</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;xkcd:azure&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
 
 <dl class="method">
 <dt id="repetition.LearningTracker.learned">
 <code class="descname">learned</code><span class="sig-paren">(</span><em>when</em>, <em>result</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.LearningTracker.learned" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Tells the learning tracker about something the student has learned.</p>
+<dl class="docutils">
+<dt><strong>Args</strong>:</dt>
+<dd><div class="first last line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">when</span></code> (int, float, datetime): moment as either time offset in days from epoch, or the moment of training represented by a datetime object</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">result</span></code> (float): how well the student performed (0.0-1.0)</div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="repetition.LearningTracker.next">
+<code class="descname">next</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#repetition.LearningTracker.next" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the next suggested time to study as a datetime object</p>
+<dl class="docutils">
+<dt><strong>Returns</strong>:</dt>
+<dd>(datetime): next suggested lesson</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="repetition.LearningTracker.next_offset">
+<code class="descname">next_offset</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#repetition.LearningTracker.next_offset" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Returns the next suggested time to study as a float, representing the</dt>
+<dd>number of days since the training epoch.</dd>
+<dt><strong>Returns</strong>:</dt>
+<dd>(float): next suggested lesson [days since training epoch]</dd>
+</dl>
+</dd></dl>
 
 <dl class="method">
 <dt id="repetition.LearningTracker.plot_graphs">
 <code class="descname">plot_graphs</code><span class="sig-paren">(</span><em>stop</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.LearningTracker.plot_graphs" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Plots the reference, feedback, error and control data points on one graph.</p>
+<dl class="docutils">
+<dt><strong>Args</strong>:</dt>
+<dd><div class="first last line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">stop</span></code> (datetime, float, int): when to stop graphing</div>
+</div>
+</dd>
+<dt><strong>Returns</strong>:</dt>
+<dd>(tuple): (PlotPaneData, dict)</dd>
+</dl>
+</dd></dl>
 
 <dl class="method">
 <dt id="repetition.LearningTracker.predict_result">
 <code class="descname">predict_result</code><span class="sig-paren">(</span><em>moment</em>, <em>curve=None</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.LearningTracker.predict_result" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>(alias for recollect_scalar) Predicts a student’s recollection ability, at
+a specified time, on a specifiy forgetting curve.</p>
+<dl class="docutils">
+<dt><strong>Args</strong>:</dt>
+<dd><div class="first last line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">moment</span></code> (float, int, datetime, timedelta):  see note</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">curve=None</span></code> (int): Which forgetting curve to use in the prediction</div>
+</div>
+</dd>
+</dl>
+<p><strong>Note</strong>:</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">moment</span></code> input can be one of these types:</p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="first docutils">
+<dt>float     - representing the number of days since epoch (when the</dt>
+<dd>spaced_repetition algorithm started to track)</dd>
+</dl>
+</li>
+<li>datetime  - a datetime object, which must be after epoch</li>
+<li><dl class="first docutils">
+<dt>timedelta - the difference in time from when the client wants to know</dt>
+<dd>something and epoch</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<dl class="docutils">
+<dt><strong>Returns</strong>:</dt>
+<dd>(float): a number between 0 and 1.  0 means the idea is completely
+forgotten and 1 means the idea is perfectly remembered.</dd>
+</dl>
+</dd></dl>
 
 <dl class="method">
 <dt id="repetition.LearningTracker.range_for">
 <code class="descname">range_for</code><span class="sig-paren">(</span><em>stop</em>, <em>curve=None</em>, <em>day_step_size=1</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.LearningTracker.range_for" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns a list of useful datetime values for a given curve, up to, but not
+including the stop value, in increments of day_step_size.</p>
+<dl class="docutils">
+<dt><strong>Args</strong>:</dt>
+<dd><div class="first last line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">stop</span></code> (datetime, float, int):  datetime or offset from epoch in days</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">curve=None</span></code> (type1): default: which forgetting curve, starting at 1</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">day_step_size=1</span></code> (type1): step size of the result (unit of days)</div>
+</div>
+</dd>
+<dt><strong>Returns</strong>:</dt>
+<dd>(list): list of datetimes that can be used in another query</dd>
+</dl>
+</dd></dl>
 
 <dl class="method">
 <dt id="repetition.LearningTracker.recollect_scalar">
 <code class="descname">recollect_scalar</code><span class="sig-paren">(</span><em>moment</em>, <em>curve=None</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.LearningTracker.recollect_scalar" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Predicts a student’s recollection ability, at a specified time, on a
+specifiy forgetting curve.</p>
+<dl class="docutils">
+<dt><strong>Args</strong>:</dt>
+<dd><div class="first last line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">moment</span></code> (float, int, datetime, timedelta):  see note</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">curve=None</span></code> (int): Which forgetting curve to use in the prediction</div>
+</div>
+</dd>
+</dl>
+<p><strong>Note</strong>:</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">moment</span></code> input can be one of these types:</p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="first docutils">
+<dt>float     - representing the number of days since epoch (when the</dt>
+<dd>spaced_repetition algorithm started to track)</dd>
+</dl>
+</li>
+<li>datetime  - a datetime object, which must be after epoch</li>
+<li><dl class="first docutils">
+<dt>timedelta - the difference in time from when the client wants to know</dt>
+<dd>something and epoch</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<dl class="docutils">
+<dt><strong>Returns</strong>:</dt>
+<dd>(float): a number between 0 and 1.  0 means the idea is completely
+forgotten and 1 means the idea is perfectly remembered.</dd>
+</dl>
+</dd></dl>
 
 <dl class="method">
 <dt id="repetition.LearningTracker.save_figure">
 <code class="descname">save_figure</code><span class="sig-paren">(</span><em>filename=None</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.LearningTracker.save_figure" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Save the graph plotted by the <code class="docutils literal notranslate"><span class="pre">plot_graphs</span></code> method to file.</p>
+<dl class="docutils">
+<dt><strong>Args</strong>:</dt>
+<dd><div class="first last line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">filename=&quot;spaced.pdf&quot;</span></code> (string): The file name and extension (defining how it will be saved)</div>
+</div>
+</dd>
+<dt><strong>Notes</strong>:</dt>
+<dd>This method uses the matplotlib library, which will automatically save the
+plot in the format indicated by the file name’s extension.</dd>
+</dl>
+</dd></dl>
 
 <dl class="method">
 <dt id="repetition.LearningTracker.schedule">
 <code class="descname">schedule</code><span class="sig-paren">(</span><em>stop</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.LearningTracker.schedule" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns a schedule as of datetimes, up-until and possibily-including the
+datetime or offset represented by the <code class="docutils literal notranslate"><span class="pre">stop</span></code> argument.</p>
+<dl class="docutils">
+<dt><strong>Args</strong>:</dt>
+<dd><div class="first line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">stop</span></code> (float, int, datetime): at what point do you want the schedule</div>
+</div>
+<p class="last">information to stop.  If <code class="docutils literal notranslate"><span class="pre">stop</span></code> is an int or a float it will be
+interpreted as the number of days-from-epoch at which you would like this
+function to stop providing information. If <code class="docutils literal notranslate"><span class="pre">stop</span></code> is a datetime, the
+output schedule will include all of the schedule suggestions up until
+that time.</p>
+</dd>
+<dt><strong>Returns</strong>:</dt>
+<dd>(list of datetime objects): The schedule</dd>
+</dl>
+</dd></dl>
 
 <dl class="method">
 <dt id="repetition.LearningTracker.schedule_as_offset">
 <code class="descname">schedule_as_offset</code><span class="sig-paren">(</span><em>stop</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.LearningTracker.schedule_as_offset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a schedule as a list of offsets measured in days from the training
+epoch, up-until and possibily-including the datetime or offset reprented by
+the <code class="docutils literal notranslate"><span class="pre">stop</span></code> argument.</p>
+<dl class="docutils">
+<dt><strong>Args</strong>:</dt>
+<dd><div class="first line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">stop</span></code> (float, int, datetime): at what point do you want the schedule</div>
+</div>
+<p class="last">information to stop.  If <code class="docutils literal notranslate"><span class="pre">stop</span></code> is an int or a float it will be
+interpreted as the number of days-from-epoch at which you would like this
+function to stop providing information. If <code class="docutils literal notranslate"><span class="pre">stop</span></code> is a datetime, the
+output schedule will include all of the schedule suggestions up until
+that time.</p>
+</dd>
+<dt><strong>Returns</strong>:</dt>
+<dd>(list of floats): The schedule as offset from the training epoch</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="repetition.LearningTracker.show">
+<code class="descname">show</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#repetition.LearningTracker.show" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -172,17 +440,12 @@
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="attribute">
 <dt id="repetition.SpaceRepetition.Default_Samples">
-<code class="descname">Default_Samples</code><em class="property"> = 1000</em><a class="headerlink" href="#repetition.SpaceRepetition.Default_Samples" title="Permalink to this definition">¶</a></dt>
+<code class="descname">Default_Samples</code><em class="property"> = 100</em><a class="headerlink" href="#repetition.SpaceRepetition.Default_Samples" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="repetition.SpaceRepetition.Horizontal_Axis">
 <code class="descname">Horizontal_Axis</code><em class="property"> = ''</em><a class="headerlink" href="#repetition.SpaceRepetition.Horizontal_Axis" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="repetition.SpaceRepetition.Title">
-<code class="descname">Title</code><em class="property"> = 'Spaced Memory Repetition Strategy\n'</em><a class="headerlink" href="#repetition.SpaceRepetition.Title" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -193,8 +456,8 @@
 <dl class="method">
 <dt id="repetition.SpaceRepetition.datetime_to_days_offset_from_epoch">
 <code class="descname">datetime_to_days_offset_from_epoch</code><span class="sig-paren">(</span><em>datetime_</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetition.datetime_to_days_offset_from_epoch" title="Permalink to this definition">¶</a></dt>
-<dd><p>convert a datetime into a float, representing the number of days
-difference between that datetime and when epoch</p>
+<dd><p>Convert a datetime object into a float, representing the number of days
+difference between that datetime and when epoch.</p>
 <dl class="docutils">
 <dt><strong>Args</strong>:</dt>
 <dd><div class="first last line-block">
@@ -209,15 +472,31 @@ difference between that datetime and when epoch</p>
 <dl class="method">
 <dt id="repetition.SpaceRepetition.days_from_epoch">
 <code class="descname">days_from_epoch</code><span class="sig-paren">(</span><em>time</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetition.days_from_epoch" title="Permalink to this definition">¶</a></dt>
-<dd><p>Convert a datetime object into a number representing the days since the
+<dd><p>Converts a datetime object into a number representing the days since the
 training epoch.</p>
+<dl class="docutils">
+<dt><strong>Args</strong>:</dt>
+<dd><div class="first last line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">time</span></code> (int, float, datetime): days since the training epoch</div>
+</div>
+</dd>
+<dt><strong>Returns</strong>:</dt>
+<dd>(float): days, as an offset, since the training epoch</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="repetition.SpaceRepetition.days_from_start">
+<code class="descname">days_from_start</code><span class="sig-paren">(</span><em>time</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetition.days_from_start" title="Permalink to this definition">¶</a></dt>
+<dd><p>(alias for days_from_epoch) Converts a datetime object into a number
+representing the days since the training epoch.</p>
 <dl class="docutils">
 <dt><strong>Args</strong>:</dt>
 <dd><div class="first last line-block">
 <div class="line"><code class="docutils literal notranslate"><span class="pre">time</span></code> (int, float): days since the training epoch</div>
 </div>
 </dd>
-<dt>Returns:</dt>
+<dt><strong>Returns</strong>:</dt>
 <dd>(float): days since training epoch</dd>
 </dl>
 </dd></dl>
@@ -225,7 +504,7 @@ training epoch.</p>
 <dl class="method">
 <dt id="repetition.SpaceRepetition.days_offset_from_epoch_to_datetime">
 <code class="descname">days_offset_from_epoch_to_datetime</code><span class="sig-paren">(</span><em>offset_</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetition.days_offset_from_epoch_to_datetime" title="Permalink to this definition">¶</a></dt>
-<dd><p>convert an days-offset-from-epoch into a datetime object</p>
+<dd><p>Convert a days-offset-from-epoch into a datetime object.</p>
 <dl class="docutils">
 <dt><strong>Args</strong>:</dt>
 <dd><div class="first last line-block">
@@ -241,14 +520,14 @@ training epoch</dd>
 <dl class="method">
 <dt id="repetition.SpaceRepetition.days_to_time">
 <code class="descname">days_to_time</code><span class="sig-paren">(</span><em>days</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetition.days_to_time" title="Permalink to this definition">¶</a></dt>
-<dd><p>Convert a time [offset in days from epoch] into a datetime object.</p>
+<dd><p>Converts a time [offset in days from epoch] into a datetime object.</p>
 <dl class="docutils">
-<dt>Args:</dt>
+<dt><strong>Args</strong>:</dt>
 <dd><div class="first last line-block">
 <div class="line"><code class="docutils literal notranslate"><span class="pre">days</span></code> (int, float): days since epoch</div>
 </div>
 </dd>
-<dt>Returns:</dt>
+<dt><strong>Returns</strong>:</dt>
 <dd>(datetime): datetime of epoch plus days</dd>
 </dl>
 </dd></dl>
@@ -256,7 +535,7 @@ training epoch</dd>
 <dl class="method">
 <dt id="repetition.SpaceRepetition.forgetting_curves">
 <code class="descname">forgetting_curves</code><span class="sig-paren">(</span><em>scale</em>, <em>offset</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetition.forgetting_curves" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function returns two other functions which have the values of <code class="docutils literal notranslate"><span class="pre">scale</span></code>
+<dd><p>Returns two other functions which have the values of <code class="docutils literal notranslate"><span class="pre">scale</span></code>
 and <code class="docutils literal notranslate"><span class="pre">offset</span></code> enclosed within them.</p>
 <dl class="docutils">
 <dt><strong>Args</strong>:</dt>
@@ -265,6 +544,8 @@ and <code class="docutils literal notranslate"><span class="pre">offset</span></
 <div class="line"><code class="docutils literal notranslate"><span class="pre">offset</span></code> (int, float): enclosed parameter</div>
 </div>
 </dd>
+<dt><strong>Returns</strong>:</dt>
+<dd>(tuple): fn, fn0</dd>
 </dl>
 <p>The returned functions are:</p>
 <ul class="simple">
@@ -307,7 +588,7 @@ and <code class="docutils literal notranslate"><span class="pre">offset</span></
 <dl class="method">
 <dt id="repetition.SpaceRepetition.make_stickleback_data_for_plot">
 <code class="descname">make_stickleback_data_for_plot</code><span class="sig-paren">(</span><em>forgetting_functions</em>, <em>solutions</em>, <em>stop_day_as_offset</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetition.make_stickleback_data_for_plot" title="Permalink to this definition">¶</a></dt>
-<dd><p>create the data set that can graph the stickleback curve</p>
+<dd><p>Creates the data set that can be used to graph the stickleback curve.</p>
 <dl class="docutils">
 <dt><strong>Args</strong>:</dt>
 <dd><div class="first last line-block">
@@ -324,7 +605,7 @@ and <code class="docutils literal notranslate"><span class="pre">offset</span></
 <dl class="method">
 <dt id="repetition.SpaceRepetition.plasticity_functions">
 <code class="descname">plasticity_functions</code><span class="sig-paren">(</span><em>denominator_offset</em>, <em>root</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetition.plasticity_functions" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function returns three other functions which have the values of
+<dd><p>Returns three other functions which have the values of
 <code class="docutils literal notranslate"><span class="pre">denominator_offset</span></code> and <code class="docutils literal notranslate"><span class="pre">root</span></code> enclosed within them.</p>
 <dl class="docutils">
 <dt><strong>Args</strong>:</dt>
@@ -334,7 +615,7 @@ and <code class="docutils literal notranslate"><span class="pre">offset</span></
 </div>
 </dd>
 <dt><strong>Returns</strong>:</dt>
-<dd>(list): fn(x), fn0(x, y), invfn(y)</dd>
+<dd>(tuple): fn(x), fn0(x, y), invfn(y)</dd>
 </dl>
 <p>These returned functions are:</p>
 <ul class="simple">
@@ -412,15 +693,9 @@ and <code class="docutils literal notranslate"><span class="pre">offset</span></
 </dd></dl>
 
 <dl class="method">
-<dt id="repetition.SpaceRepetition.plot_graph">
-<code class="descname">plot_graph</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetition.plot_graph" title="Permalink to this definition">¶</a></dt>
-<dd><p>stub</p>
-</dd></dl>
-
-<dl class="method">
 <dt id="repetition.SpaceRepetition.tune_decay_of_decay">
 <code class="descname">tune_decay_of_decay</code><span class="sig-paren">(</span><em>initial</em>, <em>tau</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetition.tune_decay_of_decay" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function returns a tuned-decay_of_decay function.  The decay_of_decay,
+<dd><p>Returns a tuned-decay_of_decay function.  The decay_of_decay,
 function can be called over and over again with greater values of t, and it
 will return a set of scalars which can be used to build, less and less
 agressive forgetting curves.</p>
@@ -514,66 +789,161 @@ fast state of forgetting to a slower state of forgetting.</p>
 <dl class="method">
 <dt id="repetition.SpaceRepetitionController.control">
 <code class="descname">control</code><span class="sig-paren">(</span><em>control_x=None</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetitionController.control" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Runs the space repetition control system.</p>
+<dl class="docutils">
+<dt><strong>Args</strong>:</dt>
+<dd><div class="first line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">control_x=None</span></code> (int, float): offset in days where to start control</div>
+</div>
+<p class="last">system.  This value defaults to the last time the student provided
+feedback.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="method">
 <dt id="repetition.SpaceRepetitionController.datetime_for">
 <code class="descname">datetime_for</code><span class="sig-paren">(</span><em>curve=None</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetitionController.datetime_for" title="Permalink to this definition">¶</a></dt>
-<dd><p>get the datetime stampe of a curve in the stickleback.  Curves are
-indexed from zero</p>
+<dd><p>Returns the datetime of a specified training suggestion.</p>
+<p>The moment of this suggestion is represented by the <code class="docutils literal notranslate"><span class="pre">curve</span></code> input
+argument.  The curve numbers are indexed from 1, not 0.  The curve is the
+forgetting curve for which you want the start-date of.</p>
+<dl class="docutils">
+<dt><strong>Args</strong>:</dt>
+<dd><div class="first line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">curve=None</span></code> (int): The number of the forgetting curve.  The curves</div>
+</div>
+<p class="last">are indexed from 1, not 0.  If no argument is provided, the curve number
+will be set to 1.</p>
+</dd>
+<dt><strong>Returns</strong>:</dt>
+<dd>(datetime): The suggested training moment.</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="repetition.SpaceRepetitionController.error">
 <code class="descname">error</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetitionController.error" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Build an error signal event given x.</p>
+<p>The error signal is the result of the reference-plasticity-function(x), minus the
+feedback-plasticity-function(x).</p>
+<dl class="docutils">
+<dt><strong>Args</strong>:</dt>
+<dd><div class="first last line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">x</span></code> (int, float): offset in days from epoch</div>
+</div>
+</dd>
+<dt><strong>Returns</strong>:</dt>
+<dd><div class="first last line-block">
+<div class="line">(float): reference plasticity result - feedback plasticity result</div>
+<div class="line-block">
+<div class="line">a positive error means we need to push harder</div>
+<div class="line">a negative error means we are pushing too hard</div>
+</div>
+</div>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="method">
 <dt id="repetition.SpaceRepetitionController.initialize_feedback">
-<code class="descname">initialize_feedback</code><span class="sig-paren">(</span><em>feedback</em>, <em>stop=None</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetitionController.initialize_feedback" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="descname">initialize_feedback</code><span class="sig-paren">(</span><em>feedback</em>, <em>stop=None</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetitionController.initialize_feedback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initializes the controller’s feedback information.</p>
+<dl class="docutils">
+<dt><strong>Args</strong>:</dt>
+<dd><div class="first last line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">feedback</span></code> (SpaceRepetitionFeedback): feedback object</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">stop=None</span></code> (int, float):  days offset since epoch</div>
+</div>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="method">
-<dt id="repetition.SpaceRepetitionController.next_lesson">
-<code class="descname">next_lesson</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetitionController.next_lesson" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dt id="repetition.SpaceRepetitionController.next">
+<code class="descname">next</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetitionController.next" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the next suggested time to study as a datetime object</p>
+<dl class="docutils">
+<dt><strong>Returns</strong>:</dt>
+<dd>(datetime): next suggested lesson</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="repetition.SpaceRepetitionController.next_offset">
+<code class="descname">next_offset</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetitionController.next_offset" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Returns the next suggested time to study as a float, representing the</dt>
+<dd>number of days since the training epoch.</dd>
+<dt><strong>Returns</strong>:</dt>
+<dd>(float): next suggested lesson [days since training epoch]</dd>
+</dl>
+</dd></dl>
 
 <dl class="method">
 <dt id="repetition.SpaceRepetitionController.plot_control">
-<code class="descname">plot_control</code><span class="sig-paren">(</span><em>stop</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetitionController.plot_control" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="descname">plot_control</code><span class="sig-paren">(</span><em>stop</em>, <em>plot_pane_data=None</em>, <em>panes=None</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetitionController.plot_control" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plots the control data.</p>
+<dl class="docutils">
+<dt><strong>Args</strong>:</dt>
+<dd><div class="first last line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">stop</span></code> (datetime, float, int): when to stop graphing</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">plot_pane_data=None</span></code> (int, float):  plot handle</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">panes=None</span></code> (type1): number of sub-plot panes to make</div>
+</div>
+</dd>
+<dt><strong>Returns</strong>:</dt>
+<dd>(tuple): (PlotPaneData, dict)</dd>
+</dl>
+</dd></dl>
 
 <dl class="method">
 <dt id="repetition.SpaceRepetitionController.plot_error">
-<code class="descname">plot_error</code><span class="sig-paren">(</span><em>stop</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetitionController.plot_error" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="descname">plot_error</code><span class="sig-paren">(</span><em>stop</em>, <em>plot_pane_data=None</em>, <em>panes=None</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetitionController.plot_error" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plots the error signal.</p>
+<dl class="docutils">
+<dt><strong>Args</strong>:</dt>
+<dd><div class="first last line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">stop</span></code> (datetime, float, int): when to stop graphing</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">plot_pane_data=None</span></code> (int, float):  plot handle</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">panes=None</span></code> (type1): number of sub-plot panes to make</div>
+</div>
+</dd>
+<dt><strong>Returns</strong>:</dt>
+<dd>(tuple): (PlotPaneData, dict)</dd>
+</dl>
+</dd></dl>
 
 <dl class="method">
 <dt id="repetition.SpaceRepetitionController.plot_graphs">
 <code class="descname">plot_graphs</code><span class="sig-paren">(</span><em>stop=None</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetitionController.plot_graphs" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Plots the reference, feedback, error and control data points on one
+graph.</p>
+<dl class="docutils">
+<dt><strong>Args</strong>:</dt>
+<dd><div class="first last line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">stop</span></code> (datetime, float, int): when to stop graphing</div>
+</div>
+</dd>
+<dt><strong>Returns</strong>:</dt>
+<dd>(tuple): (PlotPaneData, dict)</dd>
+</dl>
+</dd></dl>
 
 <dl class="method">
 <dt id="repetition.SpaceRepetitionController.predict_result">
 <code class="descname">predict_result</code><span class="sig-paren">(</span><em>moment</em>, <em>curve=None</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetitionController.predict_result" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="repetition.SpaceRepetitionController.range_for">
-<code class="descname">range_for</code><span class="sig-paren">(</span><em>stop</em>, <em>curve=None</em>, <em>day_step_size=1</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetitionController.range_for" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a list of useful datetime values for a given curve, up to, but not
-including the stop value, in increments of day_step_size.</p>
-<blockquote>
-<div>stop: can be a datetime or an offset from epoch in days
-curve: is which curve to be referenced, starting at 1
-day_step_size: defaults to 1</div></blockquote>
-</dd></dl>
-
-<dl class="method">
-<dt id="repetition.SpaceRepetitionController.recollect_scalar">
-<code class="descname">recollect_scalar</code><span class="sig-paren">(</span><em>moment</em>, <em>curve=None</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetitionController.recollect_scalar" title="Permalink to this definition">¶</a></dt>
-<dd><p>This will return a scalar representing the probability that a student can
-correctly recall something being tracked by the space repetition algorithm.</p>
+<dd><p>(alias for recollect_scalar) Predicts a student’s recollection ability at
+a specified time on a specified forgetting curve.</p>
+<dl class="docutils">
+<dt><strong>Args</strong>:</dt>
+<dd><div class="first last line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">moment</span></code> (float, int, datetime, timedelta):  see note</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">curve=None</span></code> (int): Which forgetting curve to use in the prediction</div>
+</div>
+</dd>
+</dl>
+<p><strong>Note</strong>:</p>
 <p>The <code class="docutils literal notranslate"><span class="pre">moment</span></code> input can be one of these types:</p>
 <blockquote>
 <div><ul class="simple">
@@ -590,33 +960,173 @@ correctly recall something being tracked by the space repetition algorithm.</p>
 </li>
 </ul>
 </div></blockquote>
-<p>The <code class="docutils literal notranslate"><span class="pre">moment</span></code> must occur after the <code class="docutils literal notranslate"><span class="pre">curve</span></code> number has been activated</p>
+<dl class="docutils">
+<dt><strong>Returns</strong>:</dt>
+<dd>(float): a number between 0 and 1.  0 means the idea is completely
+forgotten and 1 means the idea is perfectly remembered.</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="repetition.SpaceRepetitionController.prediction">
+<code class="descname">prediction</code><span class="sig-paren">(</span><em>moment</em>, <em>curve=None</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetitionController.prediction" title="Permalink to this definition">¶</a></dt>
+<dd><p>(alias for recollect_scalar) Predicts a student’s recollection ability at
+a specified time on a specified forgetting curve.</p>
+<dl class="docutils">
+<dt><strong>Args</strong>:</dt>
+<dd><div class="first last line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">moment</span></code> (float, int, datetime, timedelta):  see note</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">curve=None</span></code> (int): Which forgetting curve to use in the prediction</div>
+</div>
+</dd>
+</dl>
+<p><strong>Note</strong>:</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">moment</span></code> input can be one of these types:</p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="first docutils">
+<dt>float     - representing the number of days since epoch (when the</dt>
+<dd>spaced_repetition algorithm started to track)</dd>
+</dl>
+</li>
+<li>datetime  - a datetime object, which must be after epoch</li>
+<li><dl class="first docutils">
+<dt>timedelta - the difference in time from when the client wants to know</dt>
+<dd>something and epoch</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<dl class="docutils">
+<dt><strong>Returns</strong>:</dt>
+<dd>(float): a number between 0 and 1.  0 means the idea is completely
+forgotten and 1 means the idea is perfectly remembered.</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="repetition.SpaceRepetitionController.range_for">
+<code class="descname">range_for</code><span class="sig-paren">(</span><em>stop</em>, <em>curve=None</em>, <em>day_step_size=1</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetitionController.range_for" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list of useful datetime values for a given forgetting-curve, up
+to, but not including the stop value, in increments of day_step_size.</p>
+<dl class="docutils">
+<dt><strong>Args</strong>:</dt>
+<dd><div class="first last line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">stop</span></code> (datetime, float, int):  datetime or offset from epoch in days</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">curve=None</span></code> (type1): default: which forgetting curve, starting at 1</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">day_step_size=1</span></code> (type1): step size of the result (unit of days)</div>
+</div>
+</dd>
+<dt><strong>Returns</strong>:</dt>
+<dd>(list): list of datetimes that can be used in another query</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="repetition.SpaceRepetitionController.recollect_scalar">
+<code class="descname">recollect_scalar</code><span class="sig-paren">(</span><em>moment</em>, <em>curve=None</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetitionController.recollect_scalar" title="Permalink to this definition">¶</a></dt>
+<dd><p>Predicts a student’s recollection ability at a specified time on a
+specified forgetting curve.</p>
+<dl class="docutils">
+<dt><strong>Args</strong>:</dt>
+<dd><div class="first last line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">moment</span></code> (float, int, datetime, timedelta):  see note</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">curve=None</span></code> (int): Which forgetting curve to use in the prediction</div>
+</div>
+</dd>
+</dl>
+<p><strong>Note</strong>:</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">moment</span></code> input can be one of these types:</p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="first docutils">
+<dt>float     - representing the number of days since epoch (when the</dt>
+<dd>spaced_repetition algorithm started to track)</dd>
+</dl>
+</li>
+<li>datetime  - a datetime object, which must be after epoch</li>
+<li><dl class="first docutils">
+<dt>timedelta - the difference in time from when the client wants to know</dt>
+<dd>something and epoch</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<dl class="docutils">
+<dt><strong>Returns</strong>:</dt>
+<dd>(float): a number between 0 and 1.  0 means the idea is completely
+forgotten and 1 means the idea is perfectly remembered.</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="repetition.SpaceRepetitionController.save_figure">
 <code class="descname">save_figure</code><span class="sig-paren">(</span><em>filename='spaced.pdf'</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetitionController.save_figure" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Saves a graph made with the <code class="docutils literal notranslate"><span class="pre">plot_graphs</span></code> method, to file.</p>
+<dl class="docutils">
+<dt><strong>Args</strong>:</dt>
+<dd><div class="first last line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">filename=&quot;spaced.pdf&quot;</span></code> (string): The file name and extension (defining how it will be saved)</div>
+</div>
+</dd>
+<dt><strong>Notes</strong>:</dt>
+<dd>This method uses the matplotlib library, which will automatically save the
+plot in the format indicated by the file name’s extension.</dd>
+</dl>
+</dd></dl>
 
 <dl class="method">
 <dt id="repetition.SpaceRepetitionController.schedule">
 <code class="descname">schedule</code><span class="sig-paren">(</span><em>stop</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetitionController.schedule" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the learning schedule.</p>
+<p>This list will contain the recommended training moments up to, and possibly
+including the date described by the <code class="docutils literal notranslate"><span class="pre">stop</span></code> input argument.</p>
+<dl class="docutils">
+<dt><strong>Args</strong>:</dt>
+<dd><div class="first last line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">stop</span></code> (int, float, datetime): At what point to stop the schedule</div>
+<div class="line-block">
+<div class="line">if stop is an int or float it represents the days since the training epoch</div>
+</div>
+</div>
+</dd>
+<dt><strong>Returns</strong>:</dt>
+<dd>(list): list of datetime objects containing the recommended training schedule.</dd>
+</dl>
+</dd></dl>
 
 <dl class="method">
 <dt id="repetition.SpaceRepetitionController.schedule_as_offset">
 <code class="descname">schedule_as_offset</code><span class="sig-paren">(</span><em>stop</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetitionController.schedule_as_offset" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a schedule in day offsets from epoch up up until and possiblity
-includeing the stop offset [days from offset].</p>
-<blockquote>
-<div># schedule as offsets from the training epoch
-so = lt.schedule_as_offset(stop=40)</div></blockquote>
+<dd><dl class="docutils">
+<dt>Returns the learning schedule as a list offsets measure in days since</dt>
+<dd>they training epoch.</dd>
+</dl>
+<p>This list will contain the recommended training moments up to, and
+possibly including the date described by the <code class="docutils literal notranslate"><span class="pre">stop</span></code> input argument.</p>
+<dl class="docutils">
+<dt><strong>Args</strong>:</dt>
+<dd><div class="first last line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">stop</span></code> (int, float, datetime): At what point to stop the schedule</div>
+<div class="line-block">
+<div class="line">if stop is an int or float it represents the days since the training epoch</div>
+</div>
+</div>
+</dd>
+<dt><strong>Returns</strong>:</dt>
+<dd><dl class="first last docutils">
+<dt>(list): list of floats containing a the recommended schedule in days</dt>
+<dd>since the training epoch</dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="repetition.SpaceRepetitionController.show">
 <code class="descname">show</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetitionController.show" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Show the graph you have plotted using the <code class="docutils literal notranslate"><span class="pre">plot_graphs</span></code> method.</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -652,13 +1162,35 @@ so = lt.schedule_as_offset(stop=40)</div></blockquote>
 
 <dl class="method">
 <dt id="repetition.SpaceRepetitionFeedback.add_event">
-<code class="descname">add_event</code><span class="sig-paren">(</span><em>event_x</em>, <em>event_y</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetitionFeedback.add_event" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="descname">add_event</code><span class="sig-paren">(</span><em>feedback_moment</em>, <em>result</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetitionFeedback.add_event" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a feedback moment to the feedback dataset.</p>
+<dl class="docutils">
+<dt><strong>Args</strong>:</dt>
+<dd><div class="first last line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">feedback_moment</span></code> (int, float, datetime): the self examination moment</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">result</span></code> (type1): how well they did 0.0 to  1,0</div>
+</div>
+</dd>
+<dt><strong>Returns</strong>:</dt>
+<dd><p class="first">(list)  [plasticity curve, <code class="docutils literal notranslate"><span class="pre">discovered_plasticity_root</span></code>,
+<code class="docutils literal notranslate"><span class="pre">discovered_plasticity_denominator_offset</span></code>]</p>
+<ul class="simple">
+<li>fn: the plasticity curve that matches what the student is actually doing</li>
+<li><code class="docutils literal notranslate"><span class="pre">discovered_plasticity_root</span></code>:  can be fed into</li>
+</ul>
+<p class="last"><code class="docutils literal notranslate"><span class="pre">plasticity_functions</span></code> of the reference object to make a reference
+plasticty curve that matches this one.
+* <code class="docutils literal notranslate"><span class="pre">discovered_plasticity_denominator_offset</span></code>: can be fed into the
+<code class="docutils literal notranslate"><span class="pre">plasticity_functions</span></code> of the reference object to make a reference
+plasticity curve that matches this one.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="method">
 <dt id="repetition.SpaceRepetitionFeedback.plasticity_functions">
 <code class="descname">plasticity_functions</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetitionFeedback.plasticity_functions" title="Permalink to this definition">¶</a></dt>
-<dd><p>returns a function and two discovered plasticity parameters.</p>
+<dd><p>Returns the observed plasticity function and two discovered plasticity parameters.</p>
 <dl class="docutils">
 <dt><strong>Returns</strong>:</dt>
 <dd><p class="first">(list): fn, discovered_plasticity_root, discovered_plasticity_denominator_offset</p>
@@ -678,7 +1210,7 @@ plasticity curve that matches this one.</p>
 <dl class="method">
 <dt id="repetition.SpaceRepetitionFeedback.plot_graph">
 <code class="descname">plot_graph</code><span class="sig-paren">(</span><em>plot_pane_data=None</em>, <em>panes=None</em>, <em>stop=None</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetitionFeedback.plot_graph" title="Permalink to this definition">¶</a></dt>
-<dd><p>plot the feedbackgraph</p>
+<dd><p>Plots the feedback data.</p>
 <dl class="docutils">
 <dt><strong>Args</strong>:</dt>
 <dd><div class="first last line-block">
@@ -688,14 +1220,14 @@ plasticity curve that matches this one.</p>
 </div>
 </dd>
 <dt><strong>Returns</strong>:</dt>
-<dd>(type):</dd>
+<dd>(type):  SpaceRepetitionPlot, dict</dd>
 </dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="repetition.SpaceRepetitionFeedback.show">
 <code class="descname">show</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetitionFeedback.show" title="Permalink to this definition">¶</a></dt>
-<dd><p>show the plot after a plot_graph method call</p>
+<dd><p>Shows the feedback plot after the <code class="docutils literal notranslate"><span class="pre">plot_graph</span></code> method is call.</p>
 </dd></dl>
 
 </dd></dl>
@@ -770,26 +1302,9 @@ plasticity curve that matches this one.</p>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="repetition.SpaceRepetitionReference.next_lesson">
-<code class="descname">next_lesson</code><span class="sig-paren">(</span><em>a</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetitionReference.next_lesson" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the next scheduled datetime suggested by the reference</p>
-<dl class="docutils">
-<dt><strong>Note</strong>:</dt>
-<dd>The schedules are created using a generator.  This is done so that an
-infinite number of times can be suggested.  To keep memory constrained,
-the internal dates, and forgetting functions are held in a deque.  A date
-will always be available, but the forgetting curves and past suggested
-dates can be over-written so that these objects don’t take up huge
-amounts of memory when they are run over the long term.</dd>
-<dt><strong>Returns</strong>:</dt>
-<dd>(datetime): The suggested datetime for the next lesson.</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
 <dt id="repetition.SpaceRepetitionReference.plot_graph">
 <code class="descname">plot_graph</code><span class="sig-paren">(</span><em>stop</em>, <em>plot_pane_data=None</em>, <em>panes=None</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetitionReference.plot_graph" title="Permalink to this definition">¶</a></dt>
-<dd><p>plot the reference</p>
+<dd><p>Plots the reference data.</p>
 <dl class="docutils">
 <dt><strong>Args</strong>:</dt>
 <dd><div class="first last line-block">
@@ -799,8 +1314,32 @@ amounts of memory when they are run over the long term.</dd>
 </div>
 </dd>
 <dt><strong>Returns</strong>:</dt>
-<dd>(type):</dd>
+<dd>(tuple):  (PlotPaneData, dict)</dd>
 </dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="repetition.SpaceRepetitionReference.predict_result">
+<code class="descname">predict_result</code><span class="sig-paren">(</span><em>moment</em>, <em>curve=None</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetitionReference.predict_result" title="Permalink to this definition">¶</a></dt>
+<dd><p>(alias for recollect_scalar) Provides a recollection prediction at a
+provided moment after a given schedule point.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">moment</span></code> input can be one of these types:</p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="first docutils">
+<dt>float     - representing the number of days since epoch (when the</dt>
+<dd>spaced_repetition algorithm started to track)</dd>
+</dl>
+</li>
+<li>datetime  - a datetime object, which must be after epoch</li>
+<li><dl class="first docutils">
+<dt>timedelta - the difference in time from when the client wants to know</dt>
+<dd>something and epoch</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<p>The <code class="docutils literal notranslate"><span class="pre">moment</span></code> must occur after the <code class="docutils literal notranslate"><span class="pre">curve</span></code> number has been activated</p>
 </dd></dl>
 
 <dl class="method">
@@ -824,8 +1363,8 @@ including the stop value, in increments of day_step_size.</p>
 <dl class="method">
 <dt id="repetition.SpaceRepetitionReference.recollect_scalar">
 <code class="descname">recollect_scalar</code><span class="sig-paren">(</span><em>moment</em>, <em>curve=None</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetitionReference.recollect_scalar" title="Permalink to this definition">¶</a></dt>
-<dd><p>This will return a scalar representing the probability that a student can
-correctly recall something being tracked by the space repetition algorithm.</p>
+<dd><p>Provides a recollection prediction at a provided moment after a given
+schedule point.</p>
 <p>The <code class="docutils literal notranslate"><span class="pre">moment</span></code> input can be one of these types:</p>
 <blockquote>
 <div><ul class="simple">
@@ -848,7 +1387,7 @@ correctly recall something being tracked by the space repetition algorithm.</p>
 <dl class="method">
 <dt id="repetition.SpaceRepetitionReference.save_figure">
 <code class="descname">save_figure</code><span class="sig-paren">(</span><em>filename='spaced.pdf'</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetitionReference.save_figure" title="Permalink to this definition">¶</a></dt>
-<dd><p>save the file produced by the plot_graph method</p>
+<dd><p>Saves the file produced by the plot_graph method.</p>
 <dl class="docutils">
 <dt><strong>Args</strong>:</dt>
 <dd><div class="first last line-block">
@@ -861,7 +1400,7 @@ correctly recall something being tracked by the space repetition algorithm.</p>
 <dl class="method">
 <dt id="repetition.SpaceRepetitionReference.schedule">
 <code class="descname">schedule</code><span class="sig-paren">(</span><em>stop</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetitionReference.schedule" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a schedule as of datetimes up until and possibily including
+<dd><p>Returns a training schedule as of datetimes up until and possibily including
 datetime or offset represented by <code class="docutils literal notranslate"><span class="pre">stop</span></code>.</p>
 <dl class="docutils">
 <dt><strong>Args</strong>:</dt>
@@ -882,7 +1421,7 @@ that time.</p>
 <dl class="method">
 <dt id="repetition.SpaceRepetitionReference.schedule_as_offset">
 <code class="descname">schedule_as_offset</code><span class="sig-paren">(</span><em>stop</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetitionReference.schedule_as_offset" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a schedule as a list of offsets measured in days from the training
+<dd><p>Returns a training schedule as a list of offsets measured in days from the training
 epoch.</p>
 <dl class="docutils">
 <dt><strong>Args</strong>:</dt>

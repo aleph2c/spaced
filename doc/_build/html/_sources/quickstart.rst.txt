@@ -20,33 +20,30 @@ conditions:
   from space.repitition import pp
   from space.repitition import LearningTracker
 
-  days_to_track = 43  # used for graphing
-
-  lt = LearningTracker(
-    epoch=datetime.new(),
-    range=days_to_track
-  )
+  lt = LearningTracker(epoch=datetime.new())
 
 Then ask your learning tracker for its schedule:
 
 .. code-block:: python
 
-  print("Scheduled as dates")
-  pp(lt.schedule())
+  days_after_epoch=43 
+  print("Schedule as dates")
+  pp(lt.schedule(stop=days_after_epoch))
 
 Something like this would appear in your terminal window:
 
 .. code-block:: text 
 
-	Scheduled as dates
-	[ datetime.datetime(2018, 12, 22, 4, 23, 42, 247300),
-		datetime.datetime(2018, 12, 22, 15, 28, 53, 456841),
-		datetime.datetime(2018, 12, 23, 4, 3, 40, 733013),
-		datetime.datetime(2018, 12, 23, 19, 20, 14, 562054),
-		datetime.datetime(2018, 12, 24, 15, 33, 37, 943760),
-		datetime.datetime(2018, 12, 25, 22, 9, 53, 666487),
-		datetime.datetime(2018, 12, 28, 9, 45, 48, 339845),
-		datetime.datetime(2019, 1, 6, 9, 51, 41, 920278)]
+   Schedule as dates
+   [ datetime.datetime(2019, 1, 23, 17, 19, 47, 366483),
+     datetime.datetime(2019, 1, 24, 3, 48, 2, 179641),
+     datetime.datetime(2019, 1, 24, 14, 53, 13, 389181),
+     datetime.datetime(2019, 1, 25, 3, 28, 0, 665353),
+     datetime.datetime(2019, 1, 25, 18, 44, 34, 494393),
+     datetime.datetime(2019, 1, 26, 14, 57, 57, 876099),
+     datetime.datetime(2019, 1, 27, 21, 34, 13, 598825),
+     datetime.datetime(2019, 1, 30, 9, 10, 8, 272185),
+     datetime.datetime(2019, 2, 8, 9, 16, 1, 852609)]
 
 .. _quickstart-understanding-where-a-schedule-comes-from:
 
@@ -57,7 +54,9 @@ To see the graph from which this schedule was derived:
 
 .. code-block:: python
 
-  hdl, _ = lt.reference.plot_graph()
+  hdl, _ = lt.reference.plot_graph(stop=43)
+  lt.show()
+  hdl.close()  # save your computer-memory
 
 .. image:: _static/quickstart_reference.svg
     :target: _static/quickstart_reference.pdf
@@ -92,68 +91,93 @@ schedule.
 
 Adding Student Feedback
 -----------------------
-
-To begin with the schedule is completely arbitrary.  This is because the model
-doesn't understand anything about the student yet.  But each time you give it
-student data it adapts its schedule to the student's behavior, and how they
-appear to be forgetting things.
+When the ``spaced`` algorithm is first turned on, its schedule is entirely
+arbitrary:  this is because the model doesn't understand anything about the
+student yet.  But each time you give it student data it adapts its schedule to
+the student's behaviour, and how they appear to be forgetting things.
 
 Imagine that immediately after looking at the material for the first time; our
-student tries to remember what they just learned.  They determine that they can
-recall about 40 percent of the material.  To tell ``spaced`` about this, we
-would write the following code:
+student tries to remember what they just learned.  They decide to test
+themselves and determine that they can recall about 40 percent of the material
+nine seconds after looking at it for the first time.  To tell ``spaced`` about
+this, we would write the following code:
 
 .. code-block:: python
 
-  days_since_training_epoch = 0
+  days_since_training_epoch = 0.0001  # ~ 9 seconds
   lt.learned(result=0.4, when=days_since_training_epoch)
 
-Immediately after finishing their test, the student reviews the material until
-they understand all of it.
+After our student finished this self review, they would study their material
+until they could recall all of it.
 
 Suppose that 19 hours later (0.8 days later), the student tests themselves
-again.  This time they can remember 44 percent of it.  Let's feed this into the
-learning tracker, by writing the following code:
+again.  This time they can remember 44 percent of what they wanted.  Let's feed
+this into the learning tracker, by writing the following code:
 
 .. code-block:: python
 
   days_since_training_epoch = 0.8
   lt.learned(result=0.44, when=days_since_training_epoch)
 
-As before, the student reviews the material until they have complete
-understanding, immediately after they have tested themselves.
+As before, after they finish this self examination, they would restudy their
+material until they could remember all of it.
 
 .. _quickstart-getting-a-schedule-which-responds-to-the-student's-feedback:
 
 Getting a Schedule which Responds to the Student's Feedback
 -----------------------------------------------------------
 
-Now that ``spaced`` has more data, let's ask it for its new schedule:
+Now that ``spaced`` has more data, let's ask it for a new schedule that spans
+the time between the last feedback moment and up to 5 days after the training
+began.
 
 .. code-block:: python
 
-  print("Scheduled as dates")
-  pp(lt.schedule())
+  print("Schedule as dates")
+  pp(lt.schedule(stop=5))
 
 In your terminal you will see something like this:
 
 .. code-block:: text
 
+     Schedule as dates
+     [ datetime.datetime(2019, 1, 25, 0, 47, 23, 383894),
+       datetime.datetime(2019, 1, 25, 13, 14, 43, 265794)]
+
+You could get the same schedule by providing a datetime object as the stop
+argument:
+
+.. code-block:: python
+
+  print("Scheduled as dates")
+  # get a schedule from epoch to five days from epoch
+  pp(lt.schedule(stop=datetime(2019, 1, 26))
+
+.. code-block:: text
+
 	Scheduled as dates
-	[ datetime.datetime(2018, 12, 23, 1, 53, 3, 865177),
-		datetime.datetime(2018, 12, 23, 16, 32, 43, 271301),
-		datetime.datetime(2018, 12, 24, 11, 49, 1, 151759),
-		datetime.datetime(2018, 12, 25, 17, 9, 28, 362910),
-		datetime.datetime(2018, 12, 28, 3, 57, 43, 777324),
-		datetime.datetime(2019, 1, 7, 0, 21, 16, 69957),
-		datetime.datetime(2018, 12, 21, 14, 0, 13, 200220),
-		datetime.datetime(2018, 12, 22, 1, 26, 21, 259959),
-		datetime.datetime(2018, 12, 22, 13, 46, 42, 422666),
-		datetime.datetime(2018, 12, 23, 4, 26, 21, 828789),
-		datetime.datetime(2018, 12, 23, 23, 42, 39, 709248),
-		datetime.datetime(2018, 12, 25, 5, 3, 6, 920399),
-		datetime.datetime(2018, 12, 27, 15, 51, 22, 334813),
-		datetime.datetime(2019, 1, 6, 12, 14, 54, 627446)]
+        [ datetime.datetime(2019, 1, 23, 3, 13, 45, 753025),
+          datetime.datetime(2019, 1, 23, 15, 41, 5, 635312),
+          datetime.datetime(2019, 1, 24, 6, 39, 35, 613096),
+          datetime.datetime(2019, 1, 25, 2, 28, 43, 835472)]
+
+If you would have rather seen the schedule as a set of date-offsets from the
+starting moment of training (it's epoch) you could use the
+``schedule_as_offset`` api:
+
+.. code-block:: python
+
+  print("Schedule as offsets in days from the training epoch")
+  pp(lt.schedule_as_offset(stop=5))
+
+.. code-block:: text
+
+	Schedule as offsets in days from the training epoch
+        [ 1.2507216586504115,
+          1.7374520166988208,
+          2.3041058337185985,
+          3.0183370061964974,
+          4.022524650984104]
 
 .. _quickstart-understanding-the-reactive-schedule:
 
@@ -166,9 +190,11 @@ schedule is derived:
 
 .. code-block:: python
 
-  hdl, _ = lt.plot_graphs()
+  hdl, _ = lt.plot_graphs(stop=10)
+  lt.show()
+  hdl.close()
 
-.. image:: _static/quickstart_control_after_two_events.png
+.. image:: _static/quickstart_control_after_two_events.svg
     :target: _static/quickstart_control_after_two_events.pdf
     :align: center
 
@@ -213,6 +239,7 @@ Lets see what happens if the student continues to train.
   # they recall about 64 percent of the thing they are studying
   days_since_training_epoch = 1.75
   lt.learned(result=0.64, when=days_since_training_epoch)
+
   # the student reviews their material until 
   # they have a perfect recollection
 
@@ -232,43 +259,93 @@ Now suppose the student trains six more times:
 .. code-block:: python
 
   days_and_results = [ 
-    [4.8,  7.33, 10.93, 16.00, 23.00, 29.00],
-    [0.83, 0.89,  1.00,  0.99, 0.99,   1.00],
+    [4.8,  7.33, 10.93, 16.00, 23.00],
+    [0.83, 0.89,  1.00,  0.99, 0.99],
   ]
 
   for d, r in zip(*days_and_results):
-    days_since_training_epoch, result = d, r
-    lt.learned(result=result, when=days_since_training_epoch)
+    lt.learned(result=r, when=d)
 
-  print(lt.schedule())
-
-.. code-block:: python
-
-  [datetime.datetime(2019, 1, 18, 21, 24, 51, 192016)]
-
-Let's take a look at the graph:
+Now let's ask the learning tracker for it's schedule up to the 30th days after
+the training began:
 
 .. code-block:: python
 
-  hdl, _ = lt.plot_graphs()
+  print("Schedule as dates up until 30 days after the training began:")
+  print(lt.schedule(stop=30))
 
+The above code will output:
 
-.. image:: _static/quickstart_control_after_ten_events.png
+.. code-block:: text
+
+  Schedule as dates up until 30 days after the training began:
+  []
+
+The schedule result is empty.  Is this right? To find why it is empty, let's
+look at this learning tracker's graph:
+
+.. code-block:: python
+
+  hdl, _ = lt.plot_graphs(stop=30)
+  lt.show()
+  hdl.close()  # save your computer's memory
+
+.. image:: _static/quickstart_control_after_ten_events.svg
     :target: _static/quickstart_control_after_ten_events.pdf
     :align: center
 
-This last graph really isn't that useful: the next recommended training date
-isn't on its control plot.  
+By looking at the above graph we can see why the schedule results are empty when we
+give it a stop date of 30 days after epoch.  Our last training moment was at a
+23 day offset, and our next training day has been spaced out into the future
+beyond the right hand side of the graph. 
 
-In fact, it's hard to get a clear idea about what is going on by looking at any
-of these plots in isolation.  What is better is to flip through them one at a
-time in sequential succession; in this way you can look at a plot while having
-it's history in your recent visual memory, so as to give it some context.
+To get the next training dates we can just ask for it like this:
 
-What would be nice would be an animation of each training event followed by the
-next.  You could watch it for 10 seconds and get a good idea about their
-training history.  The ``spaced`` library provides such an animation feature and
-it is described in the next section.
+.. code-block:: python
+
+   print("Next scheduled training date:")
+   print(lt.next())
+   print("Next scheduled training date as an offset:")
+   print(lt.next_offset())
+
+   print("\nAsking a second time")
+   print("Next scheduled training date (same as before):")
+   print(lt.next())
+   print("Next scheduled training date as an offset (same as before):")
+   print(lt.next_offset())
+
+This will output:
+
+.. code-block:: text
+
+   Next scheduled training date:
+   2019-05-21 15:09:07.385615
+   Next scheduled training date as an offset:
+   118.37
+
+   Asking a second time
+   Next scheduled training date (same as before):
+   2019-05-21 15:09:07.385615
+   Next scheduled training date as an offset (same as before):
+   118.37
+
+The ``next`` API will always return information about when the next training
+date should occur.  You can call it multiple times and its answer won't change,
+unless you provide the learning tracker with more ``learned`` feedback.
+
+The last graph answered the problem about our missing schedule, but other than
+that, it wasn't that useful: the next recommended training date wasn't on its
+control plot.
+
+It's hard to get a clear idea about what is going on by looking at any of these
+plots in isolation.  What is better is to flip through them one at a time in
+sequential succession; in this way, you can look at a plot while having its
+history in your recent visual memory to provide context about how things are
+changing.  What we want is an oscilloscope; a device that animates plots in
+real-time.
+
+The ``spaced`` library provides this animation feature, and it is described in
+the next section.
 
 .. _quickstart-animating-reactive-schedule-to-get-an-intuitive-feel:
 
@@ -309,9 +386,9 @@ left, the student was doing better than expected, and when it shifted to the
 right, the student was doing worse than expected.
 
 We also see that our initial forgetting curves were too pessimistic, and as a
-result our initial schedule was too aggressive. But after a few training events,
-the spaced algorithm began to match the forgetting parameters to how the student
-actually forgot things.
+result, our initial schedule was too aggressive. But after a few training
+events, the spaced algorithm began to match the forgetting parameters to how the
+student forgot things.
 
 The video plays a training event every second, which means that we are
 accelerating time since the training events become more and more spaced out the
@@ -321,16 +398,15 @@ later they occur.
 
 Predicting Future Results
 -------------------------
-
-But, it is unlikely that you will be using ``spaced`` to track just one object.  You
+It is unlikely that you will be using ``spaced`` to track just one object.  You
 will probably have thousands of them running, and you will have to select from a
-small subset of these thousands of tracked objects to compile a review session for your
-student.  To do this, you need to know which of your tracked ``spaced`` objects
-are in the most need of attention.
+small subset of these thousands of tracked objects to compile a review session
+for your student.  To do this, you need to know which of your tracked ``spaced``
+objects are in the most need of attention.
 
-For this reason you will need to query a ``spaced`` object so that it can make a
-prediction about a student's ability to recall a fact at some datetime.  To predict
-a result, you can use the learning tracker's ``predict_result`` api.
+For this reason, you will need to query a ``spaced`` object so that it can
+predict a student's ability to recall a fact at some datetime.  To predict a
+result, you can use the learning tracker's ``predict_result`` API.
 
 To demonstrate this, I will make a set of predictions and graph them onto the
 plot generated by the learning tracker.
@@ -371,6 +447,9 @@ Here is how to do this:
   control_plot.plot(
     useful_range_of_datetimes, results, color='xkcd:azure')
 
+  lt.show()
+  hdl.close()  # save your computer's memory
+
 Here is the resulting plot:
 
 .. image:: _static/quickstart_control_after_five_events_and_query.svg
@@ -382,6 +461,101 @@ curve over a set of datetimes, that the line representing this information
 extends downward past the plasticity line.  This is because the query assumes
 that no additional training event will occur.
 
+But this graphing code is kind of awkward: we create a plot, get the matplotlib
+graph handle, then plot some more data into the same graph and then close it
+down.  That is a lot for you to remember.  If you forget to close the plot
+handle, you use a lot of memory.  If you do this too many times you will have a
+memory leak, something that could show up far in the future and evade simple
+reproduction steps when you are trying to trouble shoot your system.
+
+Python has an answer for these kinds of build-up-and-tear-down problems, it is
+called a context manager.  The ``spaced`` library uses a context manager to give
+you a cleaner API for graphing.  You can see how it works in the following
+example:
+
+.. code-block:: python
+
+     from datetime import datetime
+     from repetition import LearningTracker
+
+     # create a learning tracker
+     # and give it some student feedback
+     lt = LearningTracker(epoch=datetime.now())
+
+     for d, r in zip(
+       [0,    0.8,  1.75, 3.02, 4.8,  7.33],
+       [0.40, 0.44, 0.64, 0.76, 0.83, 0.89]):
+
+       lt.learned(result=r, when=d)
+
+     # plot some control predictions on the first forgetting curve
+     # of the control graph
+     with lt.graphs(
+       stop=43,
+       show=True,
+       control_handle=True,
+       filename="context_manager_one_handle.svg") as ch:
+         
+       moments = lt.range_for(curve=1, stop=43, day_step_size=0.5)
+       predictions = [
+         lt.predict_result(moment, curve=1) for moment in moments
+       ]
+       ch.plot(moments, predictions, color='xkcd:azure')
+
+This code will provide a graph handle to the controller subplot in the learning
+tracker graph, let you plot against it and then close everything after you have
+finished with it.  The resulting file would look like this:
+
+.. image:: _static/context_manager_one_handle.svg
+  :target: _static/context_manager_one_handle.pdf
+  :align: center
+
+You can use the same context manager to make predictions on the reference and
+the control graph, by specifying you want graph handles for both subplots.  Here
+is some example code that show how to plot a prediction on the reference and the
+control graphs:
+
+.. code-block:: python
+
+    from datetime import datetime
+    from repetition import LearningTracker
+
+    # create a learning tracker
+    # and give it some student feedback
+    lt = LearningTracker(epoch=datetime.now())
+
+    for d, r in zip(
+      [0,    0.8,  1.75, 3.02, 4.8,  7.33],
+      [0.40, 0.44, 0.64, 0.76, 0.83, 0.89]):
+
+      lt.learned(result=r, when=d)
+
+    # plot some reference predictions on the 3rd reference forgetting 
+    # curve and the 1st control forgetting curve using the 
+    # spaced context manager
+    with lt.graphs(
+    stop=43, 
+    control_handle=True, 
+    show=True,
+    reference_handle=True,
+    filename='context_manager_two_handles.svg') as (rh, ch):
+
+    # plot some reference predictions
+    r_m = lt.reference.range_for(curve=3, stop=43, day_step_size=0.5)
+    r_p = [lt.reference.predict_result(moment, curve=3) for moment in r_m]
+    rh.plot(r_m, r_p, color='xkcd:ruby')
+
+    # plot some control predictions
+    c_m = lt.range_for(curve=1, stop=43, day_step_size=0.5)
+    c_p = [lt.predict_result(moment, curve=1) for moment in c_m]
+    ch.plot(c_m, c_p, color='xkcd:azure')
+
+This code would product a graph that looks like this:
+
+.. image:: _static/context_manager_two_handles.svg
+   :target: _static/context_manager_two_handles.pdf
+   :align: center
+
 .. _quickstart-building-a-better-initial-student-model:
 
 Building a Better Initial Student Model
@@ -392,7 +566,7 @@ idea about how the student remembers and forgets in their current environment.
 It's control system tunes the forgetting and plasticity parameters as it tries
 to build a better schedule.
 
-Now imagine we let one learning tracker run for a while, then we pulled it's
+Now imagine we let one learning tracker run for a while, then we pulled its
 discovered parameters to create some initial conditions for another learning
 tracker, one with a more realistic set of goals.  These goals would be based on
 how a student has behaved in the past, instead of some imagined thing.
@@ -429,7 +603,10 @@ lessons) using the arbitrary default values of the ``spaced`` algorithm.
 
     # plot the lesson we want to graph
     if index is lesson_to_graph - 1:
-      hdl, _ = lt_arbitrary.plot_graphs()
+      hdl, _ = lt_arbitrary.plot_graphs(stop=43)
+
+   lt_arbitrary.show()
+   hdl.close()
 
 .. image:: _static/quickstart_arbitrary.svg
     :target: _static/quickstart_arbitrary.pdf
@@ -481,7 +658,10 @@ letting the first learning tracker run for ten lessons:
 
     # plot the lesson we want to graph
     if index is lesson_to_graph - 1:
-      lt_better_fit.plot_graphs()
+      hdl, _ = lt_better_fit.plot_graphs(stop=43)
+
+    lt_better_fit.show()
+    hdl.close()
 
 .. image:: _static/quickstart_better_fit.svg
     :target: _static/quickstart_better_fit.pdf
@@ -572,11 +752,10 @@ example:
   start_time = datetime.now()
 
   # track for 2 years
-  range_in_days = 365*2
+  days_since_epoch = 365*2
 
   lt = LearningTracker(
     epoch=start_time,
-    range=range_in_days,
     long_term_clamp=0.00005,  # default
   )
 
@@ -586,13 +765,13 @@ example:
     [0.40, 0.44, 0.64, 0.84, 0.83, 0.89,  0.99, 0.99,   0.90, 0.99],
   ]
 
-  for d, r in zip(*day_offset_from_epoch_and_results)
+  for d, r in zip(*day_offset_from_epoch_and_results):
     # r: result
     # d: days since training epoch
     lt.learned(result=r, when=d)
 
   # look at the schedule over two years
-  hdl, _ = lt.plot_graphs()
+  hdl, _ = lt.plot_graphs(stop=days_since_epoch)
 
 We create feedback for 60 days and look at the schedule recommendations provided
 by ``spaced`` for two years:
@@ -607,12 +786,12 @@ and more into the future.
 Doesn't this mean that as time progresses, spaced will annoy the student with
 maintenance reviews?
 
-To answer this question, I will first have to provide more context. There will
-be a lot of spaced learning trackers for each student in a system. As a student
-adds more items to their education, in aggregate, their learning tracker's
-schedule suggestions will cause a kind of attention-jam. The student can only
-look at so much per review without being exhausted. So the system will have to
-ignore some schedule suggestions, or the system will stop working as it scales.
+There will be a lot of spaced learning trackers for each student in a system. As
+a student adds more items to their education, in aggregate, their learning
+tracker's schedule suggestions will cause a kind of attention-jam. The student
+can only look at so much per review without being exhausted. So the system will
+have to ignore some schedule suggestions, or the system will stop working as it
+scales.
 
 The client code using spaced will query each of the objects and select a subset
 of them which are in most need of maintenance, then it will use these items for
@@ -642,10 +821,10 @@ times as moments a geriatric memory is given a single lottery ticket, in a
 lottery that is rigged for youthful memories.
 
 What happens if a geriatric memory wins a lottery and gets into a review? Well,
-it will stop trying to get tickets for a while, you can see this in on the above graph
-at 2019-04. The time between review suggestions swells a bit.  Then a pressure
-will build again and it will try to get into more and more lotteries (but the
-client will only give it one ticket).
+it will stop trying to get tickets for a while, you can see this in on the above
+graph at 2019-04. The time between review suggestions swells a bit.  Then a
+pressure will build again, and it will try to get into more and more lotteries
+(but the client will only give it one ticket).
 
 .. raw:: html
 

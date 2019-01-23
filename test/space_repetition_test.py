@@ -186,7 +186,7 @@ def test_reference_scheduled_datetimes_from_generator():
 
   stop_date = start_time + timedelta(days=40)
   for r, t in zip(hr.schedule(stop=stop_date), datetime_targets):
-    assert abs(r-t) <= 0.001
+    assert abs((r-t).total_seconds()) <= 0.001
 
 @pytest.mark.reference
 def test_reference_graph_too_short():
@@ -326,6 +326,7 @@ def test_control_graph_too_long():
   hf = SpaceRepetitionFeedback(x[0:2], y, epoch=start_time)
   hctrl = SpaceRepetitionController(reference=hr, feedback=hf, epoch=start_time)
   graph_handle, data_dict  = hctrl.plot_graphs(stop=stop_date)
+  hctrl.save_figure("results/spaced_control_too_long.svg")
   hctrl.save_figure("results/spaced_control_too_long.pdf")
   graph_handle.close()
 
@@ -492,5 +493,191 @@ def test_serialization_epoch():
   hdl.close()
 
 
-  
+@pytest.mark.learning_tracker
+def test_learning_tracker_scheduled_offsets_from_generator():
+  hr = SpaceRepetitionReference(epoch=datetime.now())
 
+  targets = [
+    0.0,
+    0.4589442709995035,
+    0.8952268306891566,
+    1.3571621263040674,
+    1.881320415336438,
+    2.517823066268917,
+    3.3604547989757783,
+    4.635636774985627,
+    7.118908457377074,
+    16.123000823500735
+  ]
+
+  for r, t in zip(hr.schedule_as_offset(stop=40), targets):
+    assert abs(r-t) <= 0.001    
+
+@pytest.mark.learning_tracker
+def test_learning_tracker_scheduled_datetimes_from_generator_1():
+  start_time = datetime.now()
+  lt = LearningTracker(epoch=datetime.now())
+
+  targets = [
+    0.4589442709995035,
+    0.8952268306895583,
+    1.357162126293895,
+    1.8813204153239627,
+    2.5178230662543553,
+    3.360454798955533,
+    4.635636774952296,
+    7.118908457356618,
+    16.123000823378668
+  ]
+
+  for (index, result) in enumerate(lt.schedule_as_offset(stop=40)):
+    assert( abs(targets[index] - result) < 0.001)
+
+@pytest.mark.learning_tracker
+def test_learning_tracker_scheduled_should_output_dates_after_feedback():
+  start_time = datetime.now()
+  lt = LearningTracker(epoch=datetime.now())
+
+  lt.learned(result=0.40, when=0.01)
+  lt.learned(result=0.44, when=0.8)
+  for offset in lt.schedule_as_offset(stop=10):
+    assert offset > 0.8
+
+@pytest.mark.learning_tracker
+def test_learning_tracker_graph_context_manager_xxxx_handle():
+ 
+  lt = LearningTracker(epoch=datetime.now())
+  with lt.graphs(stop=43, filename='results/lt_content_xxxx_handle.pdf'):
+    pass
+
+@pytest.mark.learning_tracker
+def test_learning_tracker_graph_context_manager_rxxc_handle():
+ 
+  lt = LearningTracker(epoch=datetime.now())
+  moments = lt.range_for(curve=2, stop=43, day_step_size=0.5)
+  predictions = [lt.recollect_scalar(moment, curve=2) for moment in moments]
+
+  with lt.graphs(stop=43, filename='results/lt_content_rxxc_handle.pdf',
+    control_handle=True, reference_handle=True, show=True) as (rh, ch):
+
+    rh.plot(moments, predictions, color='xkcd:azure')
+    ch.plot(moments, predictions, color='xkcd:azure')
+
+@pytest.mark.learning_tracker
+def test_learning_tracker_graph_context_manager_rfxc_handle():
+ 
+  lt = LearningTracker(epoch=datetime.now())
+  moments = lt.range_for(curve=1, stop=43, day_step_size=0.5)
+  predictions = [lt.recollect_scalar(moment, curve=1) for moment in moments]
+
+  with lt.graphs(stop=43, filename='results/lt_content_rfxc_handle.pdf',
+    control_handle=True, reference_handle=True, feedback_handle=True) as (rh, fh, ch):
+    rh.plot(moments, predictions, color='xkcd:azure')
+    fh.plot(moments, predictions, color='xkcd:azure')
+    ch.plot(moments, predictions, color='xkcd:azure')
+
+@pytest.mark.learning_tracker
+def test_learning_tracker_graph_context_manager_rfec_handle():
+ 
+  lt = LearningTracker(epoch=datetime.now())
+  moments = lt.range_for(curve=1, stop=43, day_step_size=0.5)
+  predictions = [lt.recollect_scalar(moment, curve=1) for moment in moments]
+
+  with lt.graphs(stop=43, 
+    filename='results/lt_content_rfec_handle.pdf',
+    control_handle=True,
+    reference_handle=True,
+    feedback_handle=True,
+    error_handle=True) as (rh, fh, eh, ch):
+    rh.plot(moments, predictions, color='xkcd:azure')
+    fh.plot(moments, predictions, color='xkcd:azure')
+    eh.plot(moments, predictions, color='xkcd:red')
+    ch.plot(moments, predictions, color='xkcd:azure')
+
+@pytest.mark.learning_tracker
+def test_learning_tracker_graph_context_manager_xxxc_handle():
+ 
+  lt = LearningTracker(epoch=datetime.now())
+  moments = lt.range_for(curve=1, stop=43, day_step_size=0.5)
+  predictions = [lt.recollect_scalar(moment, curve=1) for moment in moments]
+
+  with lt.graphs(stop=43, filename='results/lt_content_xxxc_handle.pdf', control_handle=True) as ch:
+    ch.plot(moments, predictions, color='xkcd:azure')
+
+@pytest.mark.learning_tracker
+def test_learning_tracker_broken_feedback_curve_reproduction():
+  lt = LearningTracker(epoch=datetime.now())
+  lt.learned(result=0.44, when=0.8)
+  lt.learned(result=0.64, when=1.75)
+  lt.learned(result=0.55, when=1.3)
+  lt.learned(result=0.40, when=0.001)
+  lt.learned(result=0.64, when=3.02)
+  lt.plot_graphs(stop=30)
+  lt.save_figure("results/lt_broken_feedback_curve.pdf")
+
+@pytest.mark.learning_tracker
+def test_learning_tracker_next_offset_feature():
+  lt = LearningTracker(epoch=datetime.now())
+  lt.learned(result=0.40, when=0.001)
+  lt.learned(result=0.44, when=0.8)
+  lt.learned(result=0.55, when=1.3)
+  lt.learned(result=0.64, when=1.75)
+  lt.learned(result=0.76, when=3.02)
+  results = [
+    [4.8,  7.33, 10.93, 16.00, 23.00, 29.00],
+    [0.83, 0.89,  1.00,  0.99, 0.99,   1.00],
+  ]
+
+  for d, r in zip(*results):
+    days_since_training_epoch, result = d, r
+    lt.learned(result=result, when=days_since_training_epoch)
+
+  sc = lt.next_offset()
+  assert  abs(sc-122.4043) < 0.01 
+
+@pytest.mark.learning_tracker
+def test_learning_tracker_next_feature():
+  lt = LearningTracker(epoch=datetime.now())
+  lt.learned(result=0.40, when=0.001)
+  lt.learned(result=0.44, when=0.8)
+  lt.learned(result=0.55, when=1.3)
+  lt.learned(result=0.64, when=1.75)
+  lt.learned(result=0.76, when=3.02)
+  results = [
+    [4.8,  7.33, 10.93, 16.00, 23.00, 29.00],
+    [0.83, 0.89,  1.00,  0.99, 0.99,   1.00],
+  ]
+
+  for d, r in zip(*results):
+    days_since_training_epoch, result = d, r
+    lt.learned(result=result, when=days_since_training_epoch)
+
+  sc = lt.next()
+  assert type(sc) is datetime
+  assert abs(lt.days_from_epoch(sc)-122.4043) < 0.01 
+
+@pytest.mark.learning_tracker
+def test_learning_tracker_broken_two_handle_graph():
+
+	lt = LearningTracker(epoch=datetime.now())
+
+	# give our learning tracker some feedback
+	for d, r in zip(
+			[0,    0.8,  1.75, 3.02, 4.8,  7.33],
+			[0.40, 0.44, 0.64, 0.76, 0.83, 0.89],
+		):
+		lt.learned(result=r, when=d)
+
+	with lt.graphs(
+		stop=43, 
+		show=True, 
+		control_handle=True, 
+		reference_handle=True,
+		filename='results/context_manager_two_handles.svg') as (rh, ch):
+			
+		r_m = lt.reference.range_for(curve=3, stop=43, day_step_size=0.5)
+		r_p = [lt.reference.predict_result(moment, curve=3) for moment in r_m]
+		rh.plot(r_m, r_p, color='xkcd:ruby')
+		c_m = lt.range_for(curve=1, stop=43, day_step_size=0.5)
+		c_p = [lt.predict_result(moment, curve=1) for moment in c_m]
+		ch.plot(c_m, c_p, color='xkcd:azure')
