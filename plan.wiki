@@ -4,8 +4,13 @@
   
   *What defines Success?*
   
-  The schedule generation is done using a Python generator.  The range uses the
-  generator to create a limited schedule which can be graphed.
+  * [X] The schedule generation is done using a Python generator.  The range
+        uses the generator to create a limited schedule which can be graphed.
+  * [X] Added a context manager for plotting complicated graphs
+  * [ ] Added a simple interface for plotting simple graphs
+  * [ ] The concept is explained well in the documentation.
+  * [ ] This feature is tested extensively at the end of life of an idea.
+        [muddled thinking, flush this out]
   
   *What is the problem?*
   
@@ -41,17 +46,17 @@
 
 = Decide =
   *Idea/Hypotheses for Space Repetition Algorithm: >=5*
-  * [ ] Keep the interface simple, the client will add complexity if it needs
+  * [X] Keep the interface simple, the client will add complexity if it needs
         to.  Have the schedule run forever using a generator, then use the range
         argument for graphing.  In doing so move the range argument out of main
         constructor and into the graph plotting methods.
   * [ ] The learning tracker should be run for a pre-set number of times, then
         die.  It should report if the learning intervention worked or not up to
         its client.
-  * [ ] The tracker can go into stasis if the idea being uses is integrating
-        into another idea being tracked
+  * [X] The tracker can go into stasis if the idea being uses is integrating
+        into another idea being tracked [pickle option]
   * [ ] The tracker can delete itself if the idea being uses is integrating
-        into another idea being tracked
+        into another idea being tracked.
   * [ ] Keeping a learning tracker in memory, when it is subsumed by another
         learning tracker is wasteful.  So, we will have the option of running
         forever (say for chinese character learning), but also have the option
@@ -89,9 +94,9 @@
         * investigate sympy?
   * [X] Simplify and document the code internally, change the structure so it
         will be easier to apply a generator
-  * [ ] Create a simplified example of what you want to do in the experiment
+  * [X] Create a simplified example of what you want to do in the experiment
         folder.
-  * [ ] Evaluate the example, will it work?
+  * [X] Evaluate the example, will it work?
         It is easier to make another example than to refactor your code
         using the wrong example.
         
@@ -172,8 +177,8 @@
       * [X] re-write documentation and generate new graphs
             
   * [X] merge with master
-  * [ ] push to github
-  * [ ] release pip package
+  * [X] push to github
+  * [X] release pip package
 
 = Act =
 
