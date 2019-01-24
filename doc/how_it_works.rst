@@ -36,12 +36,12 @@ The common features and interface shared by they classes come from them inheriti
 
 SpaceRepetitionReference
 ------------------------
-
-The ``SpaceRepetitionReference`` is used to construct the system goals.  It sets
-up the initial forgetting curves and the reference plasticity curve.  This is
-done using an exponential decay to create a set of less and less aggressive
-exponential decay curves.  The nature of these curves can be tuned using the
-``fdecay0`` and ``fdecaytau`` input parameters.
+The :meth:`SpaceRepetitionReference <repetition.SpaceRepetitionReference>` is
+used to construct the system goals.  It sets up the initial forgetting curves
+and the reference plasticity curve.  This is done using an exponential decay to
+create a set of less and less aggressive exponential decay curves.  The nature
+of these curves can be tuned using the ``fdecay0`` and ``fdecaytau`` input
+parameters.
 
 The stickleback looking part of the reference graph, which can be seen below, is
 made by restarting an exponential decay at the intersection of the forgetting
@@ -63,25 +63,33 @@ ratio of two different exponential functions:
 The plasticity curve can be tuned using the ``plasticity_root`` and the
 ``plasticity_denominator_offset`` parameters.
 
+The part of the algorithm that generates the forgetting curves is held within a
+coroutine.  This is done so that infinite schedules can be generated from any
+SpaceRepetitionReference object.  A SpaceRepetitionReference object has a finite
+computer-memory requirement, meaning that you can scale up a system without
+worrying about computer-memory leaks;  it's computer-memory requirement will
+grow linearly with the number of objects that you create.
+
 .. _how_it_works-spacerepetitionfeedback:
 
 SpaceRepetitionFeedback
 -----------------------
 
-The ``SpaceRepetitionFeedback`` class is used for accepting student feedback and
-generating the new observed-plasticity curve.  This curve is built using the
-``scipy.optimize`` ``curve_fit`` api.  It tries to find the ``plasticity_root``
-and ``plasticity_denominator_offset`` parameters that draw a line that has the
-same shape of the reference plasticity curve but fits the feedback data provided
-by the student.  When fitting this curve it places an emphasis on the most
-recently observed data.
+The :meth:`SpaceRepetitionFeedback <repetition.SpaceRepetitionFeedback>` class
+is used for accepting student feedback and generating the new
+observed-plasticity curve.  This curve is built using the ``scipy.optimize``
+``curve_fit`` api.  It tries to find the ``plasticity_root`` and
+``plasticity_denominator_offset`` parameters that draw a line that has the same
+shape of the reference plasticity curve but fits the feedback data provided by
+the student.  When fitting this curve it places an emphasis on the most recently
+observed data.
 
 .. _how_it_works-spacerepetitioncontrol:
 
-SpaceRepetitionControl
-----------------------
+SpaceRepetitionController
+-------------------------
 
-The ``SpaceRepetitionControl`` class generates an error signal by subtracting
+The :meth:`SpaceRepetitionController <repetition.SpaceRepetitionController>` class generates an error signal by subtracting
 the reference plasticity curve from the observed plasticity curve.  Then it
 feeds this error signal into two PID controllers to change the reference
 forgetting curve parameters, ``fdecay0`` and ``fdecaytau``, to look more like
@@ -92,7 +100,7 @@ control parameters look :ref:`here.<recipes-control>`
     :target: _static/quickstart_control_after_two_events.pdf
     :align: center
 
-The ``SpaceRepetitionControl`` class then finds the intersection between the
+The :meth:`SpaceRepetitionController <repetition.SpaceRepetitionController>` class then finds the intersection between the
 reference plasticity curve and the observed plasticity curve providing a
 starting point to place a new reference plasticity curve and a new set of
 forgetting curves riding on its back.
@@ -102,7 +110,7 @@ forgetting curves riding on its back.
 LearningTracker
 ---------------
 
-The ``LearningTracker`` class aggregates the reference, feedback and control
+The :meth:`LearningTracker <repetition.LearningTracker>` class aggregates the reference, feedback and control
 features into one easy-to-use class.  Any tuning parameter that can be fed into
 any of the other classes can be fed into it, and it will ensure that this
 parameter is passed on properly.

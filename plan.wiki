@@ -7,8 +7,8 @@
   * [X] The schedule generation is done using a Python generator.  The range
         uses the generator to create a limited schedule which can be graphed.
   * [X] Added a context manager for plotting complicated graphs
+  * [ ] The co-routine and infinite run concept is explained well in the documentation.
   * [ ] Added a simple interface for plotting simple graphs
-  * [ ] The concept is explained well in the documentation.
   * [ ] This feature is tested extensively at the end of life of an idea.
         [muddled thinking, flush this out]
   
@@ -46,139 +46,16 @@
 
 = Decide =
   *Idea/Hypotheses for Space Repetition Algorithm: >=5*
-  * [X] Keep the interface simple, the client will add complexity if it needs
-        to.  Have the schedule run forever using a generator, then use the range
-        argument for graphing.  In doing so move the range argument out of main
-        constructor and into the graph plotting methods.
-  * [ ] The learning tracker should be run for a pre-set number of times, then
-        die.  It should report if the learning intervention worked or not up to
-        its client.
-  * [X] The tracker can go into stasis if the idea being uses is integrating
-        into another idea being tracked [pickle option]
-  * [ ] The tracker can delete itself if the idea being uses is integrating
-        into another idea being tracked.
-  * [ ] Keeping a learning tracker in memory, when it is subsumed by another
-        learning tracker is wasteful.  So, we will have the option of running
-        forever (say for chinese character learning), but also have the option
-        to put it on ice (mathematical concept that is foundational).
-  * [ ] The learning trackers can know about one another, so that they can build
-        a Dag or statechart.
-  
+  * [ ] 
+  * [ ] 
+  * [ ] 
+  * [ ] 
+  * [ ] 
         
   *Chosen Idea/Hypothesis*
     
-    Keep the interface simple, the client will add complexity if it is needed.
-    Have the schedule run forever using a generator, then use the range argument
-    for graphing.  In doing so, move the range argument out of the main
-    constructor and into the graphing plot methods.
-    
-    Provide an option to put the learning tracker on ice, in the case its idea
-    is being subsumed by another more complicated idea that is being tracked by
-    a different learning tracker.
 
   *Plan to Expand-on-Idea/Disprove-Hypothesis*
-  * [X] Read up on generators, write some practice code.
-  * [ ] Get your tests in a state where you can see if you have broken the
-        functionality of the system.
-  * [X] Update your Jupyter notebooks so you can see if the queries are working
-        visually.
-  * [X] Check in the tests and the plan
-  * [X] Branch the code so it is easy to do diffs in the case that you break
-        things.
-  * [X] Analyze the existing code.  I think most of this work can happen in the
-        reference class, or at least this is where things are hard.
-        * write ideas as comments in the code
-        * use Gvdiff to view your notes
-        * write a general strategy (what)
-        * write a set of tactics (how)
-        * investigate sympy?
-  * [X] Simplify and document the code internally, change the structure so it
-        will be easier to apply a generator
-  * [X] Create a simplified example of what you want to do in the experiment
-        folder.
-  * [X] Evaluate the example, will it work?
-        It is easier to make another example than to refactor your code
-        using the wrong example.
-        
-        Goals:
-        * does this example do what it needs to do?
-          * Are the enclosures realistic?  Can you shape your forgetting
-            functions like this, is there a one-to-one correspondence between
-            the forgetting function and a schedule item?
-           
-            Yes, but it looks like we might only need one set of enclosure
-            functions stored.
-            
-          * Is the complicated generator analogous to the stickleback?
-      
-            Yes, it seems like a good fit.
-            
-          * Will the g_schedule generator work as a schedule
-
-          * Will the deques work?  Do we need them?
-        
-            Yes, but this is the part that you have been having a hard time
-            thinking about.  It looks like you can't just follow the analogy,
-            you have to do some additional work, add a stub to the example so
-            you don't forget this.
-
-          * Is there anyway this thing can be simplified?  If not, is it
-            sufficently documented? Tested?
-            
-          * Is the query structure analogous to that in repitition.py?
-          
-            The query in the repition package seems very complicated.  This
-            design change might simplify it. 
-
-          * By adding the deques and the infinite series requirement, you are
-            making this package a lot harder to test and rarify.  Are the deques
-            needed?  Can you get rid of them?
-            
-            If you want an infinite schedule, with the ability to make queires,
-            you will need the deques.
-
-  * [O] Make a plan of attack:
-
-    stage 1:
-    
-      * [X] start with the enclosures and the deques, doc-string as you go
-      * [X] import the example tests
-      * [X] stickle back generator, doc-string as you go
-      * [X] import the example tests
-      * [X] create the schedule generator, doc-string as you go
-      * [X] import the example tests
-      * [X] create the schedule_offset method, doc-string as you go
-      * [X] import the example tests
-      * [X] create the schedule method, doc-string as you go
-      * [X] import the example tests
-    
-    state 2:
-   
-      * [X] update the graphing tools to use the new schedule api
-        * [X] repetition graph
-        * [X] feedback
-        * [X] control graph
-        * [X] learning tracker
-      * [X] update the learning tracker animation tool
-      * [X] update the query api
-      * [X] import the example tests
-      * [X] update the query ability, doc-string as you go
-      * [X] draw three prediction graphs on the control prediction plot
-      * [X] remove all old code, re-run tests
-      * [X] change refactored variable names to meaningful names
-      * [X] add context manager for graphing
-      * [X] implement the next features (tests and notebooks)
-      * [ ] update docstrings (with examples for useful apis)
-    
-    stage 3:
-    
-      * [X] run all tests look at the graphs
-      * [X] run all notebooks, look at the graphs
-      * [X] re-write documentation and generate new graphs
-            
-  * [X] merge with master
-  * [X] push to github
-  * [X] release pip package
 
 = Act =
 

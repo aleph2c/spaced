@@ -1,7 +1,8 @@
 # 
-from repetition import *
-from graph import *
-import numpy as np
+from repetition import LearningTracker
+from repetition import SpaceRepetitionReference
+from repetition import SpaceRepetitionFeedback
+from repetition import SpaceRepetitionController
 from datetime import datetime
 from datetime import timedelta
 import pickle
@@ -476,6 +477,9 @@ def test_learning_tracker():
     stop=30,
   )
 
+  # adding this to remove pyflakes warning
+  assert lt
+
 @pytest.mark.pickle
 @pytest.mark.learning_tracker
 def test_serialization_epoch():
@@ -515,7 +519,6 @@ def test_learning_tracker_scheduled_offsets_from_generator():
 
 @pytest.mark.learning_tracker
 def test_learning_tracker_scheduled_datetimes_from_generator_1():
-  start_time = datetime.now()
   lt = LearningTracker(epoch=datetime.now())
 
   targets = [
@@ -535,7 +538,6 @@ def test_learning_tracker_scheduled_datetimes_from_generator_1():
 
 @pytest.mark.learning_tracker
 def test_learning_tracker_scheduled_should_output_dates_after_feedback():
-  start_time = datetime.now()
   lt = LearningTracker(epoch=datetime.now())
 
   lt.learned(result=0.40, when=0.01)

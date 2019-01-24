@@ -1,14 +1,11 @@
 # spaced_repetition
-import os
 import json
 import enum
 import pprint
 import warnings
-import functools
 import matplotlib
 import numpy as np
 from pid import PID
-from copy import deepcopy
 from graph import ErrorPlot
 from collections import deque
 from datetime import datetime
@@ -929,7 +926,6 @@ class SpaceRepetitionReference(SpaceRepetition):
     '''
     if(isinstance(moment, datetime)):
       assert moment + timedelta(days=0.01) > self.epoch
-      moment_as_datetime = moment
       moment_as_offset_in_days = self.datetime_to_days_offset_from_epoch(moment)
     else:
       assert moment >= 0
@@ -941,7 +937,6 @@ class SpaceRepetitionReference(SpaceRepetition):
       curve = 1
 
     forgetting_function = self.forgetting_enclosures[curve-1]
-    curve_time_as_offset_in_days = self.dates_as_day_offsets[curve-1]
 
     return forgetting_function(moment_as_offset_in_days)
 
@@ -1394,8 +1389,6 @@ class SpaceRepetitionController(SpaceRepetition):
        feedback.
 
     '''
-    x = np.linspace(0, self.range, 50)
-    rx = x[:]
 
     if(control_x is None):
       control_x = self.input_x[-1]
@@ -1790,7 +1783,6 @@ class SpaceRepetitionController(SpaceRepetition):
     '''
     if(isinstance(moment, datetime)):
       assert moment + timedelta(days=0.01) > self.epoch
-      moment_as_datetime = moment
       moment_as_offset_in_days = self.datetime_to_days_offset_from_epoch(moment)
     else:
       assert moment >= 0
@@ -2002,8 +1994,7 @@ class LearningTracker():
     '''Adds a training event to the learning tracker.
 
     **Args**:
-       | ``feedback_moment`` (int, float): moment as time offset in days from
-       epoch
+       | ``feedback_moment`` (int, float): moment as time offset in days from epoch
        | ``result`` (float): how well the student performed (0.0-1.0)
 
     '''
@@ -2092,7 +2083,7 @@ class LearningTracker():
          feedback_handle is False and \
          error_handle is False and \
          control_handle is False:
-        yield
+        yield gh
 
       # 0001
       elif reference_handle is False and \
@@ -2328,7 +2319,7 @@ class LearningTracker():
       self.student = "student: {}".format(student)
 
     if time_per_event_in_seconds is not None:
-      if time_per_event_in_seconds is 0:
+      if time_per_event_in_seconds == 0:
         time_per_event_in_seconds = 1
       fps = 1/time_per_event_in_seconds
       interval = time_per_event_in_seconds * 1000
@@ -2352,7 +2343,7 @@ class LearningTracker():
           epoch=self.start_time,
           range=stop_day_as_offset,
       )
-      if item is 0:
+      if item == 0:
         hctrl = SpaceRepetitionController(
             reference=hr,
             feedback=hf,
@@ -2593,4 +2584,7 @@ class LearningTracker():
         d_plasticity_root=state['d_plasticity_root'],
         d_plasticity_denominator_offset=state['d_plasticity_denominator_offset'],
     )
-
+    
+if __name__ == "__main__":
+  import doctest
+  doctest.testmod()
