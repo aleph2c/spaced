@@ -34,6 +34,34 @@
             
   <div class="section" id="module-cli">
 <span id="cli-module"></span><h1>cli module<a class="headerlink" href="#module-cli" title="Permalink to this headline">¶</a></h1>
+<p>cli</p>
+<p>The cli module provides a command line user interface to the <code class="docutils literal notranslate"><span class="pre">spaced</span></code> package.
+It is mostly a wrapper which sets a number of aliases for long py.test
+commands, which can be used to test different parts of the <code class="docutils literal notranslate"><span class="pre">spaced</span></code> package.
+The cli module is heavily reliant upon <a class="reference external" href="https://click.palletsprojects.com/en/7.x/">click</a>.</p>
+<dl class="docutils">
+<dt><strong>Example(s)</strong>:</dt>
+<dd><p class="first">Here are the commands that are available from a locally installed spaced
+package.</p>
+<div class="last highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># to install spaced locally and create the command entry points</span>
+$ <span class="nb">cd</span> &lt;spaced directory&gt;
+$ pip install --editable .
+
+<span class="c1"># to test everything</span>
+$ space <span class="nb">test</span>
+
+<span class="c1"># to test the reference features</span>
+$ space <span class="nb">test</span> -r
+
+<span class="c1"># to test the feedback features</span>
+$ space <span class="nb">test</span> -f
+
+<span class="c1"># to test the controller features</span>
+$ space <span class="nb">test</span> -c
+</pre></div>
+</div>
+</dd>
+</dl>
 <dl class="class">
 <dt id="cli.Cli">
 <em class="property">class </em><code class="descclassname">cli.</code><code class="descname">Cli</code><a class="headerlink" href="#cli.Cli" title="Permalink to this definition">¶</a></dt>

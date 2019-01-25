@@ -1,3 +1,33 @@
+"""cli
+
+The cli module provides a command line user interface to the ``spaced`` package.
+It is mostly a wrapper which sets a number of aliases for long py.test
+commands, which can be used to test different parts of the ``spaced`` package.
+The cli module is heavily reliant upon `click <https://click.palletsprojects.com/en/7.x/>`_.
+
+**Example(s)**:
+  Here are the commands that are available from a locally installed spaced
+  package.
+
+  .. code-block:: bash
+
+    # to install spaced locally and create the command entry points
+    $ cd <spaced directory>
+    $ pip install --editable .
+
+    # to test everything
+    $ space test
+
+    # to test the reference features
+    $ space test -r
+
+    # to test the feedback features
+    $ space test -f
+
+    # to test the controller features
+    $ space test -c
+
+"""
 import os
 import click
 

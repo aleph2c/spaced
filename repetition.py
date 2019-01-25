@@ -1,4 +1,46 @@
-# spaced_repetition
+# -*- coding: utf-8 -*-
+"""repetition
+
+The repetition module is the primary interface into the ``spaced`` package.  The
+repetition module provides access to a LearningTracker class which can be used
+to build student training goals, to track their progress and output a schedule
+which reacts to their behaviour.  From this schedule, predictions can be made
+about their future performance.
+
+**Example(s)**:
+  Here is how you can build a learning tracker, input some student feedback and
+  graph its predictions about a student's future performance:
+
+  .. code-block:: python
+
+    from datetime import datetime
+    from repetition import LearningTracker
+
+    lt = LearningTracker(epoch=datetime.now())
+    for d, r in zip(
+      [0,    0.8,  1.75, 3.02, 4.8,  7.33],
+      [0.40, 0.44, 0.64, 0.76, 0.83, 0.89],
+    ):
+      # r: result
+      # d: days since training epoch
+      lt.learned(result=r, when=d)
+
+    with lt.graphs(
+      stop=43,
+      show=True,
+      control_handle=True,
+      filename="module_docstring_example.svg") as ch:
+       
+        moments = lt.range_for(curve=1, stop=43, day_step_size=0.5)
+        predictions = [
+          lt.predict_result(moment, curve=1) for moment in moments
+        ]
+        ch.plot(moments, predictions, color='xkcd:azure')
+
+The ``repetition`` module provides a lot of features which can be read about in `the
+full spaced-package documentation <https://aleph2c.github.io/spaced/>`_
+
+"""
 import json
 import enum
 import pprint
@@ -527,13 +569,18 @@ class SpaceRepetition():
 
 class SpaceRepetitionReference(SpaceRepetition):
   Title           = "Spaced Memory Reference\n"
+  """(string): The title of the reference graph"""
   Horizontal_Axis = ""
-  Vertical_Axis   = "recommendation"
+  """(string): The title of the horizontal axis of the reference graph"""
+  Vertical_Axis = "recommendation"
+  """(string): The title of the vertical axis of the reference graph"""
   Default_Samples = 50
-  Default_Range   = 40
+  """(int): The default number of samples to generate for the reference graph"""
 
-  StickleBackColor          = 'xkcd:orangered'
+  StickleBackColor = 'xkcd:orangered'
+  """(string): The color of the skickleback forgetting curves"""
   LongTermPotentiationColor = 'xkcd:blue'
+  """(string): The color of the reference graph's plasticity curve"""
 
   # fdecay0
   Forgetting_Decay_Initial_Value = 1.4

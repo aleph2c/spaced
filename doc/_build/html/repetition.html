@@ -34,6 +34,45 @@
             
   <div class="section" id="module-repetition">
 <span id="repetition-module"></span><h1>repetition module<a class="headerlink" href="#module-repetition" title="Permalink to this headline">¶</a></h1>
+<p>repetition</p>
+<p>The repetition module is the primary interface into the <code class="docutils literal notranslate"><span class="pre">spaced</span></code> package.  The
+repetition module provides access to a LearningTracker class which can be used
+to build student training goals, to track their progress and output a schedule
+which reacts to their behaviour.  From this schedule, predictions can be made
+about their future performance.</p>
+<dl class="docutils">
+<dt><strong>Example(s)</strong>:</dt>
+<dd><p class="first">Here is how you can build a learning tracker, input some student feedback and
+graph its predictions about a student’s future performance:</p>
+<div class="last highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">repetition</span> <span class="kn">import</span> <span class="n">LearningTracker</span>
+
+<span class="n">lt</span> <span class="o">=</span> <span class="n">LearningTracker</span><span class="p">(</span><span class="n">epoch</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">())</span>
+<span class="k">for</span> <span class="n">d</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+  <span class="p">[</span><span class="mi">0</span><span class="p">,</span>    <span class="mf">0.8</span><span class="p">,</span>  <span class="mf">1.75</span><span class="p">,</span> <span class="mf">3.02</span><span class="p">,</span> <span class="mf">4.8</span><span class="p">,</span>  <span class="mf">7.33</span><span class="p">],</span>
+  <span class="p">[</span><span class="mf">0.40</span><span class="p">,</span> <span class="mf">0.44</span><span class="p">,</span> <span class="mf">0.64</span><span class="p">,</span> <span class="mf">0.76</span><span class="p">,</span> <span class="mf">0.83</span><span class="p">,</span> <span class="mf">0.89</span><span class="p">],</span>
+<span class="p">):</span>
+  <span class="c1"># r: result</span>
+  <span class="c1"># d: days since training epoch</span>
+  <span class="n">lt</span><span class="o">.</span><span class="n">learned</span><span class="p">(</span><span class="n">result</span><span class="o">=</span><span class="n">r</span><span class="p">,</span> <span class="n">when</span><span class="o">=</span><span class="n">d</span><span class="p">)</span>
+
+<span class="k">with</span> <span class="n">lt</span><span class="o">.</span><span class="n">graphs</span><span class="p">(</span>
+  <span class="n">stop</span><span class="o">=</span><span class="mi">43</span><span class="p">,</span>
+  <span class="n">show</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+  <span class="n">control_handle</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+  <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;module_docstring_example.svg&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ch</span><span class="p">:</span>
+   
+    <span class="n">moments</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">range_for</span><span class="p">(</span><span class="n">curve</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="mi">43</span><span class="p">,</span> <span class="n">day_step_size</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+    <span class="n">predictions</span> <span class="o">=</span> <span class="p">[</span>
+      <span class="n">lt</span><span class="o">.</span><span class="n">predict_result</span><span class="p">(</span><span class="n">moment</span><span class="p">,</span> <span class="n">curve</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">moment</span> <span class="ow">in</span> <span class="n">moments</span>
+    <span class="p">]</span>
+    <span class="n">ch</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">moments</span><span class="p">,</span> <span class="n">predictions</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;xkcd:azure&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+<p>The <code class="docutils literal notranslate"><span class="pre">repetition</span></code> module provides a lot of features which can be read about in <a class="reference external" href="https://aleph2c.github.io/spaced/">the
+full spaced-package documentation</a></p>
 <dl class="class">
 <dt id="repetition.ControlData">
 <em class="property">class </em><code class="descclassname">repetition.</code><code class="descname">ControlData</code><span class="sig-paren">(</span><em>object_handle</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.ControlData" title="Permalink to this definition">¶</a></dt>
@@ -1236,14 +1275,10 @@ plasticity curve that matches this one.</p>
 <em class="property">class </em><code class="descclassname">repetition.</code><code class="descname">SpaceRepetitionReference</code><span class="sig-paren">(</span><em>plot=None</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#repetition.SpaceRepetitionReference" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#repetition.SpaceRepetition" title="repetition.SpaceRepetition"><code class="xref py py-class docutils literal notranslate"><span class="pre">repetition.SpaceRepetition</span></code></a></p>
 <dl class="attribute">
-<dt id="repetition.SpaceRepetitionReference.Default_Range">
-<code class="descname">Default_Range</code><em class="property"> = 40</em><a class="headerlink" href="#repetition.SpaceRepetitionReference.Default_Range" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
 <dt id="repetition.SpaceRepetitionReference.Default_Samples">
 <code class="descname">Default_Samples</code><em class="property"> = 50</em><a class="headerlink" href="#repetition.SpaceRepetitionReference.Default_Samples" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>(int): The default number of samples to generate for the reference graph</p>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="repetition.SpaceRepetitionReference.Forgetting_Decay_Initial_Value">
@@ -1258,7 +1293,8 @@ plasticity curve that matches this one.</p>
 <dl class="attribute">
 <dt id="repetition.SpaceRepetitionReference.Horizontal_Axis">
 <code class="descname">Horizontal_Axis</code><em class="property"> = ''</em><a class="headerlink" href="#repetition.SpaceRepetitionReference.Horizontal_Axis" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>(string): The title of the horizontal axis of the reference graph</p>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="repetition.SpaceRepetitionReference.Initial_Forgetting_Offset">
@@ -1268,7 +1304,8 @@ plasticity curve that matches this one.</p>
 <dl class="attribute">
 <dt id="repetition.SpaceRepetitionReference.LongTermPotentiationColor">
 <code class="descname">LongTermPotentiationColor</code><em class="property"> = 'xkcd:blue'</em><a class="headerlink" href="#repetition.SpaceRepetitionReference.LongTermPotentiationColor" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>(string): The color of the reference graph’s plasticity curve</p>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="repetition.SpaceRepetitionReference.Max_Length">
@@ -1288,17 +1325,20 @@ plasticity curve that matches this one.</p>
 <dl class="attribute">
 <dt id="repetition.SpaceRepetitionReference.StickleBackColor">
 <code class="descname">StickleBackColor</code><em class="property"> = 'xkcd:orangered'</em><a class="headerlink" href="#repetition.SpaceRepetitionReference.StickleBackColor" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>(string): The color of the skickleback forgetting curves</p>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="repetition.SpaceRepetitionReference.Title">
 <code class="descname">Title</code><em class="property"> = 'Spaced Memory Reference\n'</em><a class="headerlink" href="#repetition.SpaceRepetitionReference.Title" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>(string): The title of the reference graph</p>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="repetition.SpaceRepetitionReference.Vertical_Axis">
 <code class="descname">Vertical_Axis</code><em class="property"> = 'recommendation'</em><a class="headerlink" href="#repetition.SpaceRepetitionReference.Vertical_Axis" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>(string): The title of the vertical axis of the reference graph</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="repetition.SpaceRepetitionReference.plot_graph">

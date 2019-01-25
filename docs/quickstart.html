@@ -159,7 +159,7 @@ argument:</p>
 </pre></div>
 </div>
 <p>If you would have rather seen the schedule as a set of date-offsets from the
-starting moment of training (it’s epoch) you could use the
+starting moment of training (its epoch) you could use the
 <code class="docutils literal notranslate"><span class="pre">schedule_as_offset</span></code> api:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">print</span><span class="p">(</span><span class="s2">&quot;Schedule as offsets in days from the training epoch&quot;</span><span class="p">)</span>
 <span class="n">pp</span><span class="p">(</span><span class="n">lt</span><span class="o">.</span><span class="n">schedule_as_offset</span><span class="p">(</span><span class="n">stop</span><span class="o">=</span><span class="mi">5</span><span class="p">))</span>
@@ -243,7 +243,7 @@ the reference-plasticity curve at this intersection point.</p>
   <span class="n">lt</span><span class="o">.</span><span class="n">learned</span><span class="p">(</span><span class="n">result</span><span class="o">=</span><span class="n">r</span><span class="p">,</span> <span class="n">when</span><span class="o">=</span><span class="n">d</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Now let’s ask the learning tracker for it’s schedule up to the 30th days after
+<p>Now let’s ask the learning tracker for its schedule up to the 30th days after
 the training began:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">print</span><span class="p">(</span><span class="s2">&quot;Schedule as dates up until 30 days after the training began:&quot;</span><span class="p">)</span>
 <span class="k">print</span><span class="p">(</span><span class="n">lt</span><span class="o">.</span><span class="n">schedule</span><span class="p">(</span><span class="n">stop</span><span class="o">=</span><span class="mi">30</span><span class="p">))</span>
@@ -702,7 +702,7 @@ forgetting curves remain mostly flat, so a query made against it in the
 maintenance pulse part of its schedule, will return a value very close to one.
 A learning tracker’s in their maintenance phase won’t be given very many lottery
 tickets.</p>
-<p>So when you look at the above curve, and it’s schedule, you can think of these
+<p>So when you look at the above curve, and its schedule, you can think of these
 times as moments a geriatric memory is given a single lottery ticket, in a
 lottery that is rigged for youthful memories.</p>
 <p>What happens if a geriatric memory wins a lottery and gets into a review? Well,

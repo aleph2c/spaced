@@ -1,3 +1,12 @@
+"""graph
+
+The graph module provides the graphing features needed by the ``spaced``
+package.  It mainly acts as a wrapper for `matplotlib <https://matplotlib.org/>`_.
+
+The ``graph`` module provides a lot of features which can be read about in `the
+full spaced-package documentation <https://aleph2c.github.io/spaced/>`_.
+
+"""
 import matplotlib.pyplot as plt
 import numpy as np
 import matplotlib.dates as mdates

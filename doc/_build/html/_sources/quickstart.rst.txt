@@ -162,7 +162,7 @@ argument:
           datetime.datetime(2019, 1, 25, 2, 28, 43, 835472)]
 
 If you would have rather seen the schedule as a set of date-offsets from the
-starting moment of training (it's epoch) you could use the
+starting moment of training (its epoch) you could use the
 ``schedule_as_offset`` api:
 
 .. code-block:: python
@@ -266,7 +266,7 @@ Now suppose the student trains six more times:
   for d, r in zip(*days_and_results):
     lt.learned(result=r, when=d)
 
-Now let's ask the learning tracker for it's schedule up to the 30th days after
+Now let's ask the learning tracker for its schedule up to the 30th days after
 the training began:
 
 .. code-block:: python
@@ -816,7 +816,7 @@ maintenance pulse part of its schedule, will return a value very close to one.
 A learning tracker's in their maintenance phase won't be given very many lottery
 tickets.
 
-So when you look at the above curve, and it's schedule, you can think of these
+So when you look at the above curve, and its schedule, you can think of these
 times as moments a geriatric memory is given a single lottery ticket, in a
 lottery that is rigged for youthful memories.
 

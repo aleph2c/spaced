@@ -1,3 +1,31 @@
+"""pid
+
+The pid module provides a PID class which is an interface to a closed-loop,
+proportional-integral-derivative controller.
+
+**Example(s)**:
+  Here is how you can build and use the PID class:
+
+  .. code-block:: python
+
+    from pid import PID
+
+    controller = PID(
+      kp=0.8,
+      ki=0.1,
+      kd=0.2
+    )
+
+    # imagine the following code is inside of a loop that is
+    # contantly monitoring the thing you are trying to control
+    reference = 11
+    observed  = 9
+    current_control_point = 10
+    current_control_point -= controller.feedback(reference-observed)
+
+To read more about pid controller see `this link <https://en.wikipedia.org/wiki/PID_controller>`_.
+
+"""
 import numpy as np
 class PID(object):
 

@@ -34,6 +34,31 @@
             
   <div class="section" id="module-pid">
 <span id="pid-module"></span><h1>pid module<a class="headerlink" href="#module-pid" title="Permalink to this headline">¶</a></h1>
+<p>pid</p>
+<p>The pid module provides a PID class which is an interface to a closed-loop,
+proportional-integral-derivative controller.</p>
+<dl class="docutils">
+<dt><strong>Example(s)</strong>:</dt>
+<dd><p class="first">Here is how you can build and use the PID class:</p>
+<div class="last highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pid</span> <span class="kn">import</span> <span class="n">PID</span>
+
+<span class="n">controller</span> <span class="o">=</span> <span class="n">PID</span><span class="p">(</span>
+  <span class="n">kp</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span>
+  <span class="n">ki</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+  <span class="n">kd</span><span class="o">=</span><span class="mf">0.2</span>
+<span class="p">)</span>
+
+<span class="c1"># imagine the following code is inside of a loop that is</span>
+<span class="c1"># contantly monitoring the thing you are trying to control</span>
+<span class="n">reference</span> <span class="o">=</span> <span class="mi">11</span>
+<span class="n">observed</span>  <span class="o">=</span> <span class="mi">9</span>
+<span class="n">current_control_point</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">current_control_point</span> <span class="o">-=</span> <span class="n">controller</span><span class="o">.</span><span class="n">feedback</span><span class="p">(</span><span class="n">reference</span><span class="o">-</span><span class="n">observed</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+<p>To read more about pid controller see <a class="reference external" href="https://en.wikipedia.org/wiki/PID_controller">this link</a>.</p>
 <dl class="class">
 <dt id="pid.PID">
 <em class="property">class </em><code class="descclassname">pid.</code><code class="descname">PID</code><span class="sig-paren">(</span><em>kp</em>, <em>ki</em>, <em>kd</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#pid.PID" title="Permalink to this definition">¶</a></dt>
