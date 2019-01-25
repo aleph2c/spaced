@@ -23,7 +23,7 @@ proportional-integral-derivative controller.
     current_control_point = 10
     current_control_point -= controller.feedback(reference-observed)
 
-To read more about pid controller see `this link <https://en.wikipedia.org/wiki/PID_controller>`_.
+To read more about pid controllers see `this link <https://en.wikipedia.org/wiki/PID_controller>`_.
 
 """
 import numpy as np

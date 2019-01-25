@@ -7,12 +7,11 @@ The ``graph`` module provides a lot of features which can be read about in `the
 full spaced-package documentation <https://aleph2c.github.io/spaced/>`_.
 
 """
-import matplotlib.pyplot as plt
 import numpy as np
-import matplotlib.dates as mdates
-import matplotlib.ticker as ticker
 from datetime import datetime
 from datetime import timedelta
+import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
 
 class PlotPaneData(object):
 

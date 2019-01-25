@@ -7,9 +7,9 @@
   * [X] The schedule generation is done using a Python generator.  The range
         uses the generator to create a limited schedule which can be graphed.
   * [X] Added a context manager for plotting complicated graphs
-  * [ ] Continue dostring work, create snippets as you go and push them to
+  * [X] Continue dostring work, create snippets as you go and push them to
         github
-  * [ ] The co-routine and infinite run concept is explained well in the documentation.
+  * [X] The co-routine and infinite run concept is explained well in the documentation.
   * [ ] Added a simple interface for plotting simple graphs
   * [ ] This feature is tested extensively at the end of life of an idea.
         [muddled thinking, flush this out]
